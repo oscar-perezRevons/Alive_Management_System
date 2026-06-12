@@ -9,7 +9,7 @@ export class GroupsService {
     leaderName?: string,
     subLeaderName?: string
   ) {
-    console.log('📝 Creando grupo:', { name, description, administratorId });
+    console.log('Creando grupo:', { name, description, administratorId });
     return await prisma.groupSmall.create({
       data: {
         name,
@@ -32,7 +32,7 @@ export class GroupsService {
   }
 
   async getAllGroups() {
-    console.log('🔍 Obteniendo todos los grupos...');
+    console.log('Obteniendo todos los grupos...');
     return await prisma.groupSmall.findMany({
       include: {
         administrator: {
@@ -48,9 +48,29 @@ export class GroupsService {
     });
   }
 
+  async getLeaderboard() {
+    console.log('Generando tabla de posiciones para los mockups...');
+    return await prisma.groupSmall.findMany({
+      select: {
+        id: true,
+        name: true,
+        motto: true,
+        totalPoints: true,
+        leaderName: true,
+        _count: {
+          select: { members: true }
+        }
+      },
+      orderBy: {
+        totalPoints: 'desc'
+      }
+    });
+  }
+
   async getGroupById(id: number) {
-    console.log('🔍 Obteniendo grupo:', id);
-    return await prisma.groupSmall.findUnique({
+    console.log('Obteniendo desglose detallado para el perfil del grupo:', id);
+    
+    const group = await prisma.groupSmall.findUnique({
       where: { id },
       include: {
         administrator: {
@@ -59,14 +79,42 @@ export class GroupsService {
         members: {
           select: { id: true, name: true, email: true },
         },
-        scores: true,
-        penalties: true,
+        scores: {
+          include: {
+            user: { select: { id: true, name: true } },
+            activity: { select: { name: true } }
+          }
+        },
+        penalties: {
+          orderBy: { date: 'desc' }
+        },
       },
     });
+
+    if (!group) return null;
+
+    const membersWithContributions = group.members.map(member => {
+      const totalContributed = group.scores
+        .filter(score => score.userId === member.id)
+        .reduce((sum, score) => sum + score.points, 0);
+
+      return {
+        ...member,
+        contributedPoints: totalContributed
+      };
+    });
+
+    const totalPenaltiesPoints = group.penalties.reduce((sum, penalty) => sum + penalty.points, 0);
+
+    return {
+      ...group,
+      members: membersWithContributions,
+      netPoints: group.totalPoints + totalPenaltiesPoints,
+    };
   }
 
   async updateGroup(id: number, data: any) {
-    console.log('✏️ Actualizando grupo:', id);
+    console.log('Actualizando grupo:', id);
     return await prisma.groupSmall.update({
       where: { id },
       data,
@@ -82,14 +130,15 @@ export class GroupsService {
   }
 
   async deleteGroup(id: number) {
-    console.log('🗑️ Eliminando grupo:', id);
+    console.log('Eliminando grupo:', id);
     return await prisma.groupSmall.delete({
       where: { id },
     });
   }
 
   async addMemberToGroup(groupId: number, userId: number) {
-    console.log('➕ Agregando miembro:', { groupId, userId });
+    console.log('Agregando miembro:', { groupId, userId });
+
     const userExists = await prisma.user.findUnique({ where: { id: userId } });
     if (!userExists) {
       throw new Error('El usuario que intenta añadir al grupo no existe.');
@@ -111,7 +160,7 @@ export class GroupsService {
   }
 
   async removeGroupMember(groupId: number, userId: number) {
-    console.log('➖ Eliminando miembro:', { groupId, userId });
+    console.log('Eliminando miembro:', { groupId, userId });
     return await prisma.groupSmall.update({
       where: { id: groupId },
       data: {

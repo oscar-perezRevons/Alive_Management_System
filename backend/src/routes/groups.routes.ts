@@ -8,6 +8,8 @@ router.use(authMiddleware);
 
 router.post('/', groupsController.create);
 router.get('/', groupsController.getAll);
+router.get('/leaderboard', groupsController.getLeaderboard); 
+router.get('/:id/details', groupsController.getDetails); 
 router.get('/:id', groupsController.getById);
 router.put('/:id', groupsController.update);
 router.delete('/:id', groupsController.delete);

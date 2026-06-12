@@ -40,6 +40,35 @@ export class GroupsController {
     }
   }
 
+  async getLeaderboard(req: AuthRequest, res: Response) {
+    try {
+      const leaderboard = await groupsService.getLeaderboard();
+      return res.json(leaderboard);
+    } catch (error: any) {
+      return res.status(500).json({ error: error.message });
+    }
+  }
+
+  async getDetails(req: AuthRequest, res: Response) {
+    try {
+      const id = parseInt(req.params.id);
+
+      if (isNaN(id)) {
+        return res.status(400).json({ error: 'El ID del grupo debe ser un número válido.' });
+      }
+
+      const groupDetails = await groupsService.getGroupById(id);
+
+      if (!groupDetails) {
+        return res.status(404).json({ error: 'Grupo no encontrado.' });
+      }
+
+      return res.json(groupDetails);
+    } catch (error: any) {
+      return res.status(500).json({ error: error.message });
+    }
+  }
+
   async getById(req: AuthRequest, res: Response) {
     try {
       const id = parseInt(req.params.id);

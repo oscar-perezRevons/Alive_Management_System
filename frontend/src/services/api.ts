@@ -25,13 +25,12 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      console.log('Sesión expirada o token inválido - Forzando desautenticación reactiva');
+      console.log('Sesión expirada o token inválido - Forzando logout reactivo');
       useAuthStore.getState().logout();
     }
     return Promise.reject(error);
   }
 );
-
 
 export const authService = {
   register: (email: string, password: string, name: string) =>
@@ -51,11 +50,12 @@ export const usersService = {
 
 export const groupsService = {
   getAll: () => apiClient.get('/groups'),
+  getLeaderboard: () => apiClient.get('/groups/leaderboard'),
+  getDetails: (id: number) => apiClient.get(`/groups/${id}/details`),
   getById: (id: number) => apiClient.get(`/groups/${id}`),
   create: (name: string, description?: string, motto?: string, leaderName?: string, subLeaderName?: string) =>
     apiClient.post('/groups', { name, description, motto, leaderName, subLeaderName }),
-  update: (id: number, data: { name?: string; description?: string; motto?: string; leaderName?: string; subLeaderName?: string }) => 
-    apiClient.put(`/users/groups/${id}`, data),
+  update: (id: number, data: any) => apiClient.put(`/groups/${id}`, data),
   delete: (id: number) => apiClient.delete(`/groups/${id}`),
   addMember: (groupId: number, userId: number) =>
     apiClient.post(`/groups/${groupId}/members`, { userId }),
