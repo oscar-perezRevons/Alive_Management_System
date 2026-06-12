@@ -3,7 +3,7 @@ import prisma from '../config/database';
 export class ActivitiesService {
   async createActivity(
     name: string,
-    description: string,
+    description: string | undefined,
     points: number,
     groupSmallId: number,
     pointCategoryId: number,
@@ -19,8 +19,9 @@ export class ActivitiesService {
         createdById,
       },
       include: {
-        createdBy: { select: { name: true, email: true } },
+        createdBy: { select: { id: true, name: true, email: true } },
         pointCategory: true,
+        groupSmall: { select: { id: true, name: true } }
       },
     });
   }
@@ -28,10 +29,13 @@ export class ActivitiesService {
   async getAllActivities() {
     return await prisma.activity.findMany({
       include: {
-        createdBy: { select: { name: true, email: true } },
+        createdBy: { select: { id: true, name: true, email: true } },
         pointCategory: true,
-        groupSmall: { select: { name: true } },
+        groupSmall: { select: { id: true, name: true } },
       },
+      orderBy: {
+        date: 'desc',
+      }
     });
   }
 
@@ -39,33 +43,37 @@ export class ActivitiesService {
     return await prisma.activity.findMany({
       where: { groupSmallId: groupId },
       include: {
-        createdBy: { select: { name: true, email: true } },
+        createdBy: { select: { id: true, name: true, email: true } },
         pointCategory: true,
       },
+      orderBy: {
+        date: 'desc',
+      }
     });
   }
 
   async addScore(userId: number, activityId: number, groupId: number, points: number) {
-    // Crear registro de puntuación
-    const score = await prisma.score.create({
-      data: {
-        userId,
-        activityId,
-        groupId,
-        points,
-      },
-    });
-
-    // Actualizar puntos totales del grupo
-    await prisma.groupSmall.update({
-      where: { id: groupId },
-      data: {
-        totalPoints: {
-          increment: points,
+    return await prisma.$transaction(async (tx) => {
+      
+      const score = await tx.score.create({
+        data: {
+          userId,
+          activityId,
+          groupId,
+          points,
         },
-      },
-    });
+      });
 
-    return score;
+      await tx.groupSmall.update({
+        where: { id: groupId },
+        data: {
+          totalPoints: {
+            increment: points,
+          },
+        },
+      });
+
+      return score;
+    });
   }
 }
