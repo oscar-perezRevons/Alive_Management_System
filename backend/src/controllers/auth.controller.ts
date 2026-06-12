@@ -1,6 +1,7 @@
 import { Response } from 'express';
 import { AuthRequest } from '../types';
 import { AuthService } from '../services/auth.service';
+import prisma from '../config/database';
 
 const authService = new AuthService();
 
@@ -10,13 +11,13 @@ export class AuthController {
       const { email, password, name } = req.body;
 
       if (!email || !password || !name) {
-        return res.status(400).json({ error: 'Faltan campos requeridos' });
+        return res.status(400).json({ error: 'Faltan campos requeridos: email, password y name son obligatorios.' });
       }
 
       const result = await authService.register(email, password, name);
-      res.status(201).json(result);
+      return res.status(201).json(result);
     } catch (error: any) {
-      res.status(400).json({ error: error.message });
+      return res.status(400).json({ error: error.message });
     }
   }
 
@@ -25,22 +26,43 @@ export class AuthController {
       const { email, password } = req.body;
 
       if (!email || !password) {
-        return res.status(400).json({ error: 'Email y contraseña requeridos' });
+        return res.status(400).json({ error: 'Email y contraseña requeridos.' });
       }
 
       const result = await authService.login(email, password);
-      res.json(result);
+      return res.json(result);
     } catch (error: any) {
-      res.status(401).json({ error: error.message });
+      return res.status(401).json({ error: error.message });
     }
   }
 
   async getProfile(req: AuthRequest, res: Response) {
     try {
-      // El middleware ya validó el token
-      res.json({ userId: req.userId, role: req.userRole });
-    } catch (error) {
-      res.status(500).json({ error: 'Error al obtener perfil' });
+      if (!req.userId) {
+        return res.status(401).json({ error: 'No autorizado', message: 'No se encontró un ID de usuario válido en la petición.' });
+      }
+      const user = await prisma.user.findUnique({
+        where: { id: req.userId },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          role: true,
+          isActive: true,
+          createdAt: true,
+        }
+      });
+
+      if (!user) {
+        return res.status(404).json({ error: 'Usuario no encontrado.' });
+      }
+
+      return res.json(user);
+    } catch (error: any) {
+      console.error('Error en getProfile:', error.message);
+      return res.status(500).json({ error: 'Error interno del servidor al obtener el perfil.' });
     }
   }
 }
+
+export const authController = new AuthController();

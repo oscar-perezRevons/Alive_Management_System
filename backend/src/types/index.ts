@@ -1,24 +1,13 @@
 import { Request } from 'express';
 
-export interface AuthRequest extends Request {
-  userId?: number;
-  userRole?: string;
-  body: any;
-  params: any;
-}
-
 export interface TokenPayload {
   userId: number;
   email: string;
-  role: string;
+  role: 'ADMIN' | 'USER';
 }
 
-export interface AuthResponse {
-  token: string;
-  user: {
-    id: number;
-    email: string;
-    name: string;
-    role: string;
-  };
+export interface AuthRequest extends Request {
+  userId?: number;
+  userEmail?: string;
+  userRole?: 'ADMIN' | 'USER';
 }

@@ -6,60 +6,55 @@ export const authMiddleware = (req: AuthRequest, res: Response, next: NextFuncti
   try {
     const authHeader = req.headers.authorization;
 
-    if (!authHeader) {
-      console.log('⚠️ Sin header Authorization - Continuando como USER');
-      req.userId = 0;
-      req.userRole = 'USER';
-      return next();
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      console.log('Intento de acceso sin token o formato incorrecto.');
+      return res.status(401).json({ 
+        error: 'No autorizado', 
+        message: 'Acceso denegado. Token no proporcionado o formato inválido.' 
+      });
     }
 
     const token = authHeader.split(' ')[1];
+    const secret = process.env.JWT_SECRET;
 
-    if (!token) {
-      console.log('⚠️ Sin token - Continuando como USER');
-      req.userId = 0;
-      req.userRole = 'USER';
-      return next();
+    if (!secret) {
+      console.error('Error de configuración: JWT_SECRET no está definido en el entorno.');
+      return res.status(500).json({ error: 'Error interno del servidor' });
     }
-
-    const secret = process.env.JWT_SECRET as string;
 
     try {
       const decoded = jwt.verify(token, secret) as TokenPayload;
-      console.log('✅ Token válido - Usuario:', decoded.userId, 'Rol:', decoded.role);
+      
       req.userId = decoded.userId;
+      req.userEmail = decoded.email;
       req.userRole = decoded.role;
+      
+      console.log(`Token válido - Usuario ID: ${req.userId} | Email: ${req.userEmail} | Rol: ${req.userRole}`);
+      next();
     } catch (error) {
-      console.log('⚠️ Token inválido - Continuando como USER');
-      req.userId = 0;
-      req.userRole = 'USER';
+      console.log('⚠️ Token inválido o expirado.');
+      return res.status(401).json({ 
+        error: 'No autorizado', 
+        message: 'El token proporcionado es inválido o ha expirado.' 
+      });
     }
-
-    next();
   } catch (error: any) {
-    console.error('❌ Error:', error.message);
-    req.userId = 0;
-    req.userRole = 'USER';
-    next();
+    console.error('Error crítico en authMiddleware:', error.message);
+    return res.status(500).json({ error: 'Error interno de autenticación' });
   }
 };
 
 export const adminMiddleware = (req: AuthRequest, res: Response, next: NextFunction) => {
-  console.log('🔐 Verificando ADMIN - Rol:', req.userRole);
+  console.log(`Verificando permisos de administrador - Rol actual: ${req.userRole}`);
 
-  // Si no es ADMIN pero tiene rol USER, bloquear
-  if (req.userRole && req.userRole !== 'ADMIN' && req.userRole !== 'USER') {
-    console.log('❌ Acceso denegado');
-    return res.status(403).json({ error: 'Solo administradores' });
+  if (!req.userRole || req.userRole !== 'ADMIN') {
+    console.log(`Acceso denegado para el Usuario ID: ${req.userId}. Permisos insuficientes.`);
+    return res.status(403).json({ 
+      error: 'Acceso denegado', 
+      message: 'Esta zona requiere privilegios de Administrador.' 
+    });
   }
 
-  // ADMIN siempre pasa
-  if (req.userRole === 'ADMIN') {
-    console.log('✅ ADMIN - Acceso permitido');
-    return next();
-  }
-
-  // USER sin token también pasa (para desarrollo)
-  console.log('✅ Acceso permitido (modo desarrollo)');
+  console.log('Acceso de administrador concedido.');
   next();
 };

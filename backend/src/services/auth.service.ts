@@ -8,7 +8,7 @@ export class AuthService {
     const userExists = await prisma.user.findUnique({ where: { email } });
 
     if (userExists) {
-      throw new Error('El usuario ya existe');
+      throw new Error('El correo electrónico ya se encuentra registrado.');
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -18,7 +18,7 @@ export class AuthService {
         email,
         password: hashedPassword,
         name,
-        role: 'USER',
+        role: 'USER', 
       },
     });
 
@@ -39,13 +39,13 @@ export class AuthService {
     const user = await prisma.user.findUnique({ where: { email } });
 
     if (!user) {
-      throw new Error('Usuario o contraseña incorrectos');
+      throw new Error('Usuario o contraseña incorrectos.');
     }
 
     const passwordValid = await bcrypt.compare(password, user.password);
 
     if (!passwordValid) {
-      throw new Error('Usuario o contraseña incorrectos');
+      throw new Error('Usuario o contraseña incorrectos.');
     }
 
     const token = this.generateToken(user.id, user.email, user.role);
@@ -61,15 +61,15 @@ export class AuthService {
     };
   }
 
-  private generateToken(userId: number, email: string, role: string): string {
+  private generateToken(userId: number, email: string, role: 'ADMIN' | 'USER'): string {
     const payload: TokenPayload = { userId, email, role };
-    const secret = process.env.JWT_SECRET as string;
+    const secret = process.env.JWT_SECRET;
 
     if (!secret) {
-      throw new Error('JWT_SECRET no está configurado');
+      throw new Error('Configuración corrupta: JWT_SECRET no está configurado en las variables de entorno.');
     }
 
-    console.log('🔑 Generando token con SECRET:', secret.substring(0, 15) + '...');
+    console.log('🔑 Generando token seguro con SECRET:', secret.substring(0, 15) + '...');
 
     const options: SignOptions = {
       expiresIn: '24h', 
