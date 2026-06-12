@@ -1,0 +1,118 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==================== MODELS ====================
+
+// Modelo de Usuario
+model User {
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  password  String
+  name      String
+  role      UserRole  @default(USER)
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  groupsAdministrated GroupSmall[] @relation("GroupAdministrator")
+  groupsMember        GroupSmall[] @relation("GroupMembers")
+  activities          Activity[]
+  scores              Score[]
+
+  @@map("users")
+}
+
+model GroupSmall {
+  id            Int       @id @default(autoincrement())
+  name          String    @unique
+  description   String?
+  motto         String?
+  createdDate   DateTime  @default(now())
+  totalPoints   Int       @default(0)
+  leaderName    String?
+  subLeaderName String?
+
+  administratorId Int
+  administrator   User     @relation("GroupAdministrator", fields: [administratorId], references: [id], onDelete: Cascade)
+
+  members    User[]        @relation("GroupMembers")
+  activities Activity[]
+  scores     Score[]
+  penalties  Penalty[]
+
+  @@map("groups_small")
+}
+
+model PointCategory {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  description String?
+  icon        String?
+  color       String?   @default("#0066FF")
+
+  activities Activity[]
+
+  @@map("point_categories")
+}
+
+model Activity {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String?
+  points      Int
+  date        DateTime  @default(now())
+  observation String?
+
+  createdById Int
+  createdBy   User      @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
+  groupSmallId Int
+  groupSmall   GroupSmall @relation(fields: [groupSmallId], references: [id], onDelete: Cascade)
+
+  pointCategoryId Int
+  pointCategory   PointCategory @relation(fields: [pointCategoryId], references: [id])
+
+  scores Score[]
+
+  @@map("activities")
+}
+
+model Score {
+  id       Int      @id @default(autoincrement())
+  points   Int
+  date     DateTime @default(now())
+
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  groupId   Int
+  group     GroupSmall @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  activityId Int
+  activity   Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+
+  @@map("scores")
+}
+
+model Penalty {
+  id       Int      @id @default(autoincrement())
+  reason   String
+  points   Int      @default(-20)
+  date     DateTime @default(now())
+
+  groupId   Int
+  group     GroupSmall @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@map("penalties")
+}
+
+enum UserRole {
+  ADMIN
+  USER
+}
