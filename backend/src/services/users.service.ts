@@ -12,6 +12,9 @@ export class UsersService {
         isActive: true,
         createdAt: true,
       },
+      orderBy: {
+        id: 'asc'
+      }
     });
   }
 
@@ -33,6 +36,11 @@ export class UsersService {
     id: number,
     data: { name?: string; role?: UserRole; isActive?: boolean }
   ) {
+    const userExists = await prisma.user.findUnique({ where: { id } });
+    if (!userExists) {
+      throw new Error('El usuario que intenta actualizar no existe.');
+    }
+
     return await prisma.user.update({
       where: { id },
       data,
@@ -42,11 +50,17 @@ export class UsersService {
         name: true,
         role: true,
         isActive: true,
+        createdAt: true,
       },
     });
   }
 
   async deleteUser(id: number) {
+    const userExists = await prisma.user.findUnique({ where: { id } });
+    if (!userExists) {
+      throw new Error('El usuario que intenta eliminar no existe.');
+    }
+
     return await prisma.user.delete({
       where: { id },
     });
