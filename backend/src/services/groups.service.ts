@@ -1,12 +1,22 @@
 import prisma from '../config/database';
 
 export class GroupsService {
-  async createGroup(name: string, description: string, administratorId: number) {
+  async createGroup(
+    name: string, 
+    description: string | undefined, 
+    administratorId: number,
+    motto?: string,
+    leaderName?: string,
+    subLeaderName?: string
+  ) {
     console.log('📝 Creando grupo:', { name, description, administratorId });
     return await prisma.groupSmall.create({
       data: {
         name,
         description,
+        motto,
+        leaderName,
+        subLeaderName,
         administratorId,
         totalPoints: 0,
       },
@@ -23,7 +33,7 @@ export class GroupsService {
 
   async getAllGroups() {
     console.log('🔍 Obteniendo todos los grupos...');
-    const groups = await prisma.groupSmall.findMany({
+    return await prisma.groupSmall.findMany({
       include: {
         administrator: {
           select: { id: true, name: true, email: true },
@@ -32,9 +42,10 @@ export class GroupsService {
           select: { id: true, name: true, email: true },
         },
       },
+      orderBy: {
+        id: 'asc'
+      }
     });
-    console.log('✅ Grupos encontrados:', groups.length);
-    return groups;
   }
 
   async getGroupById(id: number) {
@@ -63,6 +74,9 @@ export class GroupsService {
         administrator: {
           select: { id: true, name: true, email: true },
         },
+        members: {
+          select: { id: true, name: true, email: true },
+        },
       },
     });
   }
@@ -76,6 +90,11 @@ export class GroupsService {
 
   async addMemberToGroup(groupId: number, userId: number) {
     console.log('➕ Agregando miembro:', { groupId, userId });
+    const userExists = await prisma.user.findUnique({ where: { id: userId } });
+    if (!userExists) {
+      throw new Error('El usuario que intenta añadir al grupo no existe.');
+    }
+
     return await prisma.groupSmall.update({
       where: { id: groupId },
       data: {
