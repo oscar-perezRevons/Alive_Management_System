@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAuthStore } from '../stores/authStore';
-import { groupsService, usersService } from '../services/api';
-import { Trophy, Users, Activity } from 'lucide-react';
+import { groupsService, usersService, activitiesService } from '../services/api';
+import { Trophy, Users, Calendar } from 'lucide-react';
 
 export const DashboardPage: React.FC = () => {
   const user = useAuthStore((state) => state.user);
@@ -13,71 +13,100 @@ export const DashboardPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadStats = async () => {
+    const loadDashboardStats = async () => {
       try {
-        const [groupsRes, usersRes] = await Promise.all([
-          groupsService.getAll(),
-          usersService.getAll(),
-        ]);
+        if (user?.role === 'ADMIN') {
+          const [groupsRes, usersRes, activitiesRes] = await Promise.all([
+            groupsService.getAll(),
+            usersService.getAll(),
+            activitiesService.getAll(),
+          ]);
 
-        setStats({
-          totalGroups: groupsRes.data.length,
-          totalUsers: usersRes.data.length,
-          totalActivities: 0,
-        });
+          setStats({
+            totalGroups: groupsRes.data.length,
+            totalUsers: usersRes.data.length,
+            totalActivities: activitiesRes.data.length,
+          });
+        } else {
+          const [groupsRes, activitiesRes] = await Promise.all([
+            groupsService.getAll(),
+            activitiesService.getAll(),
+          ]);
+
+          setStats({
+            totalGroups: groupsRes.data.length,
+            totalUsers: 0,
+            totalActivities: activitiesRes.data.length,
+          });
+        }
       } catch (error) {
-        console.error('Error loading stats:', error);
+        console.error('Error capturado al cargar métricas del Dashboard:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    loadStats();
-  }, []);
+    loadDashboardStats();
+  }, [user?.role]);
 
   if (loading) {
-    return <div className="text-center py-8">Cargando...</div>;
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+        <span className="ml-3 text-sm font-medium text-gray-500">Cargando métricas del sistema...</span>
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold text-gray-800">
-          Bienvenido, {user?.name}
-        </h1>
-        <p className="text-gray-600 mt-2">
-          Sistema de Gestión ALIVE Maranata Adoración
-        </p>
+    <div className="space-y-6 font-sans">
+      <div className="bg-white p-6 rounded-2xl border border-gray-200/80 shadow-sm flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-black text-gray-800 tracking-tight">
+            ¡Hola de nuevo, {user?.name}!
+          </h1>
+          <p className="text-sm text-gray-500 mt-1">
+            Panel de control general de ALIVE Maranata Adoración
+          </p>
+        </div>
+        <div className="hidden sm:block text-right">
+          <span className="text-xs font-mono font-bold bg-gray-100 text-gray-500 px-3 py-1 rounded-full uppercase tracking-wider">
+            Sesión activa como: {user?.role}
+          </span>
+        </div>
       </div>
 
-      {user?.role === 'ADMIN' && (
-        <div className="grid grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+        <StatCard
+          title="Grupos Pequeños"
+          value={stats.totalGroups}
+          icon={<Trophy className="w-6 h-6 text-indigo-600" />}
+          bgColor="bg-indigo-50"
+        />
+        
+        {user?.role === 'ADMIN' && (
           <StatCard
-            title="Grupos Pequeños"
-            value={stats.totalGroups}
-            icon={<Trophy className="text-blue-500" />}
-            color="blue"
-          />
-          <StatCard
-            title="Usuarios"
+            title="Usuarios Registrados"
             value={stats.totalUsers}
-            icon={<Users className="text-green-500" />}
-            color="green"
+            icon={<Users className="w-6 h-6 text-emerald-600" />}
+            bgColor="bg-emerald-50"
           />
-          <StatCard
-            title="Actividades"
-            value={stats.totalActivities}
-            icon={<Activity className="text-purple-500" />}
-            color="purple"
-          />
-        </div>
-      )}
+        )}
+        
+        <StatCard
+          title="Actividades Creadas"
+          value={stats.totalActivities}
+          icon={<Calendar className="w-6 h-6 text-amber-600" />}
+          bgColor="bg-amber-50"
+        />
+      </div>
 
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-xl font-bold mb-4">Información del Sistema</h2>
-        <p className="text-gray-600">
-          Bienvenido al sistema de gestión de puntuaciones y actividades para
-          grupos pequeños de ALIVE Maranata Adoración.
+      <div className="bg-white rounded-2xl border border-gray-200/80 shadow-sm p-6">
+        <h2 className="text-lg font-bold text-gray-800 mb-2">Información de la Plataforma</h2>
+        <p className="text-sm text-gray-600 leading-relaxed">
+          Bienvenido al núcleo de control y visualización para grupos pequeños de ALIVE Maranata Adoración. 
+          A través de este panel interactivo podrás supervisar el avance de las puntuaciones acumuladas, el calendario de 
+          actividades vigentes y las métricas integradas de rendimiento comunitario de manera centralizada.
         </p>
       </div>
     </div>
@@ -88,18 +117,18 @@ interface StatCardProps {
   title: string;
   value: number;
   icon: React.ReactNode;
-  color: string;
+  bgColor: string;
 }
 
-const StatCard: React.FC<StatCardProps> = ({ title, value, icon, color }) => {
+const StatCard: React.FC<StatCardProps> = ({ title, value, icon, bgColor }) => {
   return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-gray-600 text-sm">{title}</p>
-          <p className="text-3xl font-bold mt-2">{value}</p>
-        </div>
-        <div className="text-4xl">{icon}</div>
+    <div className="bg-white rounded-2xl border border-gray-200/80 shadow-sm p-5 flex items-center justify-between transition-all duration-200 hover:shadow-md">
+      <div className="space-y-1">
+        <p className="text-xs font-bold uppercase tracking-wider text-gray-400">{title}</p>
+        <p className="text-3xl font-black text-gray-800 tracking-tight">{value}</p>
+      </div>
+      <div className={`p-4 ${bgColor} rounded-xl shadow-inner flex items-center justify-center`}>
+        {icon}
       </div>
     </div>
   );

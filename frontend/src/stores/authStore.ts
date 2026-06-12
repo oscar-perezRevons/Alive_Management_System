@@ -10,13 +10,13 @@ interface AuthStore {
   loadFromStorage: () => void;
 }
 
-export const useAuthStore = create<AuthStore>((set, get) => ({
+export const useAuthStore = create<AuthStore>((set) => ({
   token: null,
   user: null,
   isAuthenticated: false,
 
   setAuth: (token: string, user: User) => {
-    console.log('💾 Guardando sesión:', {
+    console.log('Guardando sesión activa:', {
       token: token.substring(0, 20) + '...',
       user: user.email,
       role: user.role,
@@ -27,7 +27,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   },
 
   logout: () => {
-    console.log('🚪 Cerrando sesión');
+    console.log('Cerrando sesión y limpiando almacenamiento...');
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     set({ token: null, user: null, isAuthenticated: false });
@@ -40,17 +40,17 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
       if (token && userStr) {
         const user = JSON.parse(userStr);
-        console.log('📂 Sesión cargada desde storage:', {
+        console.log('Sesión restaurada desde almacenamiento:', {
           token: token.substring(0, 20) + '...',
           user: user.email,
           role: user.role,
         });
         set({ token, user, isAuthenticated: true });
       } else {
-        console.log('❌ No hay sesión guardada');
+        console.log('No se encontró ninguna sesión previa guardada');
       }
     } catch (error) {
-      console.error('❌ Error cargando sesión:', error);
+      console.error('Error crítico al cargar sesión desde storage:', error);
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       set({ token: null, user: null, isAuthenticated: false });

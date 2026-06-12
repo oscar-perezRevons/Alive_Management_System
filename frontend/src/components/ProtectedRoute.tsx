@@ -13,22 +13,23 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 }) => {
   const { isAuthenticated, user } = useAuthStore();
 
-  console.log('🔐 ProtectedRoute - isAuthenticated:', isAuthenticated);
-  console.log('🔐 ProtectedRoute - user:', user);
-  console.log('🔐 ProtectedRoute - requiredRole:', requiredRole);
+  console.log('[ProtectedRoute] Evaluando acceso:', {
+    isAuthenticated,
+    userEmail: user?.email,
+    userRole: user?.role,
+    requiredRole
+  });
 
-  // Si no está autenticado
   if (!isAuthenticated || !user) {
-    console.log('❌ No autenticado - redirigiendo a login');
+    console.log('Acceso denegado: Usuario no autenticado. Redirigiendo a /login');
     return <Navigate to="/login" replace />;
   }
 
-  // Si requiere rol específico y no lo tiene
-  if (requiredRole && user.role !== requiredRole) {
-    console.log('❌ Rol insuficiente:', user.role, 'requerido:', requiredRole);
+  if (requiredRole === 'ADMIN' && user.role !== 'ADMIN') {
+    console.log(`Privilegios insuficientes: Se requiere ADMIN pero el usuario es ${user.role}. Redirigiendo a /unauthorized`);
     return <Navigate to="/unauthorized" replace />;
   }
 
-  console.log('✅ Acceso permitido');
+  console.log(`Acceso concedido de forma segura para el rol: ${user.role}`);
   return <>{children}</>;
 };
