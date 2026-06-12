@@ -113,6 +113,96 @@ export class GroupsService {
     };
   }
 
+  async getGroupProgress(userId: number) {
+    console.log(`Calculando progreso real por áreas para el usuario ID: ${userId}`);
+
+    const group = await prisma.groupSmall.findFirst({
+      where: {
+        members: {
+          some: { id: userId }
+        }
+      },
+      include: {
+        _count: { select: { members: true } },
+        scores: {
+          take: 5,
+          orderBy: { date: 'desc' },
+          include: {
+            activity: {
+              include: { pointCategory: true }
+            }
+          }
+        }
+      }
+    });
+
+    if (!group) return null;
+
+    const assistanceSum = await prisma.score.aggregate({
+      where: { groupId: group.id, activity: { pointCategory: { name: 'ASISTENCIA' } } },
+      _sum: { points: true }
+    });
+
+    const evangelismSum = await prisma.score.aggregate({
+      where: { groupId: group.id, activity: { pointCategory: { name: 'EVANGELISMO' } } },
+      _sum: { points: true }
+    });
+
+    const bibleSum = await prisma.score.aggregate({
+      where: { groupId: group.id, activity: { pointCategory: { name: 'ESTUDIO_BIBLICO' } } },
+      _sum: { points: true }
+    });
+
+    const recreationSum = await prisma.score.aggregate({
+      where: { groupId: group.id, activity: { pointCategory: { name: 'ACTIVIDADES_RECREATIVAS' } } },
+      _sum: { points: true }
+    });
+
+    const sportsSum = await prisma.score.aggregate({
+      where: { groupId: group.id, activity: { pointCategory: { name: 'DEPORTES' } } },
+      _sum: { points: true }
+    });
+
+    const higherGroupsCount = await prisma.groupSmall.count({
+      where: { totalPoints: { gt: group.totalPoints } }
+    });
+
+    let level = 'Nivel 1';
+    let levelDescription = 'Iniciando';
+    if (group.totalPoints >= 1500) {
+      level = 'Nivel 4';
+      levelDescription = 'Sobresaliente';
+    } else if (group.totalPoints >= 1000) {
+      level = 'Nivel 3';
+      levelDescription = 'Fiel y Constante';
+    } else if (group.totalPoints >= 500) {
+      level = 'Nivel 2';
+      levelDescription = 'En Crecimiento';
+    }
+
+    return {
+      groupName: group.name,
+      totalPoints: group.totalPoints,
+      position: higherGroupsCount + 1,
+      level,
+      levelDescription,
+      membersCount: group._count.members,
+      areas: {
+        asistencia: assistanceSum._sum.points || 0,
+        evangelismo: evangelismSum._sum.points || 0,
+        estudioBiblico: bibleSum._sum.points || 0,
+        recreacion: recreationSum._sum.points || 0,
+        deportes: sportsSum._sum.points || 0,
+      },
+      history: group.scores.map(s => ({
+        id: s.id,
+        activity: s.activity.name,
+        points: s.points,
+        date: s.date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })
+      }))
+    };
+  }
+
   async updateGroup(id: number, data: any) {
     console.log('Actualizando grupo:', id);
     return await prisma.groupSmall.update({

@@ -49,6 +49,24 @@ export class GroupsController {
     }
   }
 
+  async getMyProgress(req: AuthRequest, res: Response) {
+    try {
+      if (!req.userId) {
+        return res.status(401).json({ error: 'No autorizado. Token inválido o ausente.' });
+      }
+
+      const progress = await groupsService.getGroupProgress(req.userId);
+      
+      if (!progress) {
+        return res.status(404).json({ error: 'El perfil actual de tu cuenta no está asociado como miembro de ningún Grupo Pequeño en este periodo.' });
+      }
+
+      return res.json(progress);
+    } catch (error: any) {
+      return res.status(500).json({ error: error.message });
+    }
+  }
+
   async getDetails(req: AuthRequest, res: Response) {
     try {
       const id = parseInt(req.params.id);

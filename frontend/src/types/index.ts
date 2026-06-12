@@ -56,3 +56,36 @@ export interface AuthResponse {
   token: string;
   user: User;
 }
+
+export interface LeaderboardGroup {
+  id: number;
+  name: string;
+  motto?: string;
+  leaderName?: string;
+  totalPoints: number;
+  variation: number;    
+  level: string;         
+  stars: number;         
+  membersCount: number;
+}
+
+export interface ProgressStats {
+  accumulatedPoints: number;
+  pointsThisMonth: number;
+  currentPosition: number;
+  currentLevel: string;
+  levelDescription: string;
+  pointsByArea: {
+    asistencia: number;
+    evangelismo: number;
+    estudioBiblico: number;
+    recreacion: number;
+    deportes: number;
+  };
+  recentHistory: {
+    id: number;
+    activity: string;
+    points: number;
+    date: string;
+  }[];
+}

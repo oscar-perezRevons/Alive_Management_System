@@ -7,9 +7,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ==================== MODELS ====================
-
-// Modelo de Usuario
 model User {
   id        Int       @id @default(autoincrement())
   email     String    @unique
@@ -29,24 +26,20 @@ model User {
 }
 
 model GroupSmall {
-  id            Int       @id @default(autoincrement())
-  name          String    @unique
-  description   String?
-  motto         String?
-  createdDate   DateTime  @default(now())
-  totalPoints   Int       @default(0)
-  leaderName    String?
-  subLeaderName String?
-
+  id              Int        @id @default(autoincrement())
+  name            String     @unique
+  description     String?
+  motto           String?    
+  leaderName      String?    
+  subLeaderName   String?    
+  totalPoints     Int        @default(0)
+  variation       Int        @default(0)  
   administratorId Int
-  administrator   User     @relation("GroupAdministrator", fields: [administratorId], references: [id], onDelete: Cascade)
-
-  members    User[]        @relation("GroupMembers")
-  activities Activity[]
-  scores     Score[]
-  penalties  Penalty[]
-
-  @@map("groups_small")
+  administrator   User       @relation("GroupAdministrator", fields: [administratorId], references: [id], onDelete: Cascade)
+  members         User[]     @relation("GroupMembers")
+  scores          Score[]
+  penalties       Penalty[] 
+  createdAt       DateTime   @default(now())
 }
 
 model PointCategory {
@@ -101,15 +94,12 @@ model Score {
 }
 
 model Penalty {
-  id       Int      @id @default(autoincrement())
-  reason   String
-  points   Int      @default(-20)
-  date     DateTime @default(now())
-
-  groupId   Int
-  group     GroupSmall @relation(fields: [groupId], references: [id], onDelete: Cascade)
-
-  @@map("penalties")
+  id           Int        @id @default(autoincrement())
+  reason       String
+  points       Int        
+  groupSmallId Int
+  groupSmall   GroupSmall @relation(fields: [groupSmallId], references: [id], onDelete: Cascade)
+  date         DateTime   @default(now())
 }
 
 enum UserRole {

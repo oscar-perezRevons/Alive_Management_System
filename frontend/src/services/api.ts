@@ -51,7 +51,7 @@ export const usersService = {
 export const groupsService = {
   getAll: () => apiClient.get('/groups'),
   getLeaderboard: () => apiClient.get('/groups/leaderboard'),
-  getDetails: (id: number) => apiClient.get(`/groups/${id}/details`),
+  getMyProgress: () => apiClient.get('/groups/my-progress'), 
   getById: (id: number) => apiClient.get(`/groups/${id}`),
   create: (name: string, description?: string, motto?: string, leaderName?: string, subLeaderName?: string) =>
     apiClient.post('/groups', { name, description, motto, leaderName, subLeaderName }),
