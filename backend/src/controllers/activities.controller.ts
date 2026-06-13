@@ -1,33 +1,21 @@
 import { Response } from 'express';
 import { AuthRequest } from '../types';
-import { ActivitiesService } from '../services/activities.service';
-import prisma from '../config/database';
-
-const activitiesService = new ActivitiesService();
+import { activitiesService } from '../services/activities.service';
 
 export class ActivitiesController {
   async create(req: AuthRequest, res: Response) {
     try {
       const { name, description, points, groupSmallId, pointCategoryId } = req.body;
 
-      if (!name || points === undefined || !groupSmallId || !pointCategoryId) {
-        return res.status(400).json({ error: 'Faltan campos requeridos: name, points, groupSmallId y pointCategoryId son obligatorios.' });
+      if (!name || !points || !groupSmallId || !pointCategoryId) {
+        return res.status(400).json({ 
+          error: 'Campos obligatorios ausentes.', 
+          message: 'Se requiere name, points, groupSmallId y pointCategoryId.' 
+        });
       }
 
       if (!req.userId) {
-        return res.status(401).json({ error: 'No autorizado', message: 'Identificación de usuario ausente.' });
-      }
-
-      const group = await prisma.groupSmall.findUnique({ where: { id: Number(groupSmallId) } });
-      if (!group) {
-        return res.status(404).json({ error: 'El grupo especificado no existe.' });
-      }
-
-      if (req.userRole !== 'ADMIN' && group.administratorId !== req.userId) {
-        return res.status(403).json({ 
-          error: 'Acceso denegado', 
-          message: 'Solo el administrador asignado a este grupo o un ADMIN global pueden crearle actividades.' 
-        });
+        return res.status(401).json({ error: 'No autorizado. Sesión inválida.' });
       }
 
       const activity = await activitiesService.createActivity(
@@ -59,7 +47,7 @@ export class ActivitiesController {
       const groupId = parseInt(req.params.groupId);
 
       if (isNaN(groupId)) {
-        return res.status(400).json({ error: 'El parámetro groupId debe ser un número válido.' });
+        return res.status(400).json({ error: 'El ID del grupo debe ser un número válido.' });
       }
 
       const activities = await activitiesService.getActivitiesByGroup(groupId);
@@ -74,40 +62,26 @@ export class ActivitiesController {
       const { userId, activityId, groupId, points } = req.body;
 
       if (!userId || !activityId || !groupId || points === undefined) {
-        return res.status(400).json({ error: 'Faltan campos requeridos: userId, activityId, groupId y points son mandatorios.' });
-      }
-
-      if (!req.userId) {
-        return res.status(401).json({ error: 'No autorizado', message: 'Identificación de usuario ausente.' });
-      }
-
-      const group = await prisma.groupSmall.findUnique({ where: { id: Number(groupId) } });
-      if (!group) {
-        return res.status(404).json({ error: 'El grupo especificado no existe.' });
-      }
-
-      if (req.userRole !== 'ADMIN' && group.administratorId !== req.userId) {
-        return res.status(403).json({ 
-          error: 'Acceso denegado', 
-          message: 'No posees permisos para asignar puntajes en este grupo.' 
+        return res.status(400).json({ 
+          error: 'Campos inválidos', 
+          message: 'Se requiere userId, activityId, groupId y points de forma obligatoria.' 
         });
       }
 
-      const userExists = await prisma.user.findUnique({ where: { id: Number(userId) } });
-      if (!userExists) {
-        return res.status(404).json({ error: 'El usuario al que intentas asignar puntos no existe.' });
-      }
-
-      const score = await activitiesService.addScore(
-        Number(userId), 
-        Number(activityId), 
-        Number(groupId), 
+      const score = await activitiesService.addScoreToUser(
+        Number(userId),
+        Number(activityId),
+        Number(groupId),
         Number(points)
       );
 
-      return res.status(201).json(score);
+      return res.status(201).json({
+        message: '¡Puntaje asignado y registro del GP actualizado con éxito transaccional!',
+        data: score
+      });
     } catch (error: any) {
-      return res.status(400).json({ error: error.message });
+      console.error('Error en controlador al asignar score:', error);
+      return res.status(400).json({ error: error.message || 'Error al procesar la transacción de puntos.' });
     }
   }
 }

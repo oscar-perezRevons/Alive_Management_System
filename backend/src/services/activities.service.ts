@@ -9,6 +9,7 @@ export class ActivitiesService {
     pointCategoryId: number,
     createdById: number
   ) {
+    console.log('Registrando actividad en base de datos:', { name, points, groupSmallId });
     return await prisma.activity.create({
       data: {
         name,
@@ -19,48 +20,61 @@ export class ActivitiesService {
         createdById,
       },
       include: {
-        createdBy: { select: { id: true, name: true, email: true } },
         pointCategory: true,
-        groupSmall: { select: { id: true, name: true } }
+        createdBy: {
+          select: { id: true, name: true, email: true },
+        },
       },
     });
   }
 
   async getAllActivities() {
+    console.log('Listando historial general de actividades...');
     return await prisma.activity.findMany({
       include: {
-        createdBy: { select: { id: true, name: true, email: true } },
         pointCategory: true,
-        groupSmall: { select: { id: true, name: true } },
+        createdBy: {
+          select: { id: true, name: true, email: true },
+        },
       },
       orderBy: {
         date: 'desc',
-      }
+      },
     });
   }
 
-  async getActivitiesByGroup(groupId: number) {
+  async getActivitiesByGroup(groupSmallId: number) {
+    console.log(`Buscando actividades asociadas al GP ID: ${groupSmallId}`);
     return await prisma.activity.findMany({
-      where: { groupSmallId: groupId },
+      where: {
+        groupSmallId,
+      },
       include: {
-        createdBy: { select: { id: true, name: true, email: true } },
         pointCategory: true,
+        createdBy: {
+          select: { id: true, name: true, email: true },
+        },
       },
       orderBy: {
         date: 'desc',
-      }
+      },
     });
   }
 
-  async addScore(userId: number, activityId: number, groupId: number, points: number) {
+  async addScoreToUser(userId: number, activityId: number, groupId: number, points: number) {
+    console.log('Ejecutando transacción ACID para asignación de puntos:', { userId, activityId, points });
+    
     return await prisma.$transaction(async (tx) => {
-      
       const score = await tx.score.create({
         data: {
           userId,
           activityId,
           groupId,
           points,
+        },
+        include: {
+          user: { select: { id: true, name: true, email: true } },
+          activity: { select: { id: true, name: true } },
         },
       });
 
@@ -77,3 +91,5 @@ export class ActivitiesService {
     });
   }
 }
+
+export const activitiesService = new ActivitiesService();

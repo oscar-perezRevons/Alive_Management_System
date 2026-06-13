@@ -8,101 +8,83 @@ datasource db {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
-  email     String    @unique
-  password  String
-  name      String
-  role      UserRole  @default(USER)
-  isActive  Boolean   @default(true)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-
-  groupsAdministrated GroupSmall[] @relation("GroupAdministrator")
-  groupsMember        GroupSmall[] @relation("GroupMembers")
-  activities          Activity[]
-  scores              Score[]
-
-  @@map("users")
+  id                 Int          @id @default(autoincrement())
+  email              String       @unique
+  password           String
+  name               String
+  role               UserRole     @default(USER) 
+  groupRole          String       @default("MIEMBRO") 
+  birthDate          DateTime?    
+  isActive           Boolean      @default(true)
+  createdAt          DateTime     @default(now())
+  administeredGroups GroupSmall[] @relation("GroupAdministrator")
+  groups             GroupSmall[] @relation("GroupMembers")
+  scores             Score[]
+  createdActivities  Activity[]   @relation("UserCreatedActivities")
 }
 
 model GroupSmall {
   id              Int        @id @default(autoincrement())
   name            String     @unique
   description     String?
-  motto           String?    
+  motto           String?   
+  bibleVerse      String?    
+  anthemUrl       String?    
   leaderName      String?    
   subLeaderName   String?    
   totalPoints     Int        @default(0)
-  variation       Int        @default(0)  
+  variation       Int        @default(0)
   administratorId Int
   administrator   User       @relation("GroupAdministrator", fields: [administratorId], references: [id], onDelete: Cascade)
   members         User[]     @relation("GroupMembers")
   scores          Score[]
-  penalties       Penalty[] 
+  penalties       Penalty[]
   createdAt       DateTime   @default(now())
-}
-
-model PointCategory {
-  id          Int       @id @default(autoincrement())
-  name        String    @unique
-  description String?
-  icon        String?
-  color       String?   @default("#0066FF")
-
-  activities Activity[]
-
-  @@map("point_categories")
-}
-
-model Activity {
-  id          Int       @id @default(autoincrement())
-  name        String
-  description String?
-  points      Int
-  date        DateTime  @default(now())
-  observation String?
-
-  createdById Int
-  createdBy   User      @relation(fields: [createdById], references: [id], onDelete: Cascade)
-
-  groupSmallId Int
-  groupSmall   GroupSmall @relation(fields: [groupSmallId], references: [id], onDelete: Cascade)
-
-  pointCategoryId Int
-  pointCategory   PointCategory @relation(fields: [pointCategoryId], references: [id])
-
-  scores Score[]
-
-  @@map("activities")
-}
-
-model Score {
-  id       Int      @id @default(autoincrement())
-  points   Int
-  date     DateTime @default(now())
-
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  groupId   Int
-  group     GroupSmall @relation(fields: [groupId], references: [id], onDelete: Cascade)
-
-  activityId Int
-  activity   Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
-
-  @@map("scores")
-}
-
-model Penalty {
-  id           Int        @id @default(autoincrement())
-  reason       String
-  points       Int        
-  groupSmallId Int
-  groupSmall   GroupSmall @relation(fields: [groupSmallId], references: [id], onDelete: Cascade)
-  date         DateTime   @default(now())
 }
 
 enum UserRole {
   ADMIN
   USER
+}
+
+model Score {
+  id         Int        @id @default(autoincrement())
+  userId     Int
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  activityId Int
+  activity   Activity   @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  groupId    Int
+  groupSmall GroupSmall @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  points     Int
+  date       DateTime   @default(now())
+}
+
+model Activity {
+  id              Int           @id @default(autoincrement())
+  name            String
+  description     String?
+  points          Int
+  date            DateTime      @default(now())
+  createdById     Int
+  createdBy       User          @relation("UserCreatedActivities", fields: [createdById], references: [id], onDelete: Cascade)
+  groupSmallId    Int
+  pointCategoryId Int
+  pointCategory   PointCategory @relation(fields: [pointCategoryId], references: [id], onDelete: Cascade)
+  scores          Score[]
+}
+
+model PointCategory {
+  id          Int        @id @default(autoincrement())
+  name        String     @unique
+  description String?
+  activities  Activity[]
+}
+
+model Penalty {
+  id           Int        @id @default(autoincrement())
+  reason       String
+  points       Int
+  groupSmallId Int
+  groupSmall   GroupSmall @relation(fields: [groupSmallId], references: [id], onDelete: Cascade)
+  date         DateTime   @default(now())
 }
