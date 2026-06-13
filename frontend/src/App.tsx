@@ -7,9 +7,11 @@ import { DashboardPage } from './pages/DashboardPage';
 import { UsersPage } from './pages/UsersPage';
 import { GroupsPage } from './pages/GroupsPage';
 import { ActivitiesPage } from './pages/ActivitiesPage';
+import { SecretariaPage } from './pages/SecretariaPage'; 
 import { UnauthorizedPage } from './pages/UnauthorizedPage';
 import { DashboardLayout } from './layouts/DashboardLayout';
 import { ProtectedRoute } from './components/ProtectedRoute'; 
+import { MediaConfigPage } from './pages/MediaConfigPage';
 
 function App() {
   const { loadFromStorage } = useAuthStore();
@@ -24,7 +26,6 @@ function App() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
-
         <Route
           path="/dashboard"
           element={
@@ -35,13 +36,23 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/dashboard/users"
           element={
             <ProtectedRoute requiredRole="ADMIN">
               <DashboardLayout>
                 <UsersPage />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/dashboard/diseno"
+          element={
+            <ProtectedRoute requiredRole="ADMIN">
+              <DashboardLayout>
+                <MediaConfigPage />
               </DashboardLayout>
             </ProtectedRoute>
           }
@@ -57,7 +68,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/dashboard/activities"
           element={
@@ -68,7 +78,17 @@ function App() {
             </ProtectedRoute>
           }
         />
-
+        <Route
+          path="/dashboard/secretaria"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <SecretariaPage />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { useAuthStore } from '../stores/authStore';
+import { DashboardHomeData } from '../types';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
@@ -32,6 +33,20 @@ apiClient.interceptors.response.use(
   }
 );
 
+export const configService = {
+  getBrandAssets: () => apiClient.get('/config/brand-assets'),
+  uploadBrandAssets: (formData: FormData) => 
+    apiClient.post('/config/upload-brand', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }),
+};
+
+export const dashboardService = {
+  getHomeData: () => apiClient.get<DashboardHomeData>('/dashboard/home'),
+};
+
 export const authService = {
   register: (email: string, password: string, name: string) =>
     apiClient.post('/auth/register', { email, password, name }),
@@ -51,8 +66,8 @@ export const usersService = {
 export const groupsService = {
   getAll: () => apiClient.get('/groups'),
   getLeaderboard: () => apiClient.get('/groups/leaderboard'),
-  getMyProgress: () => apiClient.get('/groups/my-progress'), 
-  getById: (id: number) => apiClient.get(`/groups/${id}`),
+  getMyProgress: () => apiClient.get('/groups/my-progress'),
+  getById: (id: number) => apiClient.get(`/groups/${id}`), 
   create: (name: string, description?: string, motto?: string, leaderName?: string, subLeaderName?: string) =>
     apiClient.post('/groups', { name, description, motto, leaderName, subLeaderName }),
   update: (id: number, data: any) => apiClient.put(`/groups/${id}`, data),

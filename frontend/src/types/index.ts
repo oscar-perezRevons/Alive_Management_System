@@ -89,3 +89,60 @@ export interface ProgressStats {
     date: string;
   }[];
 }
+
+export interface GroupMemberDetailed {
+  id: number;
+  name: string;
+  email: string;
+  groupRole: string;   
+  birthDate: string;      
+  contributedPoints: number; 
+}
+
+export interface GroupDetailsResponse {
+  id: number;
+  name: string;
+  description: string | null;
+  motto: string | null;
+  bibleVerse: string;
+  anthemUrl: string;
+  totalPoints: number;
+  netPoints: number;
+  leaderName: string | null;
+  subLeaderName: string | null;
+  administrator: { id: number; name: string; email: string };
+  members: GroupMemberDetailed[];
+  penalties: any[];
+}
+
+export interface OfficialAnnouncement {
+  id: number;
+  title: string;
+  content: string;
+  timeAgo: string; 
+  type: 'INFO' | 'WARNING' | 'ALERT';
+}
+
+export interface UpcomingActivity {
+  id: number;
+  day: string;
+  month: string;
+  title: string;
+  time: string;
+  location: string;
+  iconType: 'PROGRAMA' | 'FUTBOL' | 'ALABANZA' | 'GENERAL';
+}
+
+export interface FeaturedGroup {
+  name: string;
+  reason: string;
+  totalPoints: number;
+}
+
+export interface DashboardHomeData {
+  announcements: OfficialAnnouncement[];
+  activities: UpcomingActivity[];
+  featuredGroup: FeaturedGroup | null;
+  totalGroupsCount: number;
+  totalPointsAccumulated: number;
+}

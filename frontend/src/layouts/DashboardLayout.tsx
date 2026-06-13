@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
-import { Menu, LogOut, Home, Users, Trophy, Calendar } from 'lucide-react';
+import { Menu, LogOut, Home, Users, Trophy, Calendar, BookOpen } from 'lucide-react'; 
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -39,7 +39,6 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
             <Menu size={20} />
           </button>
         </div>
-
         <nav className="mt-6 flex-1 space-y-1 px-2">
           <MenuLink
             to="/dashboard"
@@ -60,7 +59,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
           <MenuLink
             to="/dashboard/groups"
             icon={<Trophy size={20} />}
-            label="Grupos"
+            label="Ranking GP"
             open={sidebarOpen}
           />
           
@@ -70,9 +69,14 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
             label="Actividades"
             open={sidebarOpen}
           />
+          <MenuLink
+            to="/dashboard/secretaria"
+            icon={<BookOpen size={20} />}
+            label="Secretaría GP"
+            open={sidebarOpen}
+          />
         </nav>
       </div>
-
       <div className="flex-1 flex flex-col overflow-hidden">
         <header className="bg-white shadow-sm border-b border-gray-200 h-16 px-6 flex justify-between items-center">
           <h2 className="text-lg font-bold text-gray-800 tracking-tight">
@@ -100,7 +104,6 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
             </button>
           </div>
         </header>
-
         <main className="flex-1 overflow-auto p-6 bg-gray-50">
           {children}
         </main>
