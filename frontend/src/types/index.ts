@@ -146,3 +146,30 @@ export interface DashboardHomeData {
   totalGroupsCount: number;
   totalPointsAccumulated: number;
 }
+
+export interface GPMember {
+  id: number;
+  name: string;
+  birthDate: string;
+  hasLifeInsurance: boolean;
+  roleInGP: 'Líder' | 'Sub Líder' | 'Secretario' | 'Tesorera' | 'Integrante';
+  avatarUrl?: string;
+}
+
+export interface GPIdentity {
+  name: string;
+  motto: string;
+  verse: string;
+  verseReference: string;
+  flagUrl: string;
+  anthemTitle: string;
+  anthemArtist: string;
+  anthemDuration: string;
+  createdAtDate: string;
+  timeElapsed: string;
+}
+
+export interface SecretariatData {
+  members: GPMember[];
+  identity: GPIdentity;
+}

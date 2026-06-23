@@ -1,286 +1,250 @@
-import React, { useEffect, useState } from 'react';
-import { groupsService } from '../services/api';
-import { GroupDetailsResponse } from '../types';
-import { Shield, Music, BookOpen, Users, Star, RefreshCw, AlertCircle, Flag, Award, Calendar, Radio } from 'lucide-react';
+import React, { useState } from 'react';
+import { 
+  Users, UserPlus, Calendar, ShieldCheck, ShieldAlert, 
+  Crown, Star, FileText, Bookmark, Play, Pause, 
+  Flag, Music, Info, Pencil, Trash2 
+} from 'lucide-react';
+
+// DATOS SEMILLA REALES DE ACUERDO AL MOCKUP IMAGE_362820.PNG
+const INITIAL_MEMBERS: any[] = [
+  { id: 1, name: 'Mario Pérez García', birthDate: '12/05/2002', hasLifeInsurance: true, roleInGP: 'Líder' },
+  { id: 2, name: 'Ana Flores Martínez', birthDate: '08/11/2005', hasLifeInsurance: false, roleInGP: 'Sub Líder' },
+  { id: 3, name: 'Luis Ramos Torres', birthDate: '15/03/2010', hasLifeInsurance: true, roleInGP: 'Secretario' },
+  { id: 4, name: 'Sofía Hernández Díaz', birthDate: '22/07/2008', hasLifeInsurance: true, roleInGP: 'Tesorera' },
+  { id: 5, name: 'David Molina López', birthDate: '30/01/2012', hasLifeInsurance: false, roleInGP: 'Integrante' }
+];
+
+const GP_IDENTITY = {
+  name: 'GP VICTORIA',
+  motto: '"Más que vencedores por medio de Cristo."',
+  verse: '"Antes, en todas estas cosas somos más que vencedores por medio de aquel que nos amó."',
+  verseReference: 'Romanos 8:37',
+  flagUrl: '/assets/flag-victoria.png', // Fallback estático de diseño
+  anthemTitle: 'Mi Mejor Amigo',
+  anthemArtist: 'Marcela Gándara',
+  anthemDuration: '4:35',
+  createdAtDate: '15 de enero de 2024',
+  timeElapsed: '1 año, 5 meses'
+};
 
 export const SecretariaPage: React.FC = () => {
-  const [availableGroups, setAvailableGroups] = useState<{ id: number; name: string }[]>([]);
-  const [selectedGroupId, setSelectedGroupId] = useState<number | null>(null);
-  const [groupDetails, setGroupDetails] = useState<GroupDetailsResponse | null>(null);
-  
-  const [loading, setLoading] = useState(true);
-  const [detailsLoading, setDetailsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [members, setMembers] = useState(INITIAL_MEMBERS);
+  const [isPlaying, setIsPlaying] = useState(false);
 
-  useEffect(() => {
-    const loadSecretariaDetails = async (id: number) => {
-      try {
-        setDetailsLoading(true);
-        setError('');
-        console.log(`📡 Consultando ficha de secretaría del grupo: ${id}`);
-        const response = await groupsService.getById(id); 
-        setGroupDetails(response.data);
-      } catch (err: any) {
-        console.error(err);
-        setError('Error al compilar la nómina y los registros del grupo seleccionado.');
-      } finally {
-        setDetailsLoading(false);
-      }
-    };
-
-    const loadInitialGroups = async () => {
-      try {
-        setLoading(true);
-        setError('');
-        console.log('📡 Consultando listado de grupos para la secretaría...');
-        const response = await groupsService.getAll();
-        setAvailableGroups(response.data);
-        
-        if (response.data.length > 0) {
-          setSelectedGroupId(response.data[0].id);
-          await loadSecretariaDetails(response.data[0].id);
-        }
-      } catch (err: any) {
-        console.error(err);
-        setError('Error al traccionar los equipos desde la base de datos.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadInitialGroups();
-  }, []);
-
-  const handleGroupChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const id = Number(e.target.value);
-    setSelectedGroupId(id);
-    try {
-      setDetailsLoading(true);
-      setError('');
-      const response = await groupsService.getById(id); 
-      setGroupDetails(response.data);
-    } catch (err: any) {
-      setError('Error al compilar la nómina del grupo seleccionado.');
-    } finally {
-      setDetailsLoading(false);
+  // Renderizador dinámico de los badges de Responsabilidad según el Mockup
+  const renderRoleBadge = (role: string) => {
+    switch (role) {
+      case 'Líder':
+        return (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 rounded-full">
+            <Crown size={12} className="fill-indigo-200" /> Líder
+          </span>
+        );
+      case 'Sub Líder':
+        return (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold text-purple-700 bg-purple-50 border border-purple-100 rounded-full">
+            <Star size={12} className="fill-purple-200" /> Sub Líder
+          </span>
+        );
+      case 'Secretario':
+        return (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold text-amber-700 bg-amber-50 border border-amber-100 rounded-full">
+            <FileText size={12} /> Secretario
+          </span>
+        );
+      case 'Tesorera':
+        return (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold text-blue-700 bg-blue-50 border border-blue-100 rounded-full">
+            <Users size={12} /> Tesorera
+          </span>
+        );
+      default:
+        return (
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 text-xs font-bold text-slate-600 bg-slate-100 rounded-full">
+            <Users size={12} /> Integrante
+          </span>
+        );
     }
   };
-
-  const handleManualRefresh = async () => {
-    if (!selectedGroupId) return;
-    try {
-      setDetailsLoading(true);
-      setError('');
-      const response = await groupsService.getById(selectedGroupId); 
-      setGroupDetails(response.data);
-    } catch (err: any) {
-      setError('Error al actualizar registros.');
-    } finally {
-      setDetailsLoading(false);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-24 bg-white rounded-2xl border border-gray-100 shadow-sm">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-        <p className="text-xs text-gray-400 mt-4 font-bold uppercase tracking-wider">Cargando Libros de Secretaría...</p>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6 font-sans text-slate-800 animate-fadeIn">
       
-      <div className="bg-white p-5 rounded-2xl border border-gray-200/80 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div className="flex items-center gap-3">
-          <div className="p-3 bg-teal-600 rounded-xl text-white shadow-lg">
-            <BookOpen size={22} />
+      {/* SECCIÓN TITULAR TITULO/SUBTITULO */}
+      <div className="space-y-0.5 px-1">
+        <h1 className="text-2xl font-black text-[#002ec4] tracking-tight flex items-center gap-2">
+          <span className="text-3xl font-light text-slate-300">|</span> Secretaría
+        </h1>
+        <p className="text-xs text-slate-500 font-medium">Sistema de Gestión de Grupos Pequeños (GP)</p>
+      </div>
+
+      {/* BLOQUE DE INTEGRANTES (TABLA REAL DEL MOCKUP) */}
+      <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+        <div className="p-5 flex flex-col sm:flex-row justify-between items-center gap-4 bg-slate-50/40 border-b border-slate-100">
+          <div className="flex items-center gap-3">
+            <div className="p-2.5 bg-blue-50 text-[#002ec4] rounded-2xl">
+              <Users size={20} className="stroke-[2.5]" />
+            </div>
+            <div>
+              <h2 className="text-sm font-black text-slate-800 tracking-tight">Integrantes</h2>
+              <p className="text-[11px] text-slate-400 font-semibold">Lista oficial de integrantes del GP</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-xl font-black text-slate-900">Secretaría del GP</h1>
-            <p className="text-xs text-slate-400 font-medium mt-0.5">Ficha Oficial, Identidad Colectiva y Nómina del Equipo</p>
-          </div>
+          
+          <button className="flex items-center gap-1.5 px-4 py-2 bg-[#002ec4] hover:bg-blue-700 text-white font-black rounded-xl text-xs shadow-md shadow-blue-600/10 transition active:scale-95">
+            <UserPlus size={14} /> Agregar Integrante
+          </button>
         </div>
 
-        <div className="flex items-center gap-2 w-full sm:w-auto">
-          <select
-            value={selectedGroupId || ''}
-            onChange={handleGroupChange}
-            className="flex-1 sm:w-64 px-3 py-2 bg-slate-50 border border-gray-200 rounded-xl text-xs font-bold focus:outline-none focus:ring-2 focus:ring-teal-500/20 focus:border-teal-500 transition"
-          >
-            {availableGroups.map((g) => (
-              <option key={g.id} value={g.id}>GP: {g.name}</option>
-            ))}
-          </select>
-          <button 
-            onClick={handleManualRefresh}
-            disabled={detailsLoading || !selectedGroupId}
-            className="p-2 bg-white hover:bg-slate-50 border border-gray-200 text-gray-500 rounded-xl transition disabled:opacity-50"
-            title="Sincronizar Ficha"
-          >
-            <RefreshCw size={16} className={detailsLoading ? 'animate-spin' : ''} />
-          </button>
+        {/* TABLA DE INTEGRANTES CON DISEÑO DE ALTA FIDELIDAD */}
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-[#002ec4] text-white text-xs font-bold tracking-wider">
+                <th className="p-4 text-center w-12">#</th>
+                <th className="p-4">Nombre Completo</th>
+                <th className="p-4">Fecha de Nacimiento</th>
+                <th className="p-4 text-center">Seguro de Vida</th>
+                <th className="p-4">Responsabilidad</th>
+                <th className="p-4 text-center w-28">Acciones</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-slate-100 text-xs font-semibold text-slate-700">
+              {members.map((member, idx) => (
+                <tr key={member.id} className="hover:bg-slate-50/50 transition">
+                  <td className="p-4 text-center text-slate-400 font-mono font-bold">{idx + 1}</td>
+                  <td className="p-4 flex items-center gap-3 font-bold text-slate-800">
+                    <div className="w-7 h-7 bg-slate-200 rounded-full overflow-hidden shrink-0 flex items-center justify-center font-black text-slate-400 text-[10px]">
+                      {member.name.charAt(0)}
+                    </div>
+                    {member.name}
+                  </td>
+                  <td className="p-4 text-slate-500">
+                    <span className="inline-flex items-center gap-1.5"><Calendar size={13} className="text-slate-300" /> {member.birthDate}</span>
+                  </td>
+                  <td className="p-4 text-center">
+                    {member.hasLifeInsurance ? (
+                      <span className="px-3 py-0.5 bg-emerald-50 text-emerald-600 rounded-md border border-emerald-100 text-[11px] font-bold">Sí</span>
+                    ) : (
+                      <span className="px-3 py-0.5 bg-rose-50 text-rose-600 rounded-md border border-rose-100 text-[11px] font-bold">No</span>
+                    )}
+                  </td>
+                  <td className="p-4">{renderRoleBadge(member.roleInGP)}</td>
+                  <td className="p-4 text-center">
+                    <div className="flex items-center justify-center gap-1.5">
+                      <button className="p-1.5 text-blue-600 hover:bg-blue-50 border border-slate-100 rounded-lg transition" title="Editar"><Pencil size={12} /></button>
+                      <button className="p-1.5 text-rose-600 hover:bg-rose-50 border border-slate-100 rounded-lg transition" title="Eliminar"><Trash2 size={12} /></button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </div>
 
-      {error && (
-        <div className="p-4 bg-rose-50 border border-rose-200 text-rose-700 rounded-2xl text-xs font-semibold flex items-center gap-2">
-          <AlertCircle size={16} />
-          <span>{error}</span>
+      {/* BLOQUE INFERIOR: INFORMACIÓN DEL GP (TRIPLE COLUMNA EN RECUADROS INTEGRADOS) */}
+      <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+        <div className="p-5 flex items-center gap-3 bg-slate-50/40 border-b border-slate-100">
+          <div className="p-2.5 bg-blue-50 text-[#002ec4] rounded-2xl">
+            <Info size={18} />
+          </div>
+          <div>
+            <h2 className="text-sm font-black text-slate-800 tracking-tight">Información del GP</h2>
+            <p className="text-[11px] text-slate-400 font-semibold">Datos e identidad oficial del grupo</p>
+          </div>
         </div>
-      )}
 
-      {groupDetails && !detailsLoading && (
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* CONTENEDOR DE CAMPOS LITÚRGICOS */}
+        <div className="grid grid-cols-1 md:grid-cols-3 divide-y md:divide-y-0 md:divide-x divide-slate-100">
           
-          <div className="lg:col-span-5 space-y-6">
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 space-y-6 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-teal-500/5 rounded-full translate-x-10 -translate-y-10"></div>
-              
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 bg-gradient-to-tr from-teal-500 to-emerald-600 rounded-2xl flex items-center justify-center text-white shadow-md">
-                  <Flag size={28} />
+          {/* COLUMNA 1: NOMBRE DEL GP Y BANDERA */}
+          <div className="p-6 space-y-5">
+            <div className="flex items-start gap-3">
+              <div className="p-2 bg-blue-50 rounded-xl text-blue-600 shrink-0"><Users size={16} /></div>
+              <div>
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Nombre del GP</span>
+                <span className="text-base font-black text-slate-800 uppercase tracking-tight">{GP_IDENTITY.name}</span>
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
+                <Flag size={14} className="text-blue-600" /> Bandera
+              </div>
+              {/* Contenedor emulador de bandera del mockup */}
+              <div className="w-full h-32 rounded-2xl bg-gradient-to-br from-blue-700 to-indigo-900 border border-slate-200/60 p-4 flex flex-col justify-end text-white shadow-inner relative overflow-hidden">
+                <div className="absolute inset-0 bg-black/10 mix-blend-overlay"></div>
+                <div className="border-2 border-white/20 rounded-xl p-2 text-center space-y-1 relative z-10 bg-white/5 backdrop-blur-xs">
+                  <div className="w-5 h-5 mx-auto border border-white/40 rounded-full flex items-center justify-center text-[8px] font-black">★</div>
+                  <span className="text-xs font-black tracking-widest block uppercase">{GP_IDENTITY.name}</span>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          {/* COLUMNA 2: LEMA E HIMNO CON REPRODUCTOR INTERACTIVO */}
+          <div className="p-6 space-y-5">
+            <div className="flex items-start gap-3">
+              <div className="p-2 bg-blue-50 rounded-xl text-blue-600 shrink-0"><Bookmark size={16} /></div>
+              <div>
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Lema</span>
+                <p className="text-xs font-bold text-slate-700 italic mt-0.5 leading-relaxed">{GP_IDENTITY.motto}</p>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-xs font-bold text-slate-500">
+                <Music size={14} className="text-blue-600" /> Himno o Canción
+              </div>
+              <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 flex flex-col justify-center space-y-2">
                 <div>
-                  <h2 className="text-lg font-black text-slate-900 tracking-tight">{groupDetails.name}</h2>
-                  <p className="text-xs text-teal-600 font-bold italic mt-0.5">"{groupDetails.motto || 'Sin lema oficial asignado'}"</p>
+                  <h4 className="text-xs font-black text-slate-800 leading-none">{GP_IDENTITY.anthemTitle}</h4>
+                  <span className="text-[10px] text-slate-400 font-semibold">{GP_IDENTITY.anthemArtist}</span>
                 </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3 bg-slate-50 p-3 rounded-xl border border-slate-100 text-xs">
-                <div>
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Líder del GP</span>
-                  <span className="font-bold text-slate-700 block mt-0.5 truncate">{groupDetails.leaderName || 'No asignado'}</span>
-                </div>
-                <div className="border-l border-slate-200 pl-3">
-                  <span className="text-[10px] uppercase font-bold text-slate-400 block">Sublíder</span>
-                  <span className="font-bold text-slate-700 block mt-0.5 truncate">{groupDetails.subLeaderName || 'No asignado'}</span>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1">
-                  <Radio size={12} className="text-teal-600" /> Versículo Clave de Identidad
-                </span>
-                <div className="p-4 bg-teal-50/40 border border-teal-100 rounded-xl">
-                  <p className="text-xs text-slate-700 font-medium leading-relaxed italic text-center">
-                    {groupDetails.bibleVerse}
-                  </p>
-                </div>
-              </div>
-
-              <div className="space-y-2 pt-2">
-                <span className="text-[10px] font-black uppercase tracking-wider text-slate-400 flex items-center gap-1">
-                  <Music size={12} className="text-teal-600" /> Marcha o Himno Oficial del GP
-                </span>
-                <div className="bg-slate-900 p-3 rounded-xl flex flex-col gap-2 shadow-inner">
-                  <div className="flex items-center justify-between text-[11px] text-teal-400 font-mono px-1">
-                    <span>himno_oficial.mp3</span>
-                    <span className="w-1.5 h-1.5 rounded-full bg-teal-400"></span>
+                {/* Controles de reproducción exactos del mockup */}
+                <div className="flex items-center gap-3 pt-1">
+                  <button 
+                    onClick={() => setIsPlaying(!isPlaying)}
+                    className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center shadow-md shadow-blue-600/10 active:scale-95 transition"
+                  >
+                    {isPlaying ? <Pause size={12} fill="white" /> : <Play size={12} fill="white" className="translate-x-0.5" />}
+                  </button>
+                  <div className="flex-1 flex items-center gap-2">
+                    <span className="text-[9px] font-mono font-bold text-slate-400">0:00</span>
+                    <div className="flex-1 h-1 bg-slate-200 rounded-full relative">
+                      <div className="absolute top-0 left-0 w-0 h-full bg-blue-600 rounded-full"></div>
+                    </div>
+                    <span className="text-[9px] font-mono font-bold text-slate-400">{GP_IDENTITY.anthemDuration}</span>
                   </div>
-                  <audio src={groupDetails.anthemUrl} controls className="w-full h-8 rounded-lg outline-none opacity-90 filter invert" />
                 </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-white border border-gray-200 p-4 rounded-2xl flex items-center justify-between shadow-sm">
-                <div>
-                  <span className="text-[9px] font-bold text-slate-400 uppercase">Puntos Brutos</span>
-                  <p className="text-xl font-black text-slate-800 mt-0.5">{groupDetails.totalPoints}</p>
-                </div>
-                <div className="p-2.5 bg-indigo-50 rounded-xl text-indigo-600"><Award size={20} /></div>
-              </div>
-
-              <div className="bg-white border border-gray-200 p-4 rounded-2xl flex items-center justify-between shadow-sm">
-                <div>
-                  <span className="text-[9px] font-bold text-slate-400 uppercase">Impacto Neto</span>
-                  <p className="text-xl font-black text-teal-600 mt-0.5">{groupDetails.netPoints} pts</p>
-                </div>
-                <div className="p-2.5 bg-teal-50 rounded-xl text-teal-600"><Star size={20} className="fill-teal-100" /></div>
               </div>
             </div>
           </div>
 
-          <div className="lg:col-span-7">
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-              <div className="p-4 bg-slate-900 border-b border-slate-800 flex justify-between items-center">
-                <span className="text-xs font-black text-white tracking-wide uppercase flex items-center gap-1.5">
-                  <Users size={14} className="text-teal-400" /> Nómina de Integrantes Registrados
-                </span>
-                <span className="px-2.5 py-0.5 bg-white/10 text-white font-mono text-[10px] font-bold rounded-full border border-white/10">
-                  Total: {groupDetails.members.length} miembros
-                </span>
+          {/* COLUMNA 3: VERSÍCULO DE MEMORIA Y FECHA DE CREACIÓN */}
+          <div className="p-6 space-y-5">
+            <div className="flex items-start gap-3">
+              <div className="p-2 bg-blue-50 rounded-xl text-blue-600 shrink-0"><Bookmark size={16} /></div>
+              <div>
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Versículo</span>
+                <p className="text-xs font-semibold text-slate-600 leading-relaxed mt-0.5">{GP_IDENTITY.verse}</p>
+                <span className="text-[10px] font-black text-blue-600 block mt-1">{GP_IDENTITY.verseReference}</span>
               </div>
+            </div>
 
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr className="bg-slate-50/80 border-b border-gray-200 text-[10px] font-black uppercase tracking-wider text-slate-400">
-                      <th className="px-6 py-3.5">Id / Nombre</th>
-                      <th className="px-4 py-3.5 text-center">Rol Interno</th>
-                      <th className="px-4 py-3.5 text-center">Cumpleaños</th>
-                      <th className="px-6 py-3.5 text-right">Aporte Real</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100 text-xs text-slate-700 font-semibold">
-                    {groupDetails.members.map((member) => (
-                      <tr key={member.id} className="hover:bg-slate-50/30 transition duration-150">
-                        <td className="px-6 py-4">
-                          <div className="flex flex-col">
-                            <span className="font-black text-slate-900 text-sm tracking-tight">{member.name}</span>
-                            <span className="text-[10px] text-slate-400 font-normal mt-0.5">{member.email}</span>
-                          </div>
-                        </td>
-
-                        <td className="px-4 py-4 text-center">
-                          <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${
-                            member.groupRole === 'LIDER' ? 'bg-purple-50 text-purple-700 border-purple-200' :
-                            member.groupRole === 'SUBLIDER' ? 'bg-blue-50 text-blue-700 border-blue-200' :
-                            member.groupRole === 'ANFITRION' ? 'bg-amber-50 text-amber-700 border-amber-200' :
-                            'bg-slate-50 text-slate-600 border-slate-200'
-                          }`}>
-                            <Shield size={10} />
-                            {member.groupRole}
-                          </span>
-                        </td>
-
-                        <td className="px-4 py-4 text-center font-medium text-slate-500">
-                          <div className="inline-flex items-center gap-1">
-                            <Calendar size={12} className="text-slate-400" />
-                            {member.birthDate}
-                          </div>
-                        </td>
-
-                        <td className="px-6 py-4 text-right font-mono font-black text-slate-900 text-sm">
-                          {member.contributedPoints > 0 ? (
-                            <span className="text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-lg">
-                              +{member.contributedPoints} pts
-                            </span>
-                          ) : (
-                            <span className="text-slate-400 bg-slate-50 px-2 py-0.5 rounded-lg">
-                              0 pts
-                            </span>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+            <div className="pt-3 border-t border-slate-100/80 flex items-start gap-3">
+              <div className="p-2 bg-blue-50 rounded-xl text-blue-600 shrink-0"><Calendar size={16} /></div>
+              <div>
+                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Fecha de Creación</span>
+                <span className="text-xs font-black text-slate-800 block mt-0.5">{GP_IDENTITY.createdAtDate}</span>
+                <span className="text-[10px] text-slate-400 font-semibold block">({GP_IDENTITY.timeElapsed})</span>
               </div>
             </div>
           </div>
 
         </div>
-      )}
-
-      {detailsLoading && (
-        <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600 mx-auto"></div>
-          <p className="text-xs text-gray-400 mt-4 font-bold uppercase tracking-wider">Compilando Archivos de Secretaría...</p>
-        </div>
-      )}
+      </div>
 
     </div>
   );

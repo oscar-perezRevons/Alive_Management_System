@@ -1,36 +1,25 @@
 import React, { useEffect, useState } from 'react';
-import { dashboardService, configService } from '../services/api';
-import { useAuthStore } from '../stores/authStore';
+import { dashboardService } from '../services/api';
 import { DashboardHomeData } from '../types';
 import { 
   Megaphone, Calendar, Clock, Trophy, Info, 
-  Users, Star, RefreshCw, AlertTriangle, ShieldCheck 
+  Users, Star, RefreshCw, AlertTriangle
 } from 'lucide-react';
 
 export const DashboardPage: React.FC = () => {
   const [homeData, setHomeData] = useState<DashboardHomeData | null>(null);
-  const [brandAssets, setBrandAssets] = useState<{ logoUrl: string | null; bannerUrl: string | null }>({ logoUrl: null, bannerUrl: null });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  
-  const currentUser = useAuthStore((state) => state.user);
 
   const fetchHomeData = async () => {
     try {
       setLoading(true);
       setError('');
-      console.log('Solicitando datos y recursos de marca en tiempo real para el Inicio...');
-      
-      const [homeRes, assetsRes] = await Promise.all([
-        dashboardService.getHomeData(),
-        configService.getBrandAssets()
-      ]);
-      
-      setHomeData(homeRes.data);
-      setBrandAssets(assetsRes.data);
+      const response = await dashboardService.getHomeData();
+      setHomeData(response.data);
     } catch (err: any) {
-      console.error('Error cargando panel de inicio:', err);
-      setError(err.response?.data?.error || 'No se pudo sincronizar el panel de inicio con el servidor.');
+      console.error(err);
+      setError(err.response?.data?.error || 'No se pudo sincronizar el panel de inicio.');
     } finally {
       setLoading(false);
     }
@@ -42,16 +31,26 @@ export const DashboardPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center py-24 bg-white rounded-2xl border border-gray-200/80 shadow-sm">
+      <div className="flex flex-col items-center justify-center py-24 bg-white rounded-3xl border border-slate-100 shadow-sm">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        <p className="text-xs text-slate-400 mt-4 font-bold uppercase tracking-wider">Cargando Tablero Alive...</p>
+        <p className="text-xs text-slate-400 mt-4 font-bold uppercase tracking-wider">Compilando Dashboard Oficial...</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 font-sans text-slate-800 animate-fadeIn">
+    <div className="space-y-5 font-sans text-slate-800 animate-fadeIn">
       
+      {/* MENSAJE DE BIENVENIDA OFICIAL DEL MOCKUP */}
+      <div className="space-y-0.5 px-1">
+        <h1 className="text-2xl font-black text-[#002ec4] tracking-tight flex items-center gap-2">
+          <span className="text-3xl font-light text-slate-300">|</span> Inicio
+        </h1>
+        <p className="text-xs text-slate-500 font-medium">
+          Bienvenido al sistema de Alive Maranata Adoración
+        </p>
+      </div>
+
       {error && (
         <div className="p-4 bg-rose-50 border border-rose-200 text-rose-700 rounded-2xl text-xs font-bold flex items-center gap-2">
           <AlertTriangle size={16} className="shrink-0" />
@@ -59,170 +58,133 @@ export const DashboardPage: React.FC = () => {
         </div>
       )}
 
+      {/* BANNER PRINCIPAL: IMAGEN REAL CON CAPA TRANSPARENTE AZUL OSCURA */}
       <div 
-        className="rounded-2xl p-6 md:p-8 text-white shadow-xl relative overflow-hidden flex flex-col md:flex-row justify-between items-center gap-6 bg-cover bg-center transition-all duration-500"
-        style={
-          brandAssets.bannerUrl 
-            ? { backgroundImage: `linear-gradient(to right, rgba(29, 78, 216, 0.95), rgba(15, 23, 42, 0.85)), url(${brandAssets.bannerUrl})` }
-            : { backgroundColor: '#1d4ed8' } 
-        }
+        className="rounded-3xl p-8 md:p-12 text-white shadow-xl relative overflow-hidden flex flex-col md:flex-row justify-between items-center gap-6 bg-cover bg-center min-h-[220px]"
+        style={{ 
+          backgroundImage: `linear-gradient(to right, rgba(10, 31, 107, 0.95) 0%, rgba(0, 51, 204, 0.8) 100%), url('/assets/banner-default.png')` 
+        }}
       >
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#fff_1px,transparent_1px)] [background-size:16px_16px]"></div>
-        
-        <div className="space-y-2 relative z-10 text-center md:text-left">
-          <h1 className="text-2xl md:text-3xl font-black tracking-tight leading-none drop-shadow-md">
-            "Jóvenes adventistas" <br className="hidden sm:inline"/> al servicio de Cristo.
+        <div className="space-y-3 relative z-10 text-center md:text-left max-w-xl">
+          <h1 className="text-3xl md:text-4xl font-black tracking-tight leading-tight text-white">
+            "Jóvenes adventistas" <br />
+            al servicio de Cristo."
           </h1>
-          <p className="text-xs font-mono font-bold tracking-widest text-blue-200 uppercase pt-2">
+          <div className="w-16 h-0.5 bg-white/40 my-2"></div>
+          <p className="text-[10px] font-mono font-black tracking-widest text-blue-300 uppercase">
             Alive Maranata Adoración
           </p>
         </div>
         
-        <div className="w-24 h-24 bg-white/10 border border-white/20 rounded-2xl flex flex-col items-center justify-center text-center p-2 backdrop-blur-sm relative z-10 shrink-0">
-          <span className="text-[10px] font-black tracking-wider text-blue-300 uppercase">GP</span>
-          <ShieldCheck size={32} className="text-white my-1" />
-          <span className="text-[10px] font-black tracking-wider text-white uppercase">JA</span>
+        {/* LOGO EN GRANDE ASOCIADO AL ESCUDO DEL BANNER (CORREGIDO SEGÚN IMAGE_34E1A4) */}
+        <div className="w-32 h-32 bg-white/10 border border-white/20 rounded-3xl flex flex-col items-center justify-center text-center p-3 backdrop-blur-md relative z-10 shrink-0 shadow-2xl transition hover:scale-105">
+          <span className="text-xs font-black tracking-widest text-blue-200 uppercase">GP</span>
+          <div className="w-16 h-16 my-1 flex items-center justify-center">
+            <img 
+              src="/assets/logo.png" 
+              alt="Shield Asset" 
+              className="w-full h-full object-contain filter brightness-0 invert" 
+            />
+          </div>
+          <span className="text-xs font-black tracking-widest text-white uppercase">JA</span>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center gap-3">
-          <div className="p-2.5 bg-blue-50 rounded-xl text-blue-600 shrink-0"><Users size={18} /></div>
+      {/* METRICAS RÁPIDAS */}
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+        <div className="bg-white p-5 rounded-2xl shadow-sm flex items-center gap-4">
+          <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl shrink-0"><Users size={20} className="stroke-[2.5]" /></div>
           <div>
-            <span className="text-[9px] font-bold text-slate-400 uppercase block">GP Registrados</span>
-            <span className="text-sm font-black text-slate-800 tracking-tight">{homeData?.totalGroupsCount || 0} Equipos</span>
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">GP Registrados</span>
+            <span className="text-base font-black text-slate-800 tracking-tight">{homeData?.totalGroupsCount || 0} Equipos</span>
           </div>
         </div>
-        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center gap-3">
-          <div className="p-2.5 bg-amber-50 rounded-xl text-amber-500 shrink-0"><Trophy size={18} /></div>
+        
+        <div className="bg-white p-5 rounded-2xl shadow-sm flex items-center gap-4">
+          <div className="p-3 bg-amber-50 text-amber-500 rounded-2xl shrink-0"><Trophy size={20} className="stroke-[2.5]" /></div>
           <div>
-            <span className="text-[9px] font-bold text-slate-400 uppercase block">Puntos Totales</span>
-            <span className="text-sm font-black text-slate-800 tracking-tight">{(homeData?.totalPointsAccumulated || 0).toLocaleString()} pts</span>
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Puntos Totales</span>
+            <span className="text-base font-black text-slate-800 tracking-tight">{(homeData?.totalPointsAccumulated || 0).toLocaleString()} pts</span>
           </div>
         </div>
-        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center gap-3">
-          <div className="p-2.5 bg-purple-50 rounded-xl text-purple-600 shrink-0"><Star size={18} /></div>
+
+        <div className="bg-white p-5 rounded-2xl shadow-sm flex items-center gap-4">
+          <div className="p-3 bg-purple-50 text-purple-600 rounded-2xl shrink-0"><Star size={20} className="stroke-[2.5]" /></div>
           <div>
-            <span className="text-[9px] font-bold text-slate-400 uppercase block">GP Líder</span>
-            <span className="text-sm font-black text-slate-800 tracking-tight truncate max-w-[110px] block">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">GP Líder</span>
+            <span className="text-base font-black text-slate-800 tracking-tight truncate max-w-[130px] block">
               {homeData?.featuredGroup?.name || 'Calculando...'}
             </span>
           </div>
         </div>
-        <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center gap-3">
-          <div className="p-2.5 bg-emerald-50 rounded-xl text-emerald-600 shrink-0"><Clock size={18} /></div>
+
+        <div className="bg-white p-5 rounded-2xl shadow-sm flex items-center gap-4">
+          <div className="p-3 bg-emerald-50 text-emerald-600 rounded-2xl shrink-0"><Clock size={20} className="stroke-[2.5]" /></div>
           <div>
-            <span className="text-[9px] font-bold text-slate-400 uppercase block">Sincronización</span>
-            <button onClick={fetchHomeData} className="text-xs font-bold text-emerald-600 hover:underline flex items-center gap-1 mt-0.5">
-              <RefreshCw size={10} /> Actualizado
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Sincronización</span>
+            <button onClick={fetchHomeData} className="text-xs font-bold text-emerald-600 flex items-center gap-1 mt-0.5">
+              <RefreshCw size={12} /> Actualizado
             </button>
           </div>
         </div>
       </div>
 
+      {/* SECCIÓN ANUNCIOS Y DETACADO */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
-        <div className="lg:col-span-7 bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-          <div className="p-4 bg-slate-50 border-b border-gray-200 flex justify-between items-center">
-            <h2 className="text-xs font-black text-slate-900 tracking-wider uppercase flex items-center gap-1.5">
-              <Megaphone size={14} className="text-blue-600" /> Anuncios Oficiales
+        <div className="lg:col-span-7 bg-white rounded-3xl shadow-sm overflow-hidden border border-slate-100">
+          <div className="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/70">
+            <h2 className="text-xs font-black text-slate-900 tracking-wider uppercase flex items-center gap-2">
+              <Megaphone size={16} className="text-blue-600" /> Anuncios Oficiales
             </h2>
-            <button className="text-[10px] font-bold text-blue-600 hover:underline">Ver todos</button>
+            <button className="text-xs font-bold text-blue-600 hover:underline">Ver todos</button>
           </div>
           
-          <div className="divide-y divide-gray-100">
+          <div className="divide-y divide-slate-100">
             {homeData?.announcements.map((announcement) => (
-              <div key={announcement.id} className="p-4 flex items-start justify-between gap-4 hover:bg-slate-50/40 transition">
+              <div key={announcement.id} className="p-5 flex items-start justify-between gap-4 hover:bg-slate-50/40 transition">
                 <div className="space-y-1">
-                  <h3 className="text-xs font-black text-slate-800">{announcement.title}</h3>
+                  <h3 className="text-sm font-bold text-slate-800">{announcement.title}</h3>
                   <p className="text-xs text-slate-400 font-medium leading-relaxed">{announcement.content}</p>
                 </div>
-                <span className="text-[10px] font-semibold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md whitespace-nowrap shrink-0 flex items-center gap-1">
-                  <Clock size={10} /> {announcement.timeAgo}
+                <span className="text-[10px] font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded-lg whitespace-nowrap shrink-0 flex items-center gap-1">
+                  <Clock size={12} /> {announcement.timeAgo}
                 </span>
               </div>
             ))}
-            {homeData?.announcements.length === 0 && (
-              <p className="text-xs text-slate-400 text-center py-6 font-medium">No hay comunicados vigentes en cartelera.</p>
+            {(!homeData?.announcements || homeData.announcements.length === 0) && (
+              <p className="text-xs text-slate-400 text-center py-12 font-medium">No hay comunicados vigentes en este momento.</p>
             )}
           </div>
         </div>
 
-        <div className="lg:col-span-5 bg-gradient-to-b from-blue-900 to-indigo-950 rounded-2xl text-white p-6 shadow-xl space-y-4 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 rounded-full translate-x-4 -translate-y-4"></div>
+        <div className="lg:col-span-5 bg-gradient-to-b from-[#0f172a] to-[#1e293b] rounded-3xl text-white p-6 shadow-xl flex flex-col justify-between min-h-[340px]">
           <div className="flex items-center gap-2">
-            <Trophy size={16} className="text-amber-400 fill-amber-400/20" />
-            <h2 className="text-xs font-black uppercase tracking-wider text-blue-300">GP Destacado del Momento</h2>
+            <Trophy size={18} className="text-amber-400 fill-amber-400/20" />
+            <h2 className="text-xs font-black uppercase tracking-wider text-blue-400">GP Destacado del Momento</h2>
           </div>
 
           {homeData?.featuredGroup ? (
-            <div className="text-center bg-white/5 border border-white/10 rounded-xl p-5 space-y-3 backdrop-blur-sm">
-              <div className="w-12 h-12 bg-amber-500 rounded-full flex items-center justify-center mx-auto shadow-lg shadow-amber-500/20">
-                <Trophy size={22} className="text-white" />
+            <div className="text-center bg-white/5 border border-white/10 rounded-2xl p-6 space-y-4 backdrop-blur-md">
+              <div className="w-14 h-14 bg-amber-500 rounded-full flex items-center justify-center mx-auto shadow-lg">
+                <Trophy size={26} className="text-white" />
               </div>
-              <div className="space-y-0.5">
-                <h3 className="text-lg font-black tracking-tight uppercase text-amber-400">{homeData.featuredGroup.name}</h3>
-                <p className="text-[11px] text-blue-200 font-semibold">{homeData.featuredGroup.reason}</p>
+              <div className="space-y-1">
+                <h3 className="text-xl font-black tracking-tight uppercase text-amber-400">{homeData.featuredGroup.name}</h3>
+                <p className="text-xs text-slate-300 font-medium px-2">{homeData.featuredGroup.reason}</p>
               </div>
-              <div className="inline-block bg-white/10 border border-white/10 px-3 py-1 rounded-full text-xs font-mono font-bold">
+              <div className="inline-block bg-white/10 border border-white/10 px-4 py-1.5 rounded-full text-xs font-mono font-bold text-amber-300">
                 Acumulado: {homeData.featuredGroup.totalPoints} pts
               </div>
             </div>
           ) : (
-            <p className="text-xs text-blue-200/60 text-center py-8 font-medium">Evaluando puntajes del fin de semana...</p>
+            <p className="text-xs text-blue-200/50 text-center py-16 font-medium">Evaluando métricas de participación colectiva...</p>
           )}
-          <p className="text-[10px] text-blue-300/80 text-center leading-relaxed font-medium">Por su destacada participación, puntualidad en las actividades e integración comunitaria.</p>
-        </div>
-      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        
-        <div className="lg:col-span-7 space-y-3">
-          <h2 className="text-xs font-black uppercase tracking-wider text-slate-400 flex items-center gap-1.5 px-1">
-            <Calendar size={14} /> Próximas Actividades Obligatorias
-          </h2>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {homeData?.activities.map((act) => (
-              <div key={act.id} className="bg-white border border-gray-200 rounded-xl p-4 flex flex-col justify-between shadow-sm hover:shadow-md transition">
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-[10px] font-black text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md font-mono">
-                      {act.day} {act.month}
-                    </span>
-                    <Clock size={12} className="text-slate-300" />
-                  </div>
-                  <h3 className="text-xs font-black text-slate-800 line-clamp-2 min-h-[32px]">{act.title}</h3>
-                </div>
-                <div className="pt-3 border-t border-slate-100 mt-2 text-[10px] font-semibold text-slate-400 truncate">
-                  Sede: {act.location}
-                </div>
-              </div>
-            ))}
-            {homeData?.activities.length === 0 && (
-              <p className="sm:col-span-3 text-xs text-slate-400 text-center py-8 bg-white border border-gray-200 rounded-xl font-medium">
-                No hay actividades agendadas en el calendario cercano.
-              </p>
-            )}
-          </div>
+          <p className="text-[10px] text-slate-400 text-center font-medium pt-4 border-t border-white/5">
+            Por su destacada participación, puntualidad en las actividades e integración comunitaria.
+          </p>
         </div>
-
-        <div className="lg:col-span-5 bg-white border border-gray-200 rounded-2xl p-5 shadow-sm space-y-3">
-          <div className="flex items-center gap-2 text-slate-900">
-            <Info size={16} className="text-blue-600" />
-            <h2 className="text-xs font-black uppercase tracking-wider">Información del Proyecto</h2>
-          </div>
-          <div className="space-y-2">
-            <p className="text-sm font-black text-slate-900 tracking-tight">ALIVE MARANATA ADORACIÓN</p>
-            <p className="text-xs text-slate-400 font-medium leading-relaxed">
-              Somos un proyecto ministerial de la Iglesia Adventista del Séptimo Día que busca potenciar y articular el crecimiento de los jóvenes mediante una sana y transparente competencia de fidelidad en grupos pequeños.
-            </p>
-          </div>
-          <div className="pt-2 border-t border-slate-100 text-center font-bold text-xs text-indigo-600 italic">
-            ¡Unidos de corazón para servir al Señor!
-          </div>
-        </div>
-
       </div>
 
     </div>
