@@ -11,6 +11,7 @@ import activitiesRoutes from './routes/activities.routes';
 import dashboardRoutes from './routes/dashboard.routes';
 import configRoutes from './routes/config.routes';
 import secretariaRoutes from './routes/secretaria.routes';
+import puntuacionesRoutes from './routes/puntuaciones.routes';
 
 const app = express();
 
@@ -37,6 +38,7 @@ app.use('/api/activities', activitiesRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/config', configRoutes);
 app.use('/api/secretaria', secretariaRoutes); 
+app.use('/api/puntuaciones', puntuacionesRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({

@@ -101,4 +101,15 @@ export const secretariaService = {
     apiClient.post(`/secretaria/panel/${groupId}/members/create-and-link`, data)
 };
 
+export const scoreService = {
+  getKpis: () => apiClient.get('/puntuaciones/kpis'),
+  getCategories: () => apiClient.get('/puntuaciones/categories'),
+  getScoresHistory: () => apiClient.get('/puntuaciones/history/scores'),
+  getPenaltiesHistory: () => apiClient.get('/puntuaciones/history/penalties'),
+  registerScore: (data: any) => apiClient.post('/puntuaciones/register', data),
+  registerPenalty: (data: any) => apiClient.post('/puntuaciones/penalty', data),
+  createCategory: (data: { name: string }) => apiClient.post('/puntuaciones/categories', data),
+  createActivity: (data: { categoryId: number; name: string; points: number }) => apiClient.post('/puntuaciones/activities', data)
+};
+
 export default apiClient;

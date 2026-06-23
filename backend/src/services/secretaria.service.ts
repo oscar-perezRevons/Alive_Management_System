@@ -11,7 +11,7 @@ export class SecretariaService {
         anthemUrl: true,
         totalPoints: true
       },
-      orderBy: { name: 'asc' }
+      orderBy: { totalPoints: 'desc' }
     });
   }
 
