@@ -87,4 +87,18 @@ export const activitiesService = {
     apiClient.post('/activities/scores', { userId, activityId, groupId, points }),
 };
 
+export const secretariaService = {
+  getAllGroups: () => apiClient.get('/secretaria/groups'),
+  getGroupPanel: (groupId: number) => apiClient.get(`/secretaria/panel/${groupId}`),
+  createGroup: (data: any) => apiClient.post('/secretaria/groups', data),
+  updateGroup: (groupId: number, data: any) => apiClient.put(`/secretaria/groups/${groupId}`, data),
+  deleteMemberFromGroup: (groupId: number, userId: number) => 
+    apiClient.delete(`/secretaria/panel/${groupId}/members/${userId}`),
+  getAvailableUsers: () => apiClient.get('/secretaria/users/available'),
+  addMemberToGroup: (groupId: number, data: { userId: number; groupRole: string }) => 
+    apiClient.post(`/secretaria/panel/${groupId}/members`, data),
+  createAndLinkMember: (groupId: number, data: { name: string; email: string; birthDate: string; groupRole: string }) =>
+    apiClient.post(`/secretaria/panel/${groupId}/members/create-and-link`, data)
+};
+
 export default apiClient;

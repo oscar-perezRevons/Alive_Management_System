@@ -3,13 +3,14 @@ dotenv.config();
 
 import express from 'express';
 import cors from 'cors';
+import path from 'path'; 
 import authRoutes from './routes/auth.routes';
 import usersRoutes from './routes/users.routes';
 import groupsRoutes from './routes/groups.routes';
 import activitiesRoutes from './routes/activities.routes';
 import dashboardRoutes from './routes/dashboard.routes';
 import configRoutes from './routes/config.routes';
-import path from 'path/win32';
+import secretariaRoutes from './routes/secretaria.routes';
 
 const app = express();
 
@@ -35,6 +36,7 @@ app.use('/api/groups', groupsRoutes);
 app.use('/api/activities', activitiesRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/config', configRoutes);
+app.use('/api/secretaria', secretariaRoutes); 
 
 app.get('/api/health', (req, res) => {
   res.json({
