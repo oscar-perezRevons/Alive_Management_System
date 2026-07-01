@@ -1,25 +1,20 @@
 import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './stores/authStore';
-
-// IMPORTACIÓN DE COMPONENTES ESTRUCTURALES Y LOGIN
 import { LoginPage } from './pages/LoginPage';
 import { DashboardLayout } from './layouts/DashboardLayout';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { UnauthorizedPage } from './pages/UnauthorizedPage';
-
-// IMPORTACIÓN DE PÁGINAS EXISTENTES
 import { DashboardPage } from './pages/DashboardPage';
 import { UsersPage } from './pages/UsersPage';
 import { GroupsPage } from './pages/GroupsPage';
 import { ActivitiesPage } from './pages/ActivitiesPage';
 import { SecretariaPage } from './pages/SecretariaPage';
-
-// IMPORTACIÓN DE LAS NUEVAS PÁGINAS CREADAS SIMÉTRICAS AL SIDEBAR
 import { PuntuacionesPage } from './pages/PuntuacionesPage';
 import { ProgramaPage } from './pages/ProgramaPage';
 import { EventosPage } from './pages/EventosPage';
 import { MaterialesPage } from './pages/MaterialesPage';
+import { MatinalesPage } from './pages/MatinalesPage'; 
 
 function App() {
   const { loadFromStorage } = useAuthStore();
@@ -31,11 +26,8 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Rutas Públicas de Control de Acceso */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
-
-        {/* RUTAS PROTEGIDAS BAJO EL COMPONENTE LAYOUT UNIFICADO AL MOCKUP */}
         <Route
           path="/dashboard"
           element={
@@ -46,7 +38,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
         <Route
           path="/dashboard/users"
           element={
@@ -57,7 +48,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/dashboard/groups"
           element={
@@ -68,7 +58,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/dashboard/activities"
           element={
@@ -79,8 +68,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
-        {/* ENLACES DIRECTOS A LOS NUEVOS MÓDULOS DEL SIDEBAR */}
         <Route
           path="/dashboard/secretaria"
           element={
@@ -91,7 +78,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/dashboard/puntuaciones"
           element={
@@ -102,7 +88,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/dashboard/programa"
           element={
@@ -113,7 +98,16 @@ function App() {
             </ProtectedRoute>
           }
         />
-
+        <Route
+          path="/dashboard/matinales"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <MatinalesPage />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
         <Route
           path="/dashboard/eventos"
           element={
@@ -124,7 +118,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/dashboard/materiales"
           element={
@@ -135,8 +128,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
-        {/* Comportamiento de redirecciones automáticas por defecto */}
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>

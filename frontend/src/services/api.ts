@@ -6,17 +6,13 @@ const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
 const apiClient = axios.create({
   baseURL: API_URL,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+  headers: { 'Content-Type': 'application/json' },
 });
 
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
+    if (token) config.headers.Authorization = `Bearer ${token}`;
     return config;
   },
   (error) => Promise.reject(error)
@@ -26,7 +22,6 @@ apiClient.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      console.log('Sesión expirada o token inválido - Forzando logout reactivo');
       useAuthStore.getState().logout();
     }
     return Promise.reject(error);
@@ -36,11 +31,7 @@ apiClient.interceptors.response.use(
 export const configService = {
   getBrandAssets: () => apiClient.get('/config/brand-assets'),
   uploadBrandAssets: (formData: FormData) => 
-    apiClient.post('/config/upload-brand', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    }),
+    apiClient.post('/config/upload-brand', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
 };
 
 export const dashboardService = {
@@ -48,18 +39,15 @@ export const dashboardService = {
 };
 
 export const authService = {
-  register: (email: string, password: string, name: string) =>
-    apiClient.post('/auth/register', { email, password, name }),
-  login: (email: string, password: string) =>
-    apiClient.post('/auth/login', { email, password }),
+  register: (email: string, password: string, name: string) => apiClient.post('/auth/register', { email, password, name }),
+  login: (email: string, password: string) => apiClient.post('/auth/login', { email, password }),
   getProfile: () => apiClient.get('/auth/profile'),
 };
 
 export const usersService = {
   getAll: () => apiClient.get('/users'),
   getById: (id: number) => apiClient.get(`/users/${id}`),
-  update: (id: number, data: { name?: string; role?: string; isActive?: boolean }) => 
-    apiClient.put(`/users/${id}`, data),
+  update: (id: number, data: any) => apiClient.put(`/users/${id}`, data),
   delete: (id: number) => apiClient.delete(`/users/${id}`),
 };
 
@@ -72,10 +60,8 @@ export const groupsService = {
     apiClient.post('/groups', { name, description, motto, leaderName, subLeaderName }),
   update: (id: number, data: any) => apiClient.put(`/groups/${id}`, data),
   delete: (id: number) => apiClient.delete(`/groups/${id}`),
-  addMember: (groupId: number, userId: number) =>
-    apiClient.post(`/groups/${groupId}/members`, { userId }),
-  removeMember: (groupId: number, userId: number) =>
-    apiClient.delete(`/groups/${groupId}/members/${userId}`),
+  addMember: (groupId: number, userId: number) => apiClient.post(`/groups/${groupId}/members`, { userId }),
+  removeMember: (groupId: number, userId: number) => apiClient.delete(`/groups/${groupId}/members/${userId}`),
 };
 
 export const activitiesService = {
@@ -92,13 +78,10 @@ export const secretariaService = {
   getGroupPanel: (groupId: number) => apiClient.get(`/secretaria/panel/${groupId}`),
   createGroup: (data: any) => apiClient.post('/secretaria/groups', data),
   updateGroup: (groupId: number, data: any) => apiClient.put(`/secretaria/groups/${groupId}`, data),
-  deleteMemberFromGroup: (groupId: number, userId: number) => 
-    apiClient.delete(`/secretaria/panel/${groupId}/members/${userId}`),
+  deleteMemberFromGroup: (groupId: number, userId: number) => apiClient.delete(`/secretaria/panel/${groupId}/members/${userId}`),
   getAvailableUsers: () => apiClient.get('/secretaria/users/available'),
-  addMemberToGroup: (groupId: number, data: { userId: number; groupRole: string }) => 
-    apiClient.post(`/secretaria/panel/${groupId}/members`, data),
-  createAndLinkMember: (groupId: number, data: { name: string; email: string; birthDate: string; groupRole: string }) =>
-    apiClient.post(`/secretaria/panel/${groupId}/members/create-and-link`, data)
+  addMemberToGroup: (groupId: number, data: { userId: number; groupRole: string }) => apiClient.post(`/secretaria/panel/${groupId}/members`, data),
+  createAndLinkMember: (groupId: number, data: any) => apiClient.post(`/secretaria/panel/${groupId}/members/create-and-link`, data)
 };
 
 export const scoreService = {
@@ -109,7 +92,28 @@ export const scoreService = {
   registerScore: (data: any) => apiClient.post('/puntuaciones/register', data),
   registerPenalty: (data: any) => apiClient.post('/puntuaciones/penalty', data),
   createCategory: (data: { name: string }) => apiClient.post('/puntuaciones/categories', data),
-  createActivity: (data: { categoryId: number; name: string; points: number }) => apiClient.post('/puntuaciones/activities', data)
+  createActivity: (data: any) => apiClient.post('/puntuaciones/activities', data)
+};
+
+export const programService = {
+  getFullSchedule: () => apiClient.get('/programa'),
+  createEvent: (data: any) => apiClient.post('/programa', data),
+  updateEvent: (id: number, data: any) => apiClient.put(`/programa/${id}`, data),
+  deleteEvent: (id: number) => apiClient.delete(`/programa/${id}`),
+};
+
+export const matinalesService = {
+  getAll: () => apiClient.get('/matinales'),
+  
+  uploadPdf: (id: number, formData: FormData) => {
+    const token = localStorage.getItem('token'); 
+    return apiClient.post(`/matinales/${id}/upload`, formData, {
+      headers: { 
+        'Content-Type': 'multipart/form-data',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+      }
+    });
+  }
 };
 
 export default apiClient;

@@ -88,3 +88,15 @@ model Penalty {
   groupSmall   GroupSmall @relation(fields: [groupSmallId], references: [id], onDelete: Cascade)
   date         DateTime   @default(now())
 }
+
+model ProgramEvent {
+  id          Int      @id @default(autoincrement())
+  timeSlot    String   
+  title       String   
+  description String?  
+  responsible String   
+  order       Int      @default(0) 
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
