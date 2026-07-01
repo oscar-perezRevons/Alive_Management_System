@@ -27,10 +27,11 @@ const upload = multer({
 });
 
 const router = Router();
-
 router.use(authMiddleware);
 
 router.get('/', matinalesController.getMatinales);
+router.put('/:id', matinalesController.updateMatinal);
 router.post('/:id/upload', upload.single('pdf'), matinalesController.uploadMatinalPdf);
+router.delete('/:id/pdf', matinalesController.deleteMatinalPdf);
 
 export default router;

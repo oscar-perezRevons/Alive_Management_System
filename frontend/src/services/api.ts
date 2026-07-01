@@ -105,11 +105,29 @@ export const programService = {
 export const matinalesService = {
   getAll: () => apiClient.get('/matinales'),
   
+  updateInfo: (id: number, data: { category: string; range: string; currentTheme: string; responsible: string; nextDate: string }) => {
+    const token = localStorage.getItem('token');
+    return apiClient.put(`/matinales/${id}`, data, {
+      headers: {
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+      }
+    });
+  },
+
   uploadPdf: (id: number, formData: FormData) => {
-    const token = localStorage.getItem('token'); 
+    const token = localStorage.getItem('token');
     return apiClient.post(`/matinales/${id}/upload`, formData, {
       headers: { 
         'Content-Type': 'multipart/form-data',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+      }
+    });
+  },
+
+  deletePdf: (id: number) => {
+    const token = localStorage.getItem('token');
+    return apiClient.delete(`/matinales/${id}/pdf`, {
+      headers: {
         ...(token ? { 'Authorization': `Bearer ${token}` } : {})
       }
     });

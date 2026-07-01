@@ -28,6 +28,26 @@ export class MatinalesService {
     }
     return matinal;
   }
+
+  updateMatinalInfo(id: number, data: Partial<Omit<MatinalItem, 'id' | 'pdfUrl'>>) {
+    const matinal = matinalesRealData.find(m => m.id === id);
+    if (matinal) {
+      if (data.category) matinal.category = data.category;
+      if (data.range) matinal.range = data.range;
+      if (data.currentTheme !== undefined) matinal.currentTheme = data.currentTheme;
+      if (data.responsible) matinal.responsible = data.responsible;
+      if (data.nextDate) matinal.nextDate = data.nextDate;
+    }
+    return matinal;
+  }
+
+  removeMatinalPdf(id: number) {
+    const matinal = matinalesRealData.find(m => m.id === id);
+    if (matinal) {
+      matinal.pdfUrl = null;
+    }
+    return matinal;
+  }
 }
 
 export const matinalesService = new MatinalesService();
