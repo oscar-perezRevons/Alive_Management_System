@@ -134,4 +134,14 @@ export const matinalesService = {
   }
 };
 
+export const eventosService = {
+  getAll: () => apiClient.get('/eventos'),
+  getKpis: () => apiClient.get('/eventos/kpis'), 
+  create: (data: any) => apiClient.post('/eventos', data),
+  update: (id: number, data: any) => apiClient.put(`/eventos/${id}`, data),
+  delete: (id: number) => apiClient.delete(`/eventos/${id}`),
+  join: (id: number) => apiClient.post(`/eventos/${id}/participar`),
+  getMyParticipations: () => apiClient.get('/eventos/mis-participaciones')
+};
+
 export default apiClient;

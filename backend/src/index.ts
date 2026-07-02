@@ -15,6 +15,7 @@ import secretariaRoutes from './routes/secretaria.routes';
 import puntuacionesRoutes from './routes/puntuaciones.routes';
 import programRoutes from './routes/program.routes';
 import matinalesRoutes from './routes/matinales.routes'; 
+import eventosRoutes from './routes/eventos.routes';
 
 const app = express();
 
@@ -37,6 +38,7 @@ app.use('/api/secretaria', secretariaRoutes);
 app.use('/api/puntuaciones', puntuacionesRoutes);
 app.use('/api/programa', programRoutes);
 app.use('/api/matinales', matinalesRoutes); 
+app.use('/api/eventos', eventosRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'Backend running', timestamp: new Date().toISOString() });

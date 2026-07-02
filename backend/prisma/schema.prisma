@@ -40,6 +40,7 @@ model GroupSmall {
   scores          Score[]
   penalties       Penalty[]
   createdAt       DateTime   @default(now())
+  eventParticipations EventParticipation[]
 }
 
 enum UserRole {
@@ -99,4 +100,31 @@ model ProgramEvent {
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model Event {
+  id             Int                  @id @default(autoincrement())
+  title          String
+  description    String?
+  category       String               
+  typeTag        String               
+  startDate      String               
+  timeSlot       String               
+  location       String
+  maxSpots       Int                  @default(15)
+  status         String               
+  createdAt      DateTime             @default(now())
+  participations EventParticipation[]
+}
+
+model EventParticipation {
+  id         Int        @id @default(autoincrement())
+  eventId    Int
+  event      Event      @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  groupId    Int
+  groupSmall GroupSmall @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  enrolledAt DateTime   @default(now())
+  status     String     @default("Inscrito") 
+
+  @@unique([eventId, groupId])
 }
