@@ -144,4 +144,9 @@ export const eventosService = {
   getMyParticipations: () => apiClient.get('/eventos/mis-participaciones')
 };
 
+export const rankingService = {
+  getGeneral: () => apiClient.get('/ranking/general'),
+  getProgreso: (groupId: number) => apiClient.get(`/ranking/progreso/${groupId}`)
+};
+
 export default apiClient;

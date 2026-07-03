@@ -30,6 +30,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
 
   return (
     <div className="flex h-screen bg-[#f4f6fc] font-sans overflow-hidden">
+      {/* SIDEBAR LATERAL */}
       <div
         className={`${
           sidebarOpen ? 'w-64' : 'w-20'
@@ -67,24 +68,18 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
             <Menu size={16} />
           </button>
         </div>
+
         <nav className="mt-2 flex-1 space-y-1 px-3 overflow-y-auto">
           <MenuLink to="/dashboard" icon={<Home size={20} />} label="Inicio" open={sidebarOpen} />
-          
           <MenuLink to="/dashboard/secretaria" icon={<UserCheck size={20} />} label="Secretaría" open={sidebarOpen} />
-          
           <MenuLink to="/dashboard/puntuaciones" icon={<Award size={20} />} label="Puntuaciones" open={sidebarOpen} />
-          
           <MenuLink to="/dashboard/programa" icon={<CalendarDays size={20} />} label="Programa General" open={sidebarOpen} />
-
           <MenuLink to="/dashboard/matinales" icon={<BookOpen size={20} />} label="Matinales" open={sidebarOpen} />
-          
           <MenuLink to="/dashboard/eventos" icon={<Users size={20} />} label="Eventos" open={sidebarOpen} />
-          
           <MenuLink to="/dashboard/ranking" icon={<BarChart3 size={20} />} label="Ranking" open={sidebarOpen} />
-          
           <MenuLink to="/dashboard/materiales" icon={<Folder size={20} />} label="Materiales" open={sidebarOpen} />
 
-          {user?.role === 'ADMIN' && sidebarOpen && (
+          {user?.role === 'ADMIN' && (
             <div className="pt-4 mt-4 border-t border-white/10">
               <MenuLink to="/dashboard/users" icon={<Users size={18} />} label="Control Usuarios" open={sidebarOpen} />
             </div>
@@ -101,6 +96,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
           </div>
         )}
       </div>
+
       <div className="flex-1 flex flex-col overflow-hidden">
         <header className="bg-white border-b border-slate-200 h-16 px-6 flex justify-between items-center z-10 shadow-sm">
           <div className="flex items-center gap-2">

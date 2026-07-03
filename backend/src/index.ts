@@ -16,6 +16,7 @@ import puntuacionesRoutes from './routes/puntuaciones.routes';
 import programRoutes from './routes/program.routes';
 import matinalesRoutes from './routes/matinales.routes'; 
 import eventosRoutes from './routes/eventos.routes';
+import rankingRoutes from './routes/ranking.routes';
 
 const app = express();
 
@@ -39,6 +40,7 @@ app.use('/api/puntuaciones', puntuacionesRoutes);
 app.use('/api/programa', programRoutes);
 app.use('/api/matinales', matinalesRoutes); 
 app.use('/api/eventos', eventosRoutes);
+app.use('/api/ranking', rankingRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'Backend running', timestamp: new Date().toISOString() });

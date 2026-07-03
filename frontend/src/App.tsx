@@ -15,6 +15,7 @@ import { ProgramaPage } from './pages/ProgramaPage';
 import { EventosPage } from './pages/EventosPage';
 import { MaterialesPage } from './pages/MaterialesPage';
 import { MatinalesPage } from './pages/MatinalesPage'; 
+import { RankingPage } from './pages/RankingPage'; 
 
 function App() {
   const { loadFromStorage } = useAuthStore();
@@ -28,6 +29,7 @@ function App() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
+        
         <Route
           path="/dashboard"
           element={
@@ -118,6 +120,18 @@ function App() {
             </ProtectedRoute>
           }
         />
+        
+        <Route
+          path="/dashboard/ranking"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <RankingPage />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
         <Route
           path="/dashboard/materiales"
           element={
@@ -128,6 +142,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+        
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
