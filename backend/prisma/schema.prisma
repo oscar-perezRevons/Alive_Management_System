@@ -14,6 +14,7 @@ model User {
   name               String
   role               UserRole     @default(USER) 
   groupRole          String       @default("MIEMBRO") 
+  avatarUrl          String?
   birthDate          DateTime?    
   isActive           Boolean      @default(true)
   createdAt          DateTime     @default(now())

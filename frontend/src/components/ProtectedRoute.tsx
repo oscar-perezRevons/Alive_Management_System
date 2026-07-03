@@ -7,29 +7,27 @@ interface ProtectedRouteProps {
   requiredRole?: 'ADMIN' | 'USER';
 }
 
-export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
-  children,
-  requiredRole,
-}) => {
-  const { isAuthenticated, user } = useAuthStore();
+export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requiredRole }) => {
+  const { isAuthenticated, user, token } = useAuthStore();
 
-  console.log('[ProtectedRoute] Evaluando acceso:', {
-    isAuthenticated,
-    userEmail: user?.email,
-    userRole: user?.role,
-    requiredRole
+  const deFactoAuthenticated = isAuthenticated || !!token;
+
+  console.log('[ProtectedRoute] Evaluando acceso:', { 
+    isAuthenticated: deFactoAuthenticated, 
+    userEmail: user?.email, 
+    userRole: user?.role, 
+    requiredRole 
   });
 
-  if (!isAuthenticated || !user) {
+  if (!deFactoAuthenticated) {
     console.log('Acceso denegado: Usuario no autenticado. Redirigiendo a /login');
     return <Navigate to="/login" replace />;
   }
 
-  if (requiredRole === 'ADMIN' && user.role !== 'ADMIN') {
-    console.log(`Privilegios insuficientes: Se requiere ADMIN pero el usuario es ${user.role}. Redirigiendo a /unauthorized`);
+  if (requiredRole && user?.role !== requiredRole) {
+    console.log(`Acceso denegado: Se requiere rol ${requiredRole}. Redirigiendo a /unauthorized`);
     return <Navigate to="/unauthorized" replace />;
   }
 
-  console.log(`Acceso concedido de forma segura para el rol: ${user.role}`);
   return <>{children}</>;
 };

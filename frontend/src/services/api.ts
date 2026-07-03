@@ -12,7 +12,10 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
-    if (token) config.headers.Authorization = `Bearer ${token}`;
+    if (token) {
+      config.headers = config.headers || {};
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
     return config;
   },
   (error) => Promise.reject(error)
@@ -49,6 +52,8 @@ export const usersService = {
   getById: (id: number) => apiClient.get(`/users/${id}`),
   update: (id: number, data: any) => apiClient.put(`/users/${id}`, data),
   delete: (id: number) => apiClient.delete(`/users/${id}`),
+  uploadAvatar: (id: number, formData: FormData) => 
+    apiClient.post(`/users/${id}/avatar`, formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
 };
 
 export const groupsService = {
@@ -147,6 +152,16 @@ export const eventosService = {
 export const rankingService = {
   getGeneral: () => apiClient.get('/ranking/general'),
   getProgreso: (groupId: number) => apiClient.get(`/ranking/progreso/${groupId}`)
+};
+
+export const authExtensions = {
+  register: (data: any) => apiClient.post('/auth/register', data)
+};
+
+export const adminUserExtensions = {
+  getAll: () => apiClient.get('/users'),
+  updateRole: (id: number, data: { role: string, groupRole: string }) => apiClient.put(`/users/${id}/role`, data),
+  toggleStatus: (id: number, data: { isActive: boolean }) => apiClient.put(`/users/${id}/status`, data)
 };
 
 export default apiClient;

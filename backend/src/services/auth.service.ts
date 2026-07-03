@@ -1,80 +1,45 @@
 import prisma from '../config/database';
 import bcrypt from 'bcryptjs';
-import jwt, { SignOptions } from 'jsonwebtoken';
-import { TokenPayload } from '../types';
+import jwt from 'jsonwebtoken';
 
 export class AuthService {
-  async register(email: string, password: string, name: string) {
-    const userExists = await prisma.user.findUnique({ where: { email } });
-
-    if (userExists) {
-      throw new Error('El correo electrónico ya se encuentra registrado.');
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const user = await prisma.user.create({
-      data: {
-        email,
-        password: hashedPassword,
-        name,
-        role: 'USER', 
-      },
-    });
-
-    const token = this.generateToken(user.id, user.email, user.role);
-
-    return {
-      token,
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        role: user.role,
-      },
-    };
-  }
-
-  async login(email: string, password: string) {
+  async loginUser(email: string, password: string) {
     const user = await prisma.user.findUnique({ where: { email } });
+    if (!user || !user.isActive) throw new Error('El usuario no existe o se encuentra inactivo.');
 
-    if (!user) {
-      throw new Error('Usuario o contraseña incorrectos.');
-    }
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) throw new Error('Contraseña incorrecta.');
 
-    const passwordValid = await bcrypt.compare(password, user.password);
-
-    if (!passwordValid) {
-      throw new Error('Usuario o contraseña incorrectos.');
-    }
-
-    const token = this.generateToken(user.id, user.email, user.role);
+    const token = jwt.sign(
+      { id: user.id, email: user.email, role: user.role },
+      process.env.JWT_SECRET || 'ALIVE_SECRET_KEY_2026',
+      { expiresIn: '24h' }
+    );
 
     return {
       token,
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        role: user.role,
-      },
+      user: { id: user.id, name: user.name, email: user.email, role: user.role, groupRole: user.groupRole }
     };
   }
 
-  private generateToken(userId: number, email: string, role: 'ADMIN' | 'USER'): string {
-    const payload: TokenPayload = { userId, email, role };
-    const secret = process.env.JWT_SECRET;
+  async registerUser(data: any) {
+    const existe = await prisma.user.findUnique({ where: { email: data.email } });
+    if (existe) throw new Error('El correo electrónico ya se encuentra registrado.');
 
-    if (!secret) {
-      throw new Error('Configuración corrupta: JWT_SECRET no está configurado en las variables de entorno.');
-    }
-
-    console.log('🔑 Generando token seguro con SECRET:', secret.substring(0, 15) + '...');
-
-    const options: SignOptions = {
-      expiresIn: '24h', 
-    };
-
-    return jwt.sign(payload, secret, options);
+    const hashedPassword = await bcrypt.hash(data.password, 10);
+    
+    return await prisma.user.create({
+      data: {
+        email: data.email,
+        password: hashedPassword,
+        name: data.name,
+        birthDate: data.birthDate ? new Date(data.birthDate) : null,
+        role: 'USER',
+        groupRole: 'MIEMBRO'
+      },
+      select: { id: true, name: true, email: true, role: true, createdAt: true }
+    });
   }
 }
+
+export const authService = new AuthService();

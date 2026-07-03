@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuthStore } from './stores/authStore';
 import { LoginPage } from './pages/LoginPage';
+import { RegisterPage } from './pages/RegisterPage';
 import { DashboardLayout } from './layouts/DashboardLayout';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { UnauthorizedPage } from './pages/UnauthorizedPage';
@@ -16,6 +17,7 @@ import { EventosPage } from './pages/EventosPage';
 import { MaterialesPage } from './pages/MaterialesPage';
 import { MatinalesPage } from './pages/MatinalesPage'; 
 import { RankingPage } from './pages/RankingPage'; 
+import { ProfilePage } from './pages/ProfilePage';
 
 function App() {
   const { loadFromStorage } = useAuthStore();
@@ -28,6 +30,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} /> 
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
         
         <Route
@@ -120,7 +123,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-        
         <Route
           path="/dashboard/ranking"
           element={
@@ -131,13 +133,22 @@ function App() {
             </ProtectedRoute>
           }
         />
-
         <Route
           path="/dashboard/materiales"
           element={
             <ProtectedRoute>
               <DashboardLayout>
                 <MaterialesPage />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/profile"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <ProfilePage />
               </DashboardLayout>
             </ProtectedRoute>
           }

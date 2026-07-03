@@ -1,59 +1,62 @@
 import { create } from 'zustand';
-import { User } from '../types';
+import { authService } from '../services/api';
+
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  groupRole?: string;
+}
 
 interface AuthStore {
-  token: string | null;
   user: User | null;
-  isAuthenticated: boolean;
-  setAuth: (token: string, user: User) => void;
+  token: string | null;
+  isAuthenticated: boolean; 
+  login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   loadFromStorage: () => void;
 }
 
 export const useAuthStore = create<AuthStore>((set) => ({
-  token: null,
   user: null,
-  isAuthenticated: false,
+  token: null,
+  isAuthenticated: false, 
 
-  setAuth: (token: string, user: User) => {
-    console.log('Guardando sesión activa:', {
-      token: token.substring(0, 20) + '...',
-      user: user.email,
-      role: user.role,
-    });
+  login: async (email, password) => {
+    const response = await authService.login(email, password);
+    const { token, user } = response.data;
+
     localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(user));
+
     set({ token, user, isAuthenticated: true });
   },
 
   logout: () => {
-    console.log('Cerrando sesión y limpiando almacenamiento...');
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     set({ token: null, user: null, isAuthenticated: false });
   },
 
   loadFromStorage: () => {
-    try {
-      const token = localStorage.getItem('token');
-      const userStr = localStorage.getItem('user');
-
-      if (token && userStr) {
-        const user = JSON.parse(userStr);
-        console.log('Sesión restaurada desde almacenamiento:', {
-          token: token.substring(0, 20) + '...',
-          user: user.email,
-          role: user.role,
+    const token = localStorage.getItem('token');
+    const userStr = localStorage.getItem('user');
+    
+    if (token && userStr) {
+      try {
+        set({ 
+          token, 
+          user: JSON.parse(userStr), 
+          isAuthenticated: true 
         });
-        set({ token, user, isAuthenticated: true });
-      } else {
-        console.log('No se encontró ninguna sesión previa guardada');
+      } catch (e) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        set({ token: null, user: null, isAuthenticated: false });
       }
-    } catch (error) {
-      console.error('Error crítico al cargar sesión desde storage:', error);
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      set({ token: null, user: null, isAuthenticated: false });
+    } else {
+      set({ isAuthenticated: false });
     }
-  },
+  }
 }));
