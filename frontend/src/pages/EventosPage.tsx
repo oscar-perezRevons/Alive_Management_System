@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { eventosService } from '../services/api';
 import { useAuthStore } from '../stores/authStore';
+import { canManageEvents } from '../utils/access';
 import { 
   Calendar, Trophy, Plus, MoreVertical, CheckCircle2, ArrowRight,
   AlertCircle, X, CalendarDays, MapPin, Clock, Users, Eye, 
@@ -9,7 +10,7 @@ import {
 
 export const EventosPage: React.FC = () => {
   const { user } = useAuthStore();
-  const currentUserRole = user?.role || 'USER';
+  const userCanManageEvents = canManageEvents(user);
 
   const [events, setEvents] = useState<any[]>([]);
   const [myParticipations, setMyParticipations] = useState<any[]>([]);
@@ -81,6 +82,10 @@ export const EventosPage: React.FC = () => {
   useEffect(() => { loadData(); }, [loadData]);
 
   const openCreateModal = (category: 'RECREATIVO' | 'DEPORTE') => {
+    if (!userCanManageEvents) {
+      triggerNotification('Acceso restringido', 'Tu rol solo permite consultar eventos.', 'error');
+      return;
+    }
     setEditingEvent(null);
     setFormFields({
       title: '', description: '', category, typeTag: category === 'RECREATIVO' ? 'Campamento' : 'Torneo de Fútbol',
@@ -90,6 +95,10 @@ export const EventosPage: React.FC = () => {
   };
 
   const openEditModal = (event: any) => {
+    if (!userCanManageEvents) {
+      triggerNotification('Acceso restringido', 'Tu rol solo permite consultar eventos.', 'error');
+      return;
+    }
     setEditingEvent(event);
     setFormFields({
       title: event.title, description: event.description || '', category: event.category,
@@ -106,6 +115,10 @@ export const EventosPage: React.FC = () => {
   };
 
   const triggerDeleteConfirm = (id: number) => {
+    if (!userCanManageEvents) {
+      triggerNotification('Acceso restringido', 'Tu rol no puede eliminar convocatorias.', 'error');
+      return;
+    }
     setEventIdToDelete(id);
     setIsDeleteModalOpen(true);
     setActiveMenuId(null);
@@ -113,6 +126,10 @@ export const EventosPage: React.FC = () => {
 
   const executeDelete = async () => {
     if (!eventIdToDelete) return;
+    if (!userCanManageEvents) {
+      triggerNotification('Acceso restringido', 'Tu rol no puede eliminar convocatorias.', 'error');
+      return;
+    }
     try {
       await eventosService.delete(eventIdToDelete);
       triggerNotification('Purgado', 'Convocatoria eliminada del cronograma de forma definitiva.', 'success');
@@ -126,6 +143,10 @@ export const EventosPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!userCanManageEvents) {
+      triggerNotification('Acceso restringido', 'Tu rol no puede crear ni editar convocatorias.', 'error');
+      return;
+    }
     try {
       if (editingEvent) {
         await eventosService.update(editingEvent.id, formFields);
@@ -231,7 +252,7 @@ export const EventosPage: React.FC = () => {
         <div className="lg:col-span-5 bg-white p-5 rounded-3xl border border-slate-100 shadow-xs flex flex-col gap-4">
           <div className="flex justify-between items-center border-b border-slate-50 pb-2">
             <h2 className="font-black text-[#1e3a8a] text-xs uppercase tracking-tight">Eventos Recreativos</h2>
-            {currentUserRole === 'ADMIN' && (
+            {userCanManageEvents && (
               <button onClick={() => openCreateModal('RECREATIVO')} className="py-1.5 px-3 bg-indigo-50 text-indigo-700 text-[10px] font-black rounded-xl border border-indigo-100 hover:bg-indigo-100 transition shadow-2xs flex items-center gap-1"><Plus size={12} /> Convocar</button>
             )}
           </div>
@@ -250,7 +271,7 @@ export const EventosPage: React.FC = () => {
                 <div className="flex-1 space-y-2 min-w-0">
                   <div className="flex justify-between items-start">
                     <span className="text-[9px] font-black uppercase px-2 py-0.5 bg-purple-50 text-purple-700 border border-purple-100 rounded-md truncate">{ev.typeTag}</span>
-                    {currentUserRole === 'ADMIN' && (
+                    {userCanManageEvents && (
                       <div className="relative">
                         <button onClick={() => setActiveMenuId(activeMenuId === ev.id ? null : ev.id)} className="text-slate-400 hover:text-slate-700 p-0.5 rounded-lg hover:bg-slate-100 transition"><MoreVertical size={14} /></button>
                         {activeMenuId === ev.id && (
@@ -284,7 +305,7 @@ export const EventosPage: React.FC = () => {
         <div className="lg:col-span-5 bg-white p-5 rounded-3xl border border-slate-100 shadow-xs flex flex-col gap-4">
           <div className="flex justify-between items-center border-b border-slate-50 pb-2">
             <h2 className="font-black text-[#1e3a8a] text-xs uppercase tracking-tight">Deportes</h2>
-            {currentUserRole === 'ADMIN' && (
+            {userCanManageEvents && (
               <button onClick={() => openCreateModal('DEPORTE')} className="py-1.5 px-3 bg-emerald-50 text-emerald-700 text-[10px] font-black rounded-xl border border-emerald-100 hover:bg-emerald-100 transition shadow-2xs flex items-center gap-1"><Plus size={12} /> Convocar</button>
             )}
           </div>
@@ -304,7 +325,7 @@ export const EventosPage: React.FC = () => {
                 <div className="flex-1 space-y-2 min-w-0">
                   <div className="flex justify-between items-start">
                     <span className="text-[9px] font-black uppercase px-2.5 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-md truncate">{ev.typeTag}</span>
-                    {currentUserRole === 'ADMIN' && (
+                    {userCanManageEvents && (
                       <div className="relative">
                         <button onClick={() => setActiveMenuId(activeMenuId === ev.id ? null : ev.id)} className="text-slate-400 hover:text-slate-700 p-0.5 rounded-lg hover:bg-slate-100 transition"><MoreVertical size={14} /></button>
                         {activeMenuId === ev.id && (

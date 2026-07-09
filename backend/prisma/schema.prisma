@@ -19,7 +19,8 @@ model User {
   isActive           Boolean      @default(true)
   createdAt          DateTime     @default(now())
   administeredGroups GroupSmall[] @relation("GroupAdministrator")
-  groups             GroupSmall[] @relation("GroupMembers")
+  groupSmallId       Int?         
+  groupSmall         GroupSmall?  @relation("GroupMembers", fields: [groupSmallId], references: [id], onDelete: SetNull)
   scores             Score[]
   createdActivities  Activity[]   @relation("UserCreatedActivities")
 }

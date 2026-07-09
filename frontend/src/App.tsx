@@ -56,7 +56,7 @@ function App() {
         <Route
           path="/dashboard/groups"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedAccessRoles={['ADMIN']}>
               <DashboardLayout>
                 <GroupsPage />
               </DashboardLayout>
@@ -66,7 +66,7 @@ function App() {
         <Route
           path="/dashboard/activities"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedAccessRoles={['ADMIN']}>
               <DashboardLayout>
                 <ActivitiesPage />
               </DashboardLayout>
@@ -76,7 +76,7 @@ function App() {
         <Route
           path="/dashboard/secretaria"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedAccessRoles={['ADMIN', 'LIDER_GP']}>
               <DashboardLayout>
                 <SecretariaPage />
               </DashboardLayout>
@@ -86,7 +86,7 @@ function App() {
         <Route
           path="/dashboard/puntuaciones"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedAccessRoles={['ADMIN']}>
               <DashboardLayout>
                 <PuntuacionesPage />
               </DashboardLayout>
@@ -96,7 +96,7 @@ function App() {
         <Route
           path="/dashboard/programa"
           element={
-            <ProtectedRoute>
+            <ProtectedRoute allowedAccessRoles={['ADMIN', 'LIDER_GP']}>
               <DashboardLayout>
                 <ProgramaPage />
               </DashboardLayout>

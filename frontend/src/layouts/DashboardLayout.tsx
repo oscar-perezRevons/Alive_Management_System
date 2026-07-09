@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
+import { hasAnyAccessRole, resolveAccessRole } from '../utils/access';
 import { 
   Menu, 
   LogOut, 
@@ -22,6 +23,7 @@ interface DashboardLayoutProps {
 
 export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   const { user, logout } = useAuthStore();
+  const accessRole = resolveAccessRole(user);
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -83,9 +85,15 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
 
         <nav className="mt-4 flex-1 space-y-1.5 px-3 overflow-y-auto custom-scrollbar">
           <MenuLink to="/dashboard" icon={<Home size={20} />} label="Inicio" open={sidebarOpen} />
-          <MenuLink to="/dashboard/secretaria" icon={<UserCheck size={20} />} label="Secretaría" open={sidebarOpen} />
-          <MenuLink to="/dashboard/puntuaciones" icon={<Award size={20} />} label="Puntuaciones" open={sidebarOpen} />
-          <MenuLink to="/dashboard/programa" icon={<CalendarDays size={20} />} label="Programa General" open={sidebarOpen} />
+          {hasAnyAccessRole(user, ['ADMIN', 'LIDER_GP']) && (
+            <MenuLink to="/dashboard/secretaria" icon={<UserCheck size={20} />} label="Secretaría" open={sidebarOpen} />
+          )}
+          {hasAnyAccessRole(user, ['ADMIN']) && (
+            <MenuLink to="/dashboard/puntuaciones" icon={<Award size={20} />} label="Puntuaciones" open={sidebarOpen} />
+          )}
+          {hasAnyAccessRole(user, ['ADMIN', 'LIDER_GP']) && (
+            <MenuLink to="/dashboard/programa" icon={<CalendarDays size={20} />} label="Programa General" open={sidebarOpen} />
+          )}
           <MenuLink to="/dashboard/matinales" icon={<BookOpen size={20} />} label="Matinales" open={sidebarOpen} />
           <MenuLink to="/dashboard/eventos" icon={<Users size={20} />} label="Eventos" open={sidebarOpen} />
           <MenuLink to="/dashboard/ranking" icon={<BarChart3 size={20} />} label="Ranking" open={sidebarOpen} />
@@ -141,7 +149,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
             </Link>
             
             <span className="px-2.5 py-1 text-[10px] font-black rounded-lg bg-blue-50 text-blue-700 border border-blue-100 uppercase shadow-3xs tracking-wider">
-              {user?.role}
+              {accessRole === 'LIDER_GP' ? 'LIDER GP' : user?.role}
             </span>
             
             <div className="w-px h-6 bg-slate-200/80 mx-0.5"></div>

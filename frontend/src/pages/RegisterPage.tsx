@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { authExtensions } from '../services/api';
 import { User, Mail, Lock, Calendar, AlertCircle, CheckCircle2, RefreshCw } from 'lucide-react';
+import logoImage from '../assets/logo.png';
 
 export const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
@@ -34,7 +35,7 @@ export const RegisterPage: React.FC = () => {
         
         <div className="text-center space-y-2">
           <div className="w-20 h-20 bg-slate-50 border border-slate-100 rounded-2xl mx-auto flex items-center justify-center p-2 shadow-inner">
-            <img src="/assets/logo.png" alt="Alive" className="max-w-full max-h-full object-contain" />
+            <img src={logoImage} alt="Alive" className="max-w-full max-h-full object-contain" />
           </div>
           <div>
             <h2 className="text-2xl font-black text-[#1e3a8a] tracking-tight">Registro de Miembro</h2>

@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { usersController } from '../controllers/users.controller';
 import { authMiddleware } from '../middleware/auth';
+import { requireAccessRoles } from '../middleware/authorization';
 import multer from 'multer';
 import path from 'path';
 
@@ -24,10 +25,10 @@ const upload = multer({
   }
 });
 
-router.get('/', usersController.getAllUsers);
+router.get('/', requireAccessRoles(['ADMIN']), usersController.getAllUsers);
 router.put('/:id', usersController.updateUser); 
 router.post('/:id/avatar', upload.single('avatar'), usersController.uploadAvatar);
-router.put('/:id/role', usersController.updateUserRole);
-router.put('/:id/status', usersController.toggleUserStatus);
+router.put('/:id/role', requireAccessRoles(['ADMIN']), usersController.updateUserRole);
+router.put('/:id/status', requireAccessRoles(['ADMIN']), usersController.toggleUserStatus);
 
 export default router;

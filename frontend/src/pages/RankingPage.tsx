@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { rankingService } from '../services/api';
 import { useAuthStore } from '../stores/authStore';
+import { resolveAccessRole } from '../utils/access';
 import { 
   Trophy, Shield, Star, RefreshCw, Layers, Lock, Users,
   ArrowUp, ArrowDown, Calendar, Download, Settings2, X, Info
@@ -8,7 +9,8 @@ import {
 
 export const RankingPage: React.FC = () => {
   const { user } = useAuthStore();
-  const currentUserRole = user?.role || 'USER';
+  const accessRole = resolveAccessRole(user);
+  const isAdmin = accessRole === 'ADMIN';
 
   const [grupos, setGrupos] = useState<any[]>([]);
   const [tablaRanking, setTablaRanking] = useState<any[]>([]);
@@ -57,20 +59,29 @@ export const RankingPage: React.FC = () => {
       const res = await rankingService.getGeneral();
       const fetchedRanking = res.data.ranking || [];
       const fetchedGrupos = res.data.grupos || [];
-      
-      setTablaRanking(fetchedRanking);
-      setGrupos(fetchedGrupos);
 
-      if (fetchedGrupos.length > 0 && selectedGroupId === 0) {
-        setSelectedGroupId(fetchedGrupos[0].id);
-      }
+      const visibleGroups = isAdmin ? fetchedGrupos : fetchedGrupos.slice(0, 1);
+      const fallbackGroupId = visibleGroups[0]?.id || 0;
+      const effectiveGroupId =
+        selectedGroupId !== 0 && visibleGroups.some((g: any) => g.id === selectedGroupId)
+          ? selectedGroupId
+          : fallbackGroupId;
+
+      setGrupos(visibleGroups);
+      setSelectedGroupId(effectiveGroupId);
+      setTablaRanking(
+        isAdmin
+          ? fetchedRanking
+          : fetchedRanking.filter((item: any) => item.id === effectiveGroupId)
+      );
+
       formatearFechaActual();
     } catch (err) {
       triggerToast('Error al conectar con el servidor de clasificaciones.');
     } finally {
       setLoading(false);
     }
-  }, [selectedGroupId, formatearFechaActual]);
+  }, [isAdmin, selectedGroupId, formatearFechaActual]);
 
   const cargarProgresoEspecifico = useCallback(async () => {
     if (selectedGroupId === 0) return;
@@ -214,7 +225,7 @@ export const RankingPage: React.FC = () => {
             <div className="space-y-1 flex-1 min-w-0">
               <div className="flex justify-between items-center">
                 <p className="text-[10px] text-blue-600 font-black uppercase tracking-wider truncate">Próxima publicación del Ranking</p>
-                {currentUserRole === 'ADMIN' && (
+                {isAdmin && (
                   <button onClick={openDateConfigModal} className="text-slate-400 hover:text-blue-600 transition-colors p-0.5" title="Configurar Fechas">
                     <Settings2 size={13} />
                   </button>
@@ -236,7 +247,7 @@ export const RankingPage: React.FC = () => {
               <h2 className="font-black text-base text-[#1e3a8a] uppercase tracking-wider">Mi Progreso (Sólo para tu GP)</h2>
             </div>
             
-            {grupos.length > 0 && (
+            {grupos.length > 0 && isAdmin && (
               <select 
                 value={selectedGroupId} 
                 onChange={(e) => setSelectedGroupId(Number(e.target.value))}
@@ -338,10 +349,12 @@ export const RankingPage: React.FC = () => {
                 <h2 className="font-black text-sm text-[#1e3a8a] uppercase tracking-wider">Vista del Organizador (Ranking Completo)</h2>
               </div>
               <div className="flex gap-2 w-full sm:w-auto">
-                <button onClick={ejecutarExportacionPDF} className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 py-2 px-3.5 bg-slate-50 border border-slate-200 text-slate-700 text-xs font-black rounded-xl hover:bg-slate-100 transition shadow-2xs cursor-pointer">
-                  <Download size={14} /> Exportar PDF
-                </button>
-                {currentUserRole === 'ADMIN' && (
+                {isAdmin && (
+                  <button onClick={ejecutarExportacionPDF} className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 py-2 px-3.5 bg-slate-50 border border-slate-200 text-slate-700 text-xs font-black rounded-xl hover:bg-slate-100 transition shadow-2xs cursor-pointer">
+                    <Download size={14} /> Exportar PDF
+                  </button>
+                )}
+                {isAdmin && (
                   <button onClick={() => setIsControlModalOpen(true)} className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 py-2 px-3.5 bg-blue-50 border border-blue-200 text-[#002ec4] text-xs font-black rounded-xl hover:bg-blue-100 transition shadow-2xs cursor-pointer">
                     <Settings2 size={14} /> Panel de Control
                   </button>
@@ -350,8 +363,12 @@ export const RankingPage: React.FC = () => {
             </div>
 
             <div className="space-y-0.5">
-              <h3 className="font-black text-base text-[#1e3a8a] tracking-tight">Ranking General de GP</h3>
-              <p className="text-xs text-slate-400 font-extrabold uppercase tracking-wider">Cierre de periodo: 31 de Mayo de 2026</p>
+              <h3 className="font-black text-base text-[#1e3a8a] tracking-tight">
+                {isAdmin ? 'Ranking General de GP' : 'Ranking de Mi GP'}
+              </h3>
+              <p className="text-xs text-slate-400 font-extrabold uppercase tracking-wider">
+                {isAdmin ? 'Cierre de periodo: 31 de Mayo de 2026' : 'Vista restringida a tu grupo pequeño'}
+              </p>
             </div>
 
             <div className="overflow-x-auto rounded-2xl border border-slate-100 shadow-2xs">

@@ -1,5 +1,6 @@
 import { Router, Response } from 'express';
 import { authMiddleware } from '../middleware/auth';
+import { requireAccessRoles } from '../middleware/authorization';
 import { AuthRequest } from '../types';
 import { ScoreService } from '../services/score.service';
 
@@ -7,6 +8,7 @@ const router = Router();
 const scoreService = new ScoreService();
 
 router.use(authMiddleware);
+router.use(requireAccessRoles(['ADMIN']));
 
 router.get('/kpis', async (req: AuthRequest, res: Response) => {
   try {
