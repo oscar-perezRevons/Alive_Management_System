@@ -30,6 +30,10 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <Navigate to="/login" replace />;
   }
 
+  if (deFactoAuthenticated && !user) {
+    return null;
+  }
+
   if (requiredRole && user?.role !== requiredRole) {
     console.log(`Acceso denegado: Se requiere rol ${requiredRole}. Redirigiendo a /unauthorized`);
     return <Navigate to="/unauthorized" replace />;

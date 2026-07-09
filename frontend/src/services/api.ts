@@ -160,7 +160,8 @@ export const authExtensions = {
 
 export const adminUserExtensions = {
   getAll: () => apiClient.get('/users'),
-  updateRole: (id: number, data: { role: string, groupRole: string }) => apiClient.put(`/users/${id}/role`, data),
+  updateRole: (id: number, data: { accessProfile?: 'ADMIN' | 'LIDER_GP' | 'USUARIO'; role?: string; groupRole?: string }) =>
+    apiClient.put(`/users/${id}/role`, data),
   toggleStatus: (id: number, data: { isActive: boolean }) => apiClient.put(`/users/${id}/status`, data)
 };
 
