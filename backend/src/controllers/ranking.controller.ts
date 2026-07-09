@@ -4,7 +4,10 @@ import prisma from '../config/database';
 import jwt from 'jsonwebtoken';
 
 function extraerUserIdDesdeToken(req: any): number | null {
-  let userId = req.user?.id || req.user?.userId || req.user?.sub || req.user?.user?.id || req.user?.payload?.id;
+  let userId = req.userId;
+  if (userId && !isNaN(Number(userId))) return Number(userId);
+
+  userId = req.user?.id || req.user?.userId || req.user?.sub || req.user?.user?.id || req.user?.payload?.id;
   
   const authHeader = req.headers.authorization;
   if (!userId && authHeader && authHeader.startsWith('Bearer ')) {
@@ -22,7 +25,9 @@ export class RankingController {
   getRankingGeneral = async (req: any, res: Response) => {
     try {
       const rankingRaw = await rankingService.getRankingGeneral();
-      const grupos = await rankingService.getListaGrupos();
+      const userId = extraerUserIdDesdeToken(req);
+      const userRole = req.userRole || req.user?.role;
+      const isAdmin = String(userRole || '').toUpperCase() === 'ADMIN';
       
       const palette = ['text-amber-500', 'text-blue-600', 'text-purple-600', 'text-orange-500', 'text-emerald-600', 'text-red-500', 'text-teal-600', 'text-indigo-500'];
       
@@ -30,6 +35,29 @@ export class RankingController {
         ...item,
         shieldColor: palette[item.id % palette.length]
       }));
+
+      if (!isAdmin) {
+        if (!userId) {
+          return res.status(401).json({ success: false, message: 'Sesión inválida.' });
+        }
+
+        const userGroup = await (prisma as any).groupSmall.findFirst({
+          where: { OR: [{ administratorId: userId }, { members: { some: { id: userId } } }] },
+          select: { id: true, name: true }
+        });
+
+        if (!userGroup) {
+          return res.status(404).json({ success: false, message: 'No asignado a ningún GP activo.' });
+        }
+
+        return res.status(200).json({
+          success: true,
+          ranking: ranking.filter((item: any) => item.id === userGroup.id),
+          grupos: [{ id: userGroup.id, name: userGroup.name }]
+        });
+      }
+
+      const grupos = await rankingService.getListaGrupos();
 
       return res.status(200).json({ success: true, ranking, grupos });
     } catch (error: any) {

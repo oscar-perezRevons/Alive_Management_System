@@ -2,6 +2,7 @@ import { Router, Response } from 'express';
 import { authMiddleware } from '../middleware/auth';
 import { AuthRequest } from '../types';
 import { SecretariaService } from '../services/secretaria.service';
+import { requireAccessRoles } from '../middleware/authorization';
 import prisma from '../config/database';
 import bcrypt from 'bcrypt';
 
@@ -9,6 +10,7 @@ const router = Router();
 const secretariaService = new SecretariaService();
 
 router.use(authMiddleware);
+router.use(requireAccessRoles(['ADMIN', 'LIDER_GP']));
 
 router.get('/groups', async (req: AuthRequest, res: Response) => {
   try {
