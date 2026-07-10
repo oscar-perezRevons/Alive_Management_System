@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { programService } from '../services/api';
 import { 
   Calendar, Clock, Pencil, Trash2,
-  CheckCircle2, X, FileText, Download, ListCollapse, 
+  X, FileText, Download, ListCollapse, 
   Plus, Eye
 } from 'lucide-react';
 import { jsPDF } from 'jspdf';
@@ -45,22 +45,22 @@ export const ProgramaPage: React.FC = () => {
 
   const [alertConfig, setAlertConfig] = useState({ isOpen: false, type: 'success' as 'success' | 'error', title: '', message: '' });
 
-  const showAlert = (type: 'success' | 'error', title: string, message: string) => {
+  const showAlert = useCallback((type: 'success' | 'error', title: string, message: string) => {
     setAlertConfig({ isOpen: true, type, title, message });
-  };
+  }, []);
 
-  const loadScheduleData = async () => {
+  const loadScheduleData = useCallback(async () => {
     try {
       const res = await programService.getFullSchedule();
       setEvents(res.data.events || []);
     } catch (err) {
       showAlert('error', 'Error de Red', 'No se pudo sincronizar el itinerario general sabático.');
     }
-  };
+  }, [showAlert]);
 
   useEffect(() => {
     loadScheduleData();
-  }, []);
+  }, [loadScheduleData]);
 
   const convertAssetToBase64 = (url: string): Promise<string> => {
     return new Promise((resolve) => {
@@ -224,9 +224,9 @@ export const ProgramaPage: React.FC = () => {
       
       {/* PANEL DE CONTROL VISTA WEB */}
       <div className="flex items-center gap-3 px-1">
-        <div className="text-[#002ec4] bg-white p-2.5 rounded-2xl shadow-xs"><Calendar size={26} className="stroke-[2.5]" /></div>
+        <div className="text-[#3730a3] bg-white p-2.5 rounded-2xl shadow-xs"><Calendar size={26} className="stroke-[2.5]" /></div>
         <div>
-          <h1 className="text-2xl font-black text-[#1e3a8a] tracking-tight">Programa General</h1>
+          <h1 className="text-2xl font-black text-[#1e1b4b] tracking-tight">Programa General</h1>
           <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Sistema Oficial de Programación</p>
         </div>
       </div>
@@ -234,15 +234,15 @@ export const ProgramaPage: React.FC = () => {
       {/* SECCIÓN ACCIONES RÁPIDAS */}
       <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-xs flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-4">
-          <div className="w-14 h-14 bg-blue-50 text-[#002ec4] rounded-full flex items-center justify-center shrink-0"><ListCollapse size={24} /></div>
+          <div className="w-14 h-14 bg-indigo-50 text-[#3730a3] rounded-full flex items-center justify-center shrink-0"><ListCollapse size={24} /></div>
           <div>
-            <h3 className="text-sm font-black text-[#1e3a8a]">Programa Oficial Sabático</h3>
+            <h3 className="text-sm font-black text-[#1e1b4b]">Programa Oficial Sabático</h3>
             <p className="text-[11px] text-slate-400 font-semibold mt-0.5">Estructura vigente y panel interactivo del itinerario de la iglesia.</p>
           </div>
         </div>
         <button 
           onClick={() => setIsPreviewModalOpen(true)}
-          className="w-full sm:w-auto bg-[#002ec4] hover:bg-blue-700 text-white text-xs font-black py-2.5 px-5 rounded-xl transition shadow-md uppercase tracking-wider flex items-center justify-center gap-1.5"
+          className="w-full sm:w-auto bg-[#3730a3] hover:bg-indigo-700 text-white text-xs font-black py-2.5 px-5 rounded-xl transition shadow-md uppercase tracking-wider flex items-center justify-center gap-1.5"
         >
           <Eye size={13} /> Ver Programa Oficial (Vista Previa) →
         </button>
@@ -252,15 +252,15 @@ export const ProgramaPage: React.FC = () => {
       <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
         <div className="p-4 bg-white border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 px-5">
           <div className="flex items-center gap-2.5">
-            <FileText size={16} className="text-blue-600" />
+            <FileText size={16} className="text-indigo-600" />
             <div>
-              <h3 className="text-xs font-black text-[#1e3a8a] uppercase tracking-wider">Puntos de Actividades Registrados</h3>
+              <h3 className="text-xs font-black text-[#1e1b4b] uppercase tracking-wider">Puntos de Actividades Registrados</h3>
               <p className="text-[10px] text-slate-400 font-bold">Gestión continua de eventos e himnos dominicales/sabáticos.</p>
             </div>
           </div>
           <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end">
             {currentUserRole === 'ADMIN' && (
-              <button onClick={openCreateModal} className="text-xs font-black bg-blue-50 text-[#002ec4] py-2.5 px-4 rounded-xl border border-blue-100 flex items-center gap-1 hover:bg-blue-100 transition-all"><Plus size={13} /> Agregar Punto</button>
+              <button onClick={openCreateModal} className="text-xs font-black bg-indigo-50 text-[#3730a3] py-2.5 px-4 rounded-xl border border-indigo-100 flex items-center gap-1 hover:bg-indigo-100 transition-all"><Plus size={13} /> Agregar Punto</button>
             )}
             <button onClick={generatePDFReport} className="text-xs font-black bg-amber-500 hover:bg-amber-600 text-white py-2.5 px-4 rounded-xl flex items-center gap-1.5 shadow-sm transition-all"><Download size={13} /> Exportar Reporte</button>
           </div>
@@ -281,7 +281,7 @@ export const ProgramaPage: React.FC = () => {
               {events.map((event, index) => (
                 <tr key={event.id} className={`hover:bg-slate-50/40 transition-all ${!event.isActive ? 'opacity-40 line-through' : ''}`}>
                   <td className="p-4 text-center font-mono text-slate-400 font-black">{index + 1}</td>
-                  <td className="p-4 font-mono text-[#002ec4] font-black flex items-center gap-1"><Clock size={12} className="text-slate-300" /> {event.timeSlot}</td>
+                  <td className="p-4 font-mono text-[#3730a3] font-black flex items-center gap-1"><Clock size={12} className="text-slate-300" /> {event.timeSlot}</td>
                   <td className="p-4 font-black text-slate-800 uppercase tracking-tight text-xs">
                     <div>{event.title}</div>
                     {event.description && <span className="text-[10px] text-slate-400 font-medium normal-case block mt-0.5">{event.description}</span>}
@@ -308,9 +308,9 @@ export const ProgramaPage: React.FC = () => {
           <div className="bg-white w-full max-w-2xl p-6 rounded-3xl border border-slate-100 shadow-2xl space-y-4 mx-4 flex flex-col max-h-[85vh]">
             <div className="flex justify-between items-center border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
-                <div className="p-2 bg-blue-50 text-[#002ec4] rounded-xl"><ListCollapse size={18} /></div>
+                <div className="p-2 bg-indigo-50 text-[#3730a3] rounded-xl"><ListCollapse size={18} /></div>
                 <div>
-                  <h3 className="text-sm font-black text-[#1e3a8a] uppercase tracking-tight">Vista Previa Parcial</h3>
+                  <h3 className="text-sm font-black text-[#1e1b4b] uppercase tracking-tight">Vista Previa Parcial</h3>
                   <p className="text-[10px] text-slate-400 font-bold">Estado actual de la programación oficial sabática</p>
                 </div>
               </div>
@@ -323,7 +323,7 @@ export const ProgramaPage: React.FC = () => {
               ) : (
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="bg-[#1e3a8a] text-white text-[10px] uppercase tracking-wider sticky top-0 z-10">
+                    <tr className="bg-[#1e1b4b] text-white text-[10px] uppercase tracking-wider sticky top-0 z-10">
                       <th className="p-3 text-center w-12 rounded-tl-xl">#</th>
                       <th className="p-3 w-28">Horario</th>
                       <th className="p-3">Actividad / Punto</th>
@@ -332,9 +332,9 @@ export const ProgramaPage: React.FC = () => {
                   </thead>
                   <tbody className="text-xs font-bold text-slate-700 bg-white">
                     {events.map((event, index) => (
-                      <tr key={event.id} className={`border-b border-slate-100 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-blue-50/30'} ${!event.isActive ? 'opacity-40 line-through' : ''}`}>
+                      <tr key={event.id} className={`border-b border-slate-100 transition-colors ${index % 2 === 0 ? 'bg-white' : 'bg-indigo-50/30'} ${!event.isActive ? 'opacity-40 line-through' : ''}`}>
                         <td className="p-3 text-center font-mono text-slate-400 font-black">{index + 1}</td>
-                        <td className="p-3 font-mono text-[#002ec4] font-black">{event.timeSlot}</td>
+                        <td className="p-3 font-mono text-[#3730a3] font-black">{event.timeSlot}</td>
                         <td className="p-3 font-black text-slate-800 uppercase tracking-tight">
                           <div>{event.title}</div>
                           {event.description && <span className="text-[10px] text-slate-400 font-medium normal-case block mt-0.5">{event.description}</span>}
@@ -348,7 +348,7 @@ export const ProgramaPage: React.FC = () => {
             </div>
 
             <div className="flex justify-end pt-2 border-t border-slate-100">
-              <button type="button" onClick={() => setIsPreviewModalOpen(false)} className="px-5 py-2.5 bg-[#1e3a8a] hover:bg-blue-900 text-white rounded-xl font-black text-xs uppercase tracking-wider shadow-sm transition-all">Cerrar Vista Previa</button>
+              <button type="button" onClick={() => setIsPreviewModalOpen(false)} className="px-5 py-2.5 bg-[#1e1b4b] hover:bg-indigo-900 text-white rounded-xl font-black text-xs uppercase tracking-wider shadow-sm transition-all">Cerrar Vista Previa</button>
             </div>
           </div>
         </div>
@@ -359,7 +359,7 @@ export const ProgramaPage: React.FC = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs animate-fadeIn">
           <div className="bg-white w-full max-w-sm p-6 rounded-3xl border border-slate-100 shadow-2xl space-y-4 mx-4">
             <div className="flex justify-between items-center border-b border-slate-100 pb-2">
-              <h3 className="text-xs font-black text-[#1e3a8a] uppercase flex items-center gap-1.5"><Clock size={14} /> Configurar Bloque</h3>
+              <h3 className="text-xs font-black text-[#1e1b4b] uppercase flex items-center gap-1.5"><Clock size={14} /> Configurar Bloque</h3>
               <button onClick={() => setIsModalOpen(false)} className="text-slate-400 p-1 rounded-lg hover:bg-slate-50"><X size={16} /></button>
             </div>
             
@@ -379,14 +379,14 @@ export const ProgramaPage: React.FC = () => {
                 <label className="text-[10px] font-black text-slate-400 uppercase">Punto del Programa</label>
                 <select value={form.title} onChange={(e) => handleTitleDropdownChange(e.target.value)} className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-800 focus:outline-none">
                   {programPoints.map((point) => (<option key={point} value={point}>{point}</option>))}
-                  <option value="CUSTOM" className="text-blue-600 font-black">+ Otro (Agregar nuevo punto...)</option>
+                  <option value="CUSTOM" className="text-indigo-600 font-black">+ Otro (Agregar nuevo punto...)</option>
                 </select>
               </div>
 
               {showCustomTitleInput && (
                 <div className="space-y-1 animate-fadeIn">
-                  <label className="text-[10px] font-black text-blue-600 uppercase">Nuevo Punto *</label>
-                  <input type="text" required={showCustomTitleInput} placeholder="Ej: Alabanza" value={customTitle} onChange={(e) => setCustomTitle(e.target.value)} className="w-full p-2.5 bg-white border-2 border-blue-200 rounded-xl font-bold text-slate-800 focus:outline-none" />
+                  <label className="text-[10px] font-black text-indigo-600 uppercase">Nuevo Punto *</label>
+                  <input type="text" required={showCustomTitleInput} placeholder="Ej: Alabanza" value={customTitle} onChange={(e) => setCustomTitle(e.target.value)} className="w-full p-2.5 bg-white border-2 border-indigo-200 rounded-xl font-bold text-slate-800 focus:outline-none" />
                 </div>
               )}
 
@@ -399,7 +399,7 @@ export const ProgramaPage: React.FC = () => {
 
               <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
                 <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 bg-slate-100 rounded-xl font-black text-slate-600">Cancelar</button>
-                <button type="submit" className="px-5 py-2 bg-[#002ec4] text-white rounded-xl font-black shadow-md">Guardar</button>
+                <button type="submit" className="px-5 py-2 bg-[#3730a3] text-white rounded-xl font-black shadow-md">Guardar</button>
               </div>
             </form>
           </div>
@@ -412,7 +412,7 @@ export const ProgramaPage: React.FC = () => {
           <div className="bg-white w-full max-w-sm p-6 rounded-3xl border border-slate-100 shadow-2xl text-center space-y-4 mx-4">
             <div className="w-14 h-14 mx-auto rounded-full flex items-center justify-center bg-emerald-50 text-emerald-600">✓</div>
             <div className="space-y-1"><h4 className="text-sm font-black text-slate-800 uppercase">{alertConfig.title}</h4><p className="text-xs text-slate-500 font-semibold">{alertConfig.message}</p></div>
-            <button onClick={() => setAlertConfig({ ...alertConfig, isOpen: false })} className="w-full py-2.5 bg-[#002ec4] text-white font-black text-xs rounded-xl">Entendido</button>
+            <button onClick={() => setAlertConfig({ ...alertConfig, isOpen: false })} className="w-full py-2.5 bg-[#3730a3] text-white font-black text-xs rounded-xl">Entendido</button>
           </div>
         </div>
       )}

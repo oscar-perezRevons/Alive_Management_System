@@ -5,6 +5,7 @@ import {
   Clock, ShieldAlert, PlusCircle, CheckCircle2, ListFilter, 
   HelpCircle, Users, X, Layers, Plus
 } from 'lucide-react';
+import { Loader } from '../components/Loader';
 
 export const PuntuacionesPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'OPERACIONES' | 'MATRIZ'>('OPERACIONES');
@@ -142,11 +143,7 @@ export const PuntuacionesPage: React.FC = () => {
   };
 
   if (loading) {
-    return (
-      <div className="py-24 text-center text-xs font-bold text-slate-400 uppercase tracking-widest bg-[#f4f6fc]">
-        <RefreshCw size={18} className="animate-spin mx-auto mb-2 text-[#002ec4]" /> Sincronizando Módulos Visuales...
-      </div>
-    );
+    return <Loader text="Cargando Información..." />;
   }
 
   return (
@@ -154,9 +151,9 @@ export const PuntuacionesPage: React.FC = () => {
       
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4 px-1">
         <div className="flex items-center gap-3">
-          <div className="text-[#002ec4] bg-white p-2.5 rounded-2xl shadow-xs"><Trophy size={26} className="stroke-[2.5]" /></div>
+          <div className="text-[#3730a3] bg-white p-2.5 rounded-2xl shadow-xs"><Trophy size={26} className="stroke-[2.5]" /></div>
           <div>
-            <h1 className="text-2xl font-black text-[#1e3a8a] tracking-tight">Puntuaciones</h1>
+            <h1 className="text-2xl font-black text-[#1e1b4b] tracking-tight">Puntuaciones</h1>
             <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Sistema Oficial de Puntos</p>
           </div>
         </div>
@@ -164,13 +161,13 @@ export const PuntuacionesPage: React.FC = () => {
         <div className="flex bg-white/80 backdrop-blur-xs p-1 rounded-2xl border border-slate-200 shadow-xs">
           <button 
             onClick={() => setActiveTab('OPERACIONES')}
-            className={`px-5 py-2 text-xs font-black rounded-xl transition-all duration-200 ${activeTab === 'OPERACIONES' ? 'bg-[#002ec4] text-white shadow-md' : 'text-slate-500 hover:text-[#002ec4]'}`}
+            className={`px-5 py-2 text-xs font-black rounded-xl transition-all duration-200 ${activeTab === 'OPERACIONES' ? 'bg-[#3730a3] text-white shadow-md' : 'text-slate-500 hover:text-[#3730a3]'}`}
           >
             Panel Operativo
           </button>
           <button 
             onClick={() => setActiveTab('MATRIZ')}
-            className={`px-5 py-2 text-xs font-black rounded-xl transition-all duration-200 ${activeTab === 'MATRIZ' ? 'bg-[#002ec4] text-white shadow-md' : 'text-slate-500 hover:text-[#002ec4]'}`}
+            className={`px-5 py-2 text-xs font-black rounded-xl transition-all duration-200 ${activeTab === 'MATRIZ' ? 'bg-[#3730a3] text-white shadow-md' : 'text-slate-500 hover:text-[#3730a3]'}`}
           >
             Matriz de Criterios
           </button>
@@ -180,7 +177,7 @@ export const PuntuacionesPage: React.FC = () => {
       {kpis && (
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 animate-fadeIn">
           <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-xs flex items-center gap-4">
-            <div className="p-3 bg-blue-50 text-blue-600 rounded-2xl"><Users size={20} /></div>
+            <div className="p-3 bg-indigo-50 text-indigo-600 rounded-2xl"><Users size={20} /></div>
             <div><span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">GP Registrados</span><span className="text-lg font-black text-slate-800">{kpis.totalGroups} <span className="text-xs text-slate-400 font-bold">Equipos</span></span></div>
           </div>
           <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-xs flex items-center gap-4 md:col-span-2">
@@ -199,7 +196,7 @@ export const PuntuacionesPage: React.FC = () => {
       )}
 
       {refreshing && (
-        <div className="text-right text-[10px] text-blue-600 font-bold flex items-center justify-end gap-1 px-1">
+        <div className="text-right text-[10px] text-indigo-600 font-bold flex items-center justify-end gap-1 px-1">
           <RefreshCw size={12} className="animate-spin" /> Sincronizando en tiempo real...
         </div>
       )}
@@ -210,13 +207,13 @@ export const PuntuacionesPage: React.FC = () => {
             <div className="flex items-center gap-3">
               <div className="p-2 bg-indigo-50 text-indigo-600 rounded-xl"><ListFilter size={16} /></div>
               <div>
-                <h2 className="text-sm font-black text-[#1e3a8a]">Categorías de Puntuación</h2>
+                <h2 className="text-sm font-black text-[#1e1b4b]">Categorías de Puntuación</h2>
                 <p className="text-[11px] text-slate-400 font-semibold">Configura dinámicamente las columnas de puntuación sabática</p>
               </div>
             </div>
             <div className="flex gap-2">
               <button onClick={() => setIsCategoryModalOpen(true)} className="flex items-center gap-1.5 text-[11px] font-black bg-slate-100 hover:bg-slate-200 text-slate-700 px-3.5 py-2 rounded-xl transition-all"><Plus size={13} /> Nueva Categoría</button>
-              <button onClick={() => setIsActivityModalOpen(true)} className="flex items-center gap-1.5 text-[11px] font-black bg-[#002ec4] hover:bg-blue-700 text-white px-3.5 py-2 rounded-xl transition-all shadow-md shadow-blue-600/10"><PlusCircle size={13} /> Agregar Subcriterio</button>
+              <button onClick={() => setIsActivityModalOpen(true)} className="flex items-center gap-1.5 text-[11px] font-black bg-[#3730a3] hover:bg-indigo-700 text-white px-3.5 py-2 rounded-xl transition-all shadow-md shadow-indigo-600/10"><PlusCircle size={13} /> Agregar Subcriterio</button>
             </div>
           </div>
 
@@ -225,7 +222,7 @@ export const PuntuacionesPage: React.FC = () => {
               {categories.map((cat, idx) => (
                 <div key={cat.id} className="w-64 bg-slate-50/60 rounded-2xl border border-slate-200/80 p-4 flex flex-col justify-between space-y-4 shadow-2xs hover:border-slate-300 transition-all">
                   <div className="text-center space-y-1">
-                    <span className="text-xs font-black text-[#1e3a8a] uppercase tracking-wide block">{idx + 1}. {cat.name}</span>
+                    <span className="text-xs font-black text-[#1e1b4b] uppercase tracking-wide block">{idx + 1}. {cat.name}</span>
                     <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Bloque Operativo</p>
                   </div>
                   
@@ -243,7 +240,7 @@ export const PuntuacionesPage: React.FC = () => {
                   
                   <button 
                     onClick={() => { setSelectedCategoryIdForActivity(cat.id); setIsActivityModalOpen(true); }}
-                    className="text-[10px] text-[#002ec4] hover:text-blue-700 font-black text-center block w-full pt-1 uppercase tracking-wider"
+                    className="text-[10px] text-[#3730a3] hover:text-indigo-700 font-black text-center block w-full pt-1 uppercase tracking-wider"
                   >
                     + Añadir Criterio
                   </button>
@@ -259,8 +256,8 @@ export const PuntuacionesPage: React.FC = () => {
           
           <div className="xl:col-span-3 bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
             <div className="p-4 border-b border-slate-100 bg-slate-50/30 flex items-center gap-2">
-              <BarChart3 size={15} className="text-[#002ec4]" />
-              <h3 className="text-xs font-black text-[#1e3a8a] uppercase tracking-wider">Ranking General</h3>
+              <BarChart3 size={15} className="text-[#3730a3]" />
+              <h3 className="text-xs font-black text-[#1e1b4b] uppercase tracking-wider">Ranking General</h3>
             </div>
             <div className="divide-y divide-slate-100">
               {[...groups]
@@ -281,13 +278,13 @@ export const PuntuacionesPage: React.FC = () => {
           </div>
 
           <div className="xl:col-span-4 bg-white rounded-3xl shadow-sm border border-slate-100 p-5 space-y-4">
-            <h3 className="text-xs font-black text-[#1e3a8a] uppercase tracking-wider border-b border-slate-100 pb-3 flex items-center gap-2">
-              <PlusCircle size={15} className="text-blue-600" /> Registrar Puntuación
+            <h3 className="text-xs font-black text-[#1e1b4b] uppercase tracking-wider border-b border-slate-100 pb-3 flex items-center gap-2">
+              <PlusCircle size={15} className="text-indigo-600" /> Registrar Puntuación
             </h3>
             <form onSubmit={handleScoreSubmit} className="space-y-4 text-xs font-bold text-slate-600">
               <div className="space-y-1">
                 <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">1. Seleccionar GP</label>
-                <select value={selectedGroup} onChange={(e) => setSelectedGroup(e.target.value)} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-800 focus:outline-none focus:border-[#002ec4] transition-all">
+                <select value={selectedGroup} onChange={(e) => setSelectedGroup(e.target.value)} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-800 focus:outline-none focus:border-[#3730a3] transition-all">
                   <option value="">-- Elige un grupo --</option>
                   {groups.map(g => (<option key={g.id} value={g.id}>GP {g.name.toUpperCase()}</option>))}
                 </select>
@@ -295,7 +292,7 @@ export const PuntuacionesPage: React.FC = () => {
 
               <div className="space-y-1">
                 <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">2. Seleccionar Categoría</label>
-                <select value={selectedCategory} onChange={(e) => handleCategoryChange(Number(e.target.value))} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-800 focus:outline-none focus:border-[#002ec4] transition-all">
+                <select value={selectedCategory} onChange={(e) => handleCategoryChange(Number(e.target.value))} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-800 focus:outline-none focus:border-[#3730a3] transition-all">
                   <option value="">-- Criterios institucionales --</option>
                   {categories.map(c => (<option key={c.id} value={c.id}>{c.name}</option>))}
                 </select>
@@ -306,7 +303,7 @@ export const PuntuacionesPage: React.FC = () => {
                   <label className="text-[10px] font-black uppercase text-slate-400 tracking-wider">3. Seleccionar Actividad / Logro</label>
                   <select 
                     onChange={(e) => setSelectedActivity(categories.find(c => c.id === selectedCategory)?.activities?.find((a: any) => a.id === Number(e.target.value)))}
-                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-800 focus:outline-none focus:border-[#002ec4] transition-all"
+                    className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-800 focus:outline-none focus:border-[#3730a3] transition-all"
                   >
                     <option value="">-- Elige el logro alcanzado --</option>
                     {categories.find(c => c.id === selectedCategory)?.activities?.map((a: any) => (
@@ -333,7 +330,7 @@ export const PuntuacionesPage: React.FC = () => {
                 <textarea rows={2} placeholder="Escribe anotaciones complementarias..." value={observation} onChange={(e) => setObservation(e.target.value)} className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-800 focus:outline-none resize-none" />
               </div>
 
-              <button type="submit" className="w-full py-3 bg-[#002ec4] hover:bg-blue-700 text-white font-black rounded-xl shadow-md transition transform active:scale-95 text-xs uppercase tracking-wider">
+              <button type="submit" className="w-full py-3 bg-[#3730a3] hover:bg-indigo-700 text-white font-black rounded-xl shadow-md transition transform active:scale-95 text-xs uppercase tracking-wider">
                 Guardar Puntuación
               </button>
             </form>
@@ -342,7 +339,7 @@ export const PuntuacionesPage: React.FC = () => {
           <div className="xl:col-span-5 space-y-5">
             <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
               <div className="p-4 border-b border-slate-100 bg-slate-50/20 flex justify-between items-center">
-                <h3 className="text-xs font-black text-[#1e3a8a] uppercase tracking-wider flex items-center gap-1.5"><Clock size={14} className="text-blue-600" /> Historial Reciente</h3>
+                <h3 className="text-xs font-black text-[#1e1b4b] uppercase tracking-wider flex items-center gap-1.5"><Clock size={14} className="text-indigo-600" /> Historial Reciente</h3>
                 <span className="text-[10px] text-slate-400 bg-slate-100 px-2 py-0.5 rounded-md font-bold">Últimas 10</span>
               </div>
               <div className="overflow-x-auto text-xs font-bold">
@@ -398,23 +395,23 @@ export const PuntuacionesPage: React.FC = () => {
       )}
 
       <div className="bg-white p-5 rounded-3xl shadow-sm border border-slate-100 space-y-4">
-        <h4 className="text-xs font-black text-[#1e3a8a] flex items-center gap-1.5"><HelpCircle size={15} /> ¿Cómo funciona el ciclo operativo?</h4>
+        <h4 className="text-xs font-black text-[#1e1b4b] flex items-center gap-1.5"><HelpCircle size={15} /> ¿Cómo funciona el ciclo operativo?</h4>
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4 text-center text-slate-600 font-bold text-[11px] leading-relaxed">
-          <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 relative"><span className="absolute top-2 left-2 w-5 h-5 bg-[#002ec4] text-white rounded-full flex items-center justify-center font-black text-[9px]">1</span><p className="mt-4 text-slate-700">Selecciona el GP</p></div>
-          <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 relative"><span className="absolute top-2 left-2 w-5 h-5 bg-[#002ec4] text-white rounded-full flex items-center justify-center font-black text-[9px]">2</span><p className="mt-4 text-slate-700">Elige Categoría</p></div>
-          <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 relative"><span className="absolute top-2 left-2 w-5 h-5 bg-[#002ec4] text-white rounded-full flex items-center justify-center font-black text-[9px]">3</span><p className="mt-4 text-slate-700">Asignación Automática</p></div>
-          <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 relative"><span className="absolute top-2 left-2 w-5 h-5 bg-[#002ec4] text-white rounded-full flex items-center justify-center font-black text-[9px]">4</span><p className="mt-4 text-slate-700">Guardar Actividad</p></div>
-          <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 relative"><span className="absolute top-2 left-2 w-5 h-5 bg-[#002ec4] text-white rounded-full flex items-center justify-center font-black text-[9px]">5</span><p className="mt-4 text-slate-700">Ranking Refrescado</p></div>
+          <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 relative"><span className="absolute top-2 left-2 w-5 h-5 bg-[#3730a3] text-white rounded-full flex items-center justify-center font-black text-[9px]">1</span><p className="mt-4 text-slate-700">Selecciona el GP</p></div>
+          <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 relative"><span className="absolute top-2 left-2 w-5 h-5 bg-[#3730a3] text-white rounded-full flex items-center justify-center font-black text-[9px]">2</span><p className="mt-4 text-slate-700">Elige Categoría</p></div>
+          <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 relative"><span className="absolute top-2 left-2 w-5 h-5 bg-[#3730a3] text-white rounded-full flex items-center justify-center font-black text-[9px]">3</span><p className="mt-4 text-slate-700">Asignación Automática</p></div>
+          <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 relative"><span className="absolute top-2 left-2 w-5 h-5 bg-[#3730a3] text-white rounded-full flex items-center justify-center font-black text-[9px]">4</span><p className="mt-4 text-slate-700">Guardar Actividad</p></div>
+          <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 relative"><span className="absolute top-2 left-2 w-5 h-5 bg-[#3730a3] text-white rounded-full flex items-center justify-center font-black text-[9px]">5</span><p className="mt-4 text-slate-700">Ranking Refrescado</p></div>
         </div>
       </div>
 
       {isCategoryModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs">
           <div className="bg-white w-full max-w-sm p-6 rounded-3xl border border-slate-100 shadow-2xl space-y-4 mx-4">
-            <div className="flex justify-between items-center border-b border-slate-100 pb-2"><h3 className="text-xs font-black text-[#1e3a8a] uppercase flex items-center gap-1.5"><Layers size={14} /> Nueva Categoría</h3><button onClick={() => setIsCategoryModalOpen(false)} className="text-slate-400 p-1 rounded-lg hover:bg-slate-50"><X size={16} /></button></div>
+            <div className="flex justify-between items-center border-b border-slate-100 pb-2"><h3 className="text-xs font-black text-[#1e1b4b] uppercase flex items-center gap-1.5"><Layers size={14} /> Nueva Categoría</h3><button onClick={() => setIsCategoryModalOpen(false)} className="text-slate-400 p-1 rounded-lg hover:bg-slate-50"><X size={16} /></button></div>
             <form onSubmit={handleCreateCategory} className="space-y-4 text-xs font-bold">
               <input type="text" required placeholder="Ej: Espíritu de Servicio..." value={newCategoryName} onChange={(e) => setNewCategoryName(e.target.value)} className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-800 focus:outline-none" />
-              <div className="flex justify-end gap-2"><button type="button" onClick={() => setIsCategoryModalOpen(false)} className="px-4 py-2 bg-slate-100 rounded-xl">Cancelar</button><button type="submit" className="px-4 py-2 bg-[#002ec4] text-white rounded-xl shadow-md">Crear</button></div>
+              <div className="flex justify-end gap-2"><button type="button" onClick={() => setIsCategoryModalOpen(false)} className="px-4 py-2 bg-slate-100 rounded-xl">Cancelar</button><button type="submit" className="px-4 py-2 bg-[#3730a3] text-white rounded-xl shadow-md">Crear</button></div>
             </form>
           </div>
         </div>
@@ -423,7 +420,7 @@ export const PuntuacionesPage: React.FC = () => {
       {isActivityModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs">
           <div className="bg-white w-full max-w-sm p-6 rounded-3xl border border-slate-100 shadow-2xl space-y-4 mx-4">
-            <div className="flex justify-between items-center border-b border-slate-100 pb-2"><h3 className="text-xs font-black text-[#1e3a8a] uppercase flex items-center gap-1.5"><PlusCircle size={14} /> Añadir Subcriterio</h3><button onClick={() => setIsActivityModalOpen(false)} className="text-slate-400 p-1 rounded-lg hover:bg-slate-50"><X size={16} /></button></div>
+            <div className="flex justify-between items-center border-b border-slate-100 pb-2"><h3 className="text-xs font-black text-[#1e1b4b] uppercase flex items-center gap-1.5"><PlusCircle size={14} /> Añadir Subcriterio</h3><button onClick={() => setIsActivityModalOpen(false)} className="text-slate-400 p-1 rounded-lg hover:bg-slate-50"><X size={16} /></button></div>
             <form onSubmit={handleCreateActivity} className="space-y-4 text-xs font-bold text-slate-600">
               <select required value={selectedCategoryIdForActivity} onChange={(e) => setSelectedCategoryIdForActivity(Number(e.target.value))} className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-800 focus:outline-none">
                 <option value="">-- Elige Columna Destino --</option>
@@ -431,7 +428,7 @@ export const PuntuacionesPage: React.FC = () => {
               </select>
               <input type="text" required placeholder="Nombre del criterio..." value={newActivityName} onChange={(e) => setNewActivityName(e.target.value)} className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-800 focus:outline-none" />
               <input type="number" required placeholder="Puntos asignados..." value={newActivityPoints} onChange={(e) => setNewActivityPoints(e.target.value)} className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-bold text-slate-800 focus:outline-none" />
-              <div className="flex justify-end gap-2"><button type="button" onClick={() => setIsActivityModalOpen(false)} className="px-4 py-2 bg-slate-100 rounded-xl">Cancelar</button><button type="submit" className="px-4 py-2 bg-[#002ec4] text-white rounded-xl shadow-md">Vincular</button></div>
+              <div className="flex justify-end gap-2"><button type="button" onClick={() => setIsActivityModalOpen(false)} className="px-4 py-2 bg-slate-100 rounded-xl">Cancelar</button><button type="submit" className="px-4 py-2 bg-[#3730a3] text-white rounded-xl shadow-md">Vincular</button></div>
             </form>
           </div>
         </div>
@@ -459,7 +456,7 @@ export const PuntuacionesPage: React.FC = () => {
           <div className="bg-white w-full max-w-sm p-6 rounded-3xl border border-slate-100 shadow-2xl text-center space-y-4 mx-4">
             <div className={`w-14 h-14 mx-auto rounded-full flex items-center justify-center ${alertConfig.type === 'success' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>{alertConfig.type === 'success' ? <CheckCircle2 size={28} /> : <AlertTriangle size={28} />}</div>
             <div className="space-y-1"><h4 className="text-sm font-black text-slate-800 uppercase tracking-tight">{alertConfig.title}</h4><p className="text-xs text-slate-500 font-semibold leading-relaxed">{alertConfig.message}</p></div>
-            <button onClick={() => setAlertConfig({ ...alertConfig, isOpen: false })} className={`w-full py-2.5 text-white font-black text-xs rounded-xl shadow-md ${alertConfig.type === 'success' ? 'bg-[#002ec4] hover:bg-blue-700' : 'bg-rose-600'}`}>Entendido</button>
+            <button onClick={() => setAlertConfig({ ...alertConfig, isOpen: false })} className={`w-full py-2.5 text-white font-black text-xs rounded-xl shadow-md ${alertConfig.type === 'success' ? 'bg-[#3730a3] hover:bg-indigo-700' : 'bg-rose-600'}`}>Entendido</button>
           </div>
         </div>
       )}

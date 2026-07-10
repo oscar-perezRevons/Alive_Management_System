@@ -1,10 +1,11 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { secretariaService } from '../services/api';
 import { 
   Users, UserPlus, Calendar, Crown, Star, FileText, UserCheck,
   Flag, Music, Info, Trash2, Edit3, Plus,
   AlertTriangle, RefreshCw, Layers, X, Sliders, CheckCircle2, UserIcon, Mail, Pencil
 } from 'lucide-react';
+import { Loader } from '../components/Loader';
 
 export const SecretariaPage: React.FC = () => {
   const [groups, setGroups] = useState<any[]>([]);
@@ -17,6 +18,7 @@ export const SecretariaPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [gpDropdownOpen, setGpDropdownOpen] = useState(false);
+  const isInitialLoad = useRef(true);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLinkModalOpen, setIsLinkModalOpen] = useState(false);
@@ -41,9 +43,15 @@ export const SecretariaPage: React.FC = () => {
     try {
       setLoading(true);
       const res = await secretariaService.getAllGroups();
-      setGroups(res.data || []);
-      if (res.data && res.data.length > 0) {
-        setActiveGroupId(targetGroupId || res.data[0].id);
+      const groupsData = res.data || [];
+      setGroups(groupsData);
+      
+      const nextGroupId = targetGroupId || (groupsData.length > 0 ? groupsData[0].id : null);
+      if (nextGroupId !== null) {
+        setActiveGroupId(nextGroupId);
+        const panelRes = await secretariaService.getGroupPanel(nextGroupId);
+        setMembers(panelRes.data.members || []);
+        setIdentity(panelRes.data.identity || null);
       }
     } catch (err) {
       showAlert('error', 'Fallo de Sincronización', 'Error al sincronizar el ecosistema de Grupos Pequeños.');
@@ -70,8 +78,14 @@ export const SecretariaPage: React.FC = () => {
   }, [loadGroupsList]);
 
   useEffect(() => {
-    if (activeGroupId !== null) { loadPanelDetails(activeGroupId); }
-  }, [activeGroupId, loadPanelDetails]);
+    if (activeGroupId !== null && !loading) { 
+      if (isInitialLoad.current) {
+        isInitialLoad.current = false;
+      } else {
+        loadPanelDetails(activeGroupId);
+      }
+    }
+  }, [activeGroupId, loading, loadPanelDetails]);
 
   const openLinkModal = async () => {
     try {
@@ -223,18 +237,22 @@ export const SecretariaPage: React.FC = () => {
 
   const roleCardsOptions = [
     { value: 'Integrante', label: 'Integrante', desc: 'Miembro regular del concilio', icon: <UserCheck size={15} />, style: 'hover:border-slate-350 hover:bg-slate-50', active: 'border-slate-600 bg-slate-100 text-slate-900 ring-2 ring-slate-200 scale-[1.01]' },
-    { value: 'Líder', label: 'Líder', desc: 'Director espiritual del GP', icon: <Crown size={15} />, style: 'hover:border-blue-300 hover:bg-blue-50/40', active: 'border-[#0033cc] bg-blue-50 text-blue-700 ring-2 ring-blue-200 scale-[1.015]' },
+    { value: 'Líder', label: 'Líder', desc: 'Director espiritual del GP', icon: <Crown size={15} />, style: 'hover:border-blue-300 hover:bg-blue-50/40', active: 'border-[#4f46e5] bg-blue-50 text-blue-700 ring-2 ring-blue-200 scale-[1.015]' },
     { value: 'Sub Líder', label: 'Sub Líder', desc: 'Asistente de directiva', icon: <Star size={15} />, style: 'hover:border-purple-300 hover:bg-purple-50/40', active: 'border-purple-600 bg-purple-50 text-purple-700 ring-2 ring-purple-200 scale-[1.015]' },
     { value: 'Secretario', label: 'Secretario', desc: 'Encargado de actas', icon: <FileText size={15} />, style: 'hover:border-amber-300 hover:bg-amber-50/40', active: 'border-amber-600 bg-amber-50 text-amber-700 ring-2 ring-amber-200 scale-[1.015]' },
     { value: 'Tesorera', label: 'Tesorera', desc: 'Control de finanzas', icon: <Layers size={15} />, style: 'hover:border-emerald-300 hover:bg-emerald-50/40', active: 'border-emerald-600 bg-emerald-50 text-emerald-700 ring-2 ring-emerald-200 scale-[1.015]' }
   ];
+
+  if (loading) {
+    return <Loader text="Cargando Información..." />;
+  }
 
   return (
     <div className="space-y-5 font-sans text-slate-800 animate-fadeIn bg-[#f4f6fc] w-full px-2 sm:px-4 select-none pb-8">
       
       <div className="flex flex-col sm:flex-row justify-between items-center gap-4 bg-white p-5 rounded-3xl border border-slate-200">
         <div className="flex items-center gap-3">
-          <div className="bg-[#0033cc] p-2.5 text-white rounded-2xl"><Users size={24} className="stroke-[2.5]" /></div>
+          <div className="bg-[#4f46e5] p-2.5 text-white rounded-2xl"><Users size={24} className="stroke-[2.5]" /></div>
           <div className="space-y-0.5">
             <h1 className="text-2xl font-black text-[#1e3a8a] tracking-tight">Secretaría</h1>
             <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Sistema de Gestión de Grupos Pequeños (GP)</p>
@@ -248,7 +266,7 @@ export const SecretariaPage: React.FC = () => {
             <div className="relative">
               <button 
                 onClick={() => setGpDropdownOpen(!gpDropdownOpen)}
-                className="flex items-center gap-2 px-4 py-2.5 bg-white border-2 border-[#0033cc] rounded-xl text-xs font-black text-[#0033cc] focus:outline-none cursor-pointer uppercase tracking-wider transition-colors hover:bg-blue-50/40"
+                className="flex items-center gap-2 px-4 py-2.5 bg-white border-2 border-[#4f46e5] rounded-xl text-xs font-black text-[#4f46e5] focus:outline-none cursor-pointer uppercase tracking-wider transition-colors hover:bg-blue-50/40"
               >
                 <span>GP: {groups.find(g => g.id === activeGroupId)?.name.toUpperCase() || 'SELECCIONAR'}</span>
                 <Sliders size={13} className={`transition-transform duration-200 ${gpDropdownOpen ? 'rotate-180' : ''}`} />
@@ -266,11 +284,11 @@ export const SecretariaPage: React.FC = () => {
                           setGpDropdownOpen(false);
                         }}
                         className={`w-full text-left px-4 py-2.5 text-xs font-black transition-colors flex items-center justify-between cursor-pointer ${
-                          activeGroupId === g.id ? 'bg-blue-50 text-[#0033cc]' : 'text-slate-700 hover:bg-slate-50'
+                          activeGroupId === g.id ? 'bg-blue-50 text-[#4f46e5]' : 'text-slate-700 hover:bg-slate-50'
                         }`}
                       >
                         <span>GP {g.name.toUpperCase()}</span>
-                        {activeGroupId === g.id && <CheckCircle2 size={13} className="text-[#0033cc]" />}
+                        {activeGroupId === g.id && <CheckCircle2 size={13} className="text-[#4f46e5]" />}
                       </button>
                     ))}
                   </div>
@@ -282,35 +300,20 @@ export const SecretariaPage: React.FC = () => {
       </div>
 
       {refreshing || loading ? (
-        <div className="bg-white rounded-3xl border border-slate-200 p-8 space-y-6 animate-pulse">
-          <div className="flex justify-between items-center pb-4 border-b border-slate-100">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-slate-100 rounded-xl flex items-center justify-center"><RefreshCw size={18} className="animate-spin text-[#0033cc]" /></div>
-              <div className="space-y-2">
-                <div className="h-4 bg-slate-200 rounded-md w-36"></div>
-                <div className="h-3 bg-slate-100 rounded-md w-56"></div>
-              </div>
-            </div>
-            <div className="h-10 bg-slate-200 rounded-xl w-36"></div>
-          </div>
-          <div className="space-y-3 pt-2">
-            <div className="h-12 bg-slate-50 rounded-xl border border-slate-200 w-full"></div>
-            <div className="h-12 bg-slate-50 rounded-xl border border-slate-200 w-full"></div>
-          </div>
-        </div>
+        <Loader text="Cargando Información..." />
       ) : identity ? (
         <div className="space-y-5 animate-fadeIn">
           
           <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden">
             <div className="p-5 flex justify-between items-center bg-white border-b border-slate-100">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-50 text-[#0033cc] rounded-xl"><UserCheck size={18} /></div>
+                <div className="p-2 bg-blue-50 text-[#4f46e5] rounded-xl"><UserCheck size={18} /></div>
                 <div>
                   <h2 className="text-base font-black text-[#1e3a8a] uppercase tracking-wide">Lista de Integrantes</h2>
                   <p className="text-xs text-slate-400 font-bold">Feligresía registrada oficialmente en el grupo</p>
                 </div>
               </div>
-              <button onClick={openLinkModal} className="flex items-center gap-1.5 px-5 py-2.5 bg-[#0033cc] hover:bg-blue-700 text-white font-black text-sm uppercase tracking-wider rounded-xl transition-all duration-200 hover:-translate-y-0.5 active:scale-95 cursor-pointer">
+              <button onClick={openLinkModal} className="flex items-center gap-1.5 px-5 py-2.5 bg-[#4f46e5] hover:bg-blue-700 text-white font-black text-sm uppercase tracking-wider rounded-xl transition-all duration-200 hover:-translate-y-0.5 active:scale-95 cursor-pointer">
                 <UserPlus size={14} /> Agregar Integrante
               </button>
             </div>
@@ -362,7 +365,7 @@ export const SecretariaPage: React.FC = () => {
           <div className="bg-white rounded-3xl border border-slate-200 overflow-hidden">
             <div className="p-5 flex items-center justify-between bg-white border-b border-slate-100">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-50 text-[#0033cc] rounded-xl"><Info size={18} /></div>
+                <div className="p-2 bg-blue-50 text-[#4f46e5] rounded-xl"><Info size={18} /></div>
                 <div>
                   <h2 className="text-lg font-black text-[#1e3a8a] uppercase tracking-wide">Ficha de Identidad del GP</h2>
                   <p className="text-xs text-slate-400 font-bold">Datos heráldicos, ideales colectivos y versículo de fe</p>
@@ -376,11 +379,11 @@ export const SecretariaPage: React.FC = () => {
               <div className="p-6 space-y-4 bg-gradient-to-br from-slate-50/50 to-white">
                 <div>
                   <span className="text-xs font-black text-slate-400 uppercase block tracking-wider">Nombre Oficial del Concilio</span>
-                  <span className="text-2xl font-black text-[#0033cc] uppercase tracking-tight block mt-1">GP {identity.name}</span>
+                  <span className="text-2xl font-black text-[#4f46e5] uppercase tracking-tight block mt-1">GP {identity.name}</span>
                 </div>
                 <div className="space-y-2">
-                  <span className="text-sm font-black text-slate-600 flex items-center gap-1.5 uppercase tracking-wide"><Flag size={14} className="text-[#0033cc]" /> Estandarte Heráldico</span>
-                  <div className="w-full h-36 bg-gradient-to-br from-blue-700 via-[#0033cc] to-indigo-900 rounded-2xl flex items-center justify-center text-white font-black text-base uppercase relative border border-white/10 overflow-hidden group">
+                  <span className="text-sm font-black text-slate-600 flex items-center gap-1.5 uppercase tracking-wide"><Flag size={14} className="text-[#4f46e5]" /> Estandarte Heráldico</span>
+                  <div className="w-full h-36 bg-gradient-to-br from-blue-700 via-[#4f46e5] to-indigo-900 rounded-2xl flex items-center justify-center text-white font-black text-base uppercase relative border border-white/10 overflow-hidden group">
                     <div className="border-2 border-white/20 rounded-xl p-4 text-center bg-white/10 backdrop-blur-xs tracking-widest font-black transition transform group-hover:scale-105">
                        GP {identity.name.toUpperCase()} 
                     </div>
@@ -396,9 +399,9 @@ export const SecretariaPage: React.FC = () => {
                   </p>
                 </div>
                 <div className="space-y-2">
-                  <span className="text-sm font-black text-slate-600 flex items-center gap-1.5 uppercase tracking-wide"><Music size={14} className="text-[#0033cc]" /> Himno Corporativo Registrado</span>
+                  <span className="text-sm font-black text-slate-600 flex items-center gap-1.5 uppercase tracking-wide"><Music size={14} className="text-[#4f46e5]" /> Himno Corporativo Registrado</span>
                   <div className="p-4 bg-blue-50/40 rounded-2xl border border-blue-100 flex items-center gap-3.5">
-                    <div className="p-2.5 bg-white rounded-xl text-[#0033cc] border border-blue-200/60"><Music size={18} /></div>
+                    <div className="p-2.5 bg-white rounded-xl text-[#4f46e5] border border-blue-200/60"><Music size={18} /></div>
                     <div className="min-w-0 flex-1">
                       <h4 className="text-sm font-black text-blue-900 truncate uppercase tracking-tight">{identity.anthemUrl || 'Sin Himno Registrado'}</h4>
                       <p className="text-[10px] text-slate-400 font-black mt-0.5 uppercase tracking-wider">Archivo Oficial Conectado</p>
@@ -413,7 +416,7 @@ export const SecretariaPage: React.FC = () => {
                   <p className="text-base font-bold text-slate-700 leading-relaxed mt-1 bg-white p-3 rounded-xl border border-slate-200/70">
                     "{identity.verse || 'No redactado.'}"
                   </p>
-                  <span className="text-xs font-black text-[#0033cc] bg-blue-50 border border-blue-100 px-3 py-1 rounded-md inline-block mt-2 uppercase tracking-wide">Romanos 8:37</span>
+                  <span className="text-xs font-black text-[#4f46e5] bg-blue-50 border border-blue-100 px-3 py-1 rounded-md inline-block mt-2 uppercase tracking-wide">Romanos 8:37</span>
                 </div>
                 <div className="pt-3 border-t border-slate-100 text-xs text-slate-400 font-black uppercase tracking-wider space-y-1">
                   <span className="block text-[10px] text-slate-400 tracking-wide">Fecha de Fundación</span>
@@ -433,7 +436,7 @@ export const SecretariaPage: React.FC = () => {
       )}
 
       {deleteConfirm.isOpen && (
-        <div className="fixed inset-0 bg-[#0033cc]/10 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-fadeIn">
+        <div className="fixed inset-0 bg-[#4f46e5]/10 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-fadeIn">
           <div className="bg-white w-full max-w-sm p-6 rounded-3xl border border-slate-200 text-center space-y-4">
             <div className="w-14 h-14 mx-auto rounded-full bg-rose-50 text-rose-600 border border-rose-100 flex items-center justify-center">
               <Trash2 size={26} />
@@ -446,7 +449,7 @@ export const SecretariaPage: React.FC = () => {
             </div>
             <div className="flex gap-2.5 pt-1">
               <button type="button" disabled={refreshing} onClick={() => setDeleteConfirm({ isOpen: false, memberId: null, memberName: '' })} className="flex-1 py-2.5 bg-slate-100 text-slate-500 font-black uppercase tracking-wider text-xs rounded-xl cursor-pointer hover:bg-slate-200 transition">Cancelar</button>
-              <button type="button" disabled={refreshing} onClick={executeRemoveMember} className="flex-1 py-2.5 bg-[#0033cc] hover:bg-blue-700 text-white font-black uppercase tracking-wider text-xs rounded-xl cursor-pointer transition flex items-center justify-center gap-1.5">
+              <button type="button" disabled={refreshing} onClick={executeRemoveMember} className="flex-1 py-2.5 bg-[#4f46e5] hover:bg-blue-700 text-white font-black uppercase tracking-wider text-xs rounded-xl cursor-pointer transition flex items-center justify-center gap-1.5">
                 {refreshing ? <RefreshCw size={12} className="animate-spin" /> : 'Confirmar'}
               </button>
             </div>
@@ -455,11 +458,11 @@ export const SecretariaPage: React.FC = () => {
       )}
 
       {isEditMemberModalOpen && editingMember && (
-        <div className="fixed inset-0 bg-[#0033cc]/10 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-fadeIn">
+        <div className="fixed inset-0 bg-[#4f46e5]/10 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-fadeIn">
           <div className="bg-white w-full max-w-md p-6 rounded-3xl border border-slate-200 space-y-5">
             <div className="flex justify-between items-center border-b border-slate-100 pb-2.5">
               <div className="flex items-center gap-2">
-                <Sliders size={18} className="text-[#0033cc]" />
+                <Sliders size={18} className="text-[#4f46e5]" />
                 <h3 className="text-lg font-black text-slate-900 uppercase tracking-wide">Editar Responsabilidad</h3>
               </div>
               <button type="button" onClick={() => setIsEditMemberModalOpen(false)} className="text-slate-400 hover:bg-slate-100 p-1.5 rounded-lg transition cursor-pointer"><X size={18} /></button>
@@ -467,7 +470,7 @@ export const SecretariaPage: React.FC = () => {
             
             <form onSubmit={handleEditMemberSubmit} className="space-y-4 text-xs font-bold text-slate-600">
               <div className="space-y-1 bg-blue-50/50 p-3 rounded-xl border border-blue-100">
-                <span className="text-[10px] font-black text-[#0033cc] uppercase tracking-wider block">Integrante Seleccionado</span>
+                <span className="text-[10px] font-black text-[#4f46e5] uppercase tracking-wider block">Integrante Seleccionado</span>
                 <span className="text-base font-black text-slate-900 block mt-0.5 capitalize">{editingMember.name}</span>
               </div>
               
@@ -503,7 +506,7 @@ export const SecretariaPage: React.FC = () => {
 
               <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
                 <button type="button" onClick={() => setIsEditMemberModalOpen(false)} className="px-5 py-2.5 bg-slate-100 text-slate-500 rounded-xl font-black uppercase text-xs cursor-pointer">Cancelar</button>
-                <button type="submit" disabled={refreshing} className="px-5 py-2.5 bg-[#0033cc] hover:bg-blue-700 text-white rounded-xl font-black uppercase text-xs cursor-pointer transition flex items-center justify-center gap-1.5 shadow-3xs">
+                <button type="submit" disabled={refreshing} className="px-5 py-2.5 bg-[#4f46e5] hover:bg-blue-700 text-white rounded-xl font-black uppercase text-xs cursor-pointer transition flex items-center justify-center gap-1.5 shadow-3xs">
                   {refreshing ? <RefreshCw size={12} className="animate-spin" /> : 'Sincronizar Cargo'}
                 </button>
               </div>
@@ -513,35 +516,35 @@ export const SecretariaPage: React.FC = () => {
       )}
 
       {isModalOpen && (
-        <div className="fixed inset-0 bg-[#0033cc]/10 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-fadeIn">
+        <div className="fixed inset-0 bg-[#4f46e5]/10 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-fadeIn">
           <div className="bg-white w-full max-w-lg p-6 rounded-3xl border border-slate-200 space-y-5">
             <div className="flex justify-between items-center border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
-                <Sliders size={18} className="text-[#0033cc]" />
+                <Sliders size={18} className="text-[#4f46e5]" />
                 <h3 className="text-lg font-black text-slate-900 uppercase tracking-wide">{modalMode === 'CREATE' ? 'Agregar Nuevo Grupo' : `Modificar Información`}</h3>
               </div>
               <button type="button" onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:bg-slate-100 p-1.5 rounded-lg transition cursor-pointer"><X size={18} /></button>
             </div>
             <form onSubmit={handleFormSubmit} className="space-y-4 text-xs font-bold text-slate-600">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1"><label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Nombre del Grupo *</label><input type="text" required placeholder="Ej: Siloé" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full p-3 bg-slate-50 border-2 border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:border-[#0033cc] focus:bg-white transition" /></div>
-                <div className="space-y-1"><label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Lema o Slogan</label><input type="text" placeholder="Ej: Firmes en la fe" value={formData.motto} onChange={(e) => setFormData({...formData, motto: e.target.value})} className="w-full p-3 bg-slate-50 border-2 border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:border-[#0033cc] focus:bg-white transition" /></div>
+                <div className="space-y-1"><label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Nombre del Grupo *</label><input type="text" required placeholder="Ej: Siloé" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full p-3 bg-slate-50 border-2 border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:border-[#4f46e5] focus:bg-white transition" /></div>
+                <div className="space-y-1"><label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Lema o Slogan</label><input type="text" placeholder="Ej: Firmes en la fe" value={formData.motto} onChange={(e) => setFormData({...formData, motto: e.target.value})} className="w-full p-3 bg-slate-50 border-2 border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:border-[#4f46e5] focus:bg-white transition" /></div>
               </div>
-              <div className="space-y-1"><label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Título del Himno Oficial</label><input type="text" placeholder="Ej: Cuán Grande es Él" value={formData.anthemUrl} onChange={(e) => setFormData({...formData, anthemUrl: e.target.value})} className="w-full p-3 bg-slate-50 border-2 border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:border-[#0033cc] focus:bg-white transition" /></div>
-              <div className="space-y-1"><label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Versículo Bíblico Corporativo</label><textarea placeholder="Texto bíblico..." rows={3} value={formData.bibleVerse} onChange={(e) => setFormData({...formData, bibleVerse: e.target.value})} className="w-full p-3 bg-slate-50 border-2 border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:border-[#0033cc] focus:bg-white resize-none transition" /></div>
-              <div className="space-y-1"><label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Descripción</label><input type="text" placeholder="Breve reseña..." value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} className="w-full p-3 bg-slate-50 border-2 border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:border-[#0033cc] focus:bg-white transition" /></div>
-              <div className="flex justify-end gap-2 pt-3 border-t border-slate-100"><button type="button" onClick={() => setIsModalOpen(false)} className="px-5 py-2.5 bg-slate-100 text-slate-500 rounded-xl font-black uppercase text-xs cursor-pointer">Cancelar</button><button type="submit" disabled={refreshing} className="px-5 py-2.5 bg-[#0033cc] text-white rounded-xl font-black uppercase text-xs cursor-pointer transition flex items-center justify-center gap-1.5">{refreshing && <RefreshCw size={12} className="animate-spin" />} Guardar Registro</button></div>
+              <div className="space-y-1"><label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Título del Himno Oficial</label><input type="text" placeholder="Ej: Cuán Grande es Él" value={formData.anthemUrl} onChange={(e) => setFormData({...formData, anthemUrl: e.target.value})} className="w-full p-3 bg-slate-50 border-2 border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:border-[#4f46e5] focus:bg-white transition" /></div>
+              <div className="space-y-1"><label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Versículo Bíblico Corporativo</label><textarea placeholder="Texto bíblico..." rows={3} value={formData.bibleVerse} onChange={(e) => setFormData({...formData, bibleVerse: e.target.value})} className="w-full p-3 bg-slate-50 border-2 border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:border-[#4f46e5] focus:bg-white resize-none transition" /></div>
+              <div className="space-y-1"><label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Descripción</label><input type="text" placeholder="Breve reseña..." value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} className="w-full p-3 bg-slate-50 border-2 border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:border-[#4f46e5] focus:bg-white transition" /></div>
+              <div className="flex justify-end gap-2 pt-3 border-t border-slate-100"><button type="button" onClick={() => setIsModalOpen(false)} className="px-5 py-2.5 bg-slate-100 text-slate-500 rounded-xl font-black uppercase text-xs cursor-pointer">Cancelar</button><button type="submit" disabled={refreshing} className="px-5 py-2.5 bg-[#4f46e5] text-white rounded-xl font-black uppercase text-xs cursor-pointer transition flex items-center justify-center gap-1.5">{refreshing && <RefreshCw size={12} className="animate-spin" />} Guardar Registro</button></div>
             </form>
           </div>
         </div>
       )}
 
       {isLinkModalOpen && (
-        <div className="fixed inset-0 bg-[#0033cc]/10 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-fadeIn">
+        <div className="fixed inset-0 bg-[#4f46e5]/10 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-fadeIn">
           <div className="bg-white w-full max-w-md p-6 rounded-3xl border border-slate-200 space-y-4">
             <div className="flex justify-between items-center border-b border-slate-100 pb-2.5">
               <div className="flex items-center gap-2">
-                <UserCheck size={18} className="text-[#0033cc]" />
+                <UserCheck size={18} className="text-[#4f46e5]" />
                 <h3 className="text-lg font-black text-slate-900 uppercase tracking-wide">Vincular Integrante</h3>
               </div>
               <button type="button" onClick={() => setIsLinkModalOpen(false)} className="text-slate-400 hover:bg-slate-100 p-1.5 rounded-lg transition cursor-pointer"><X size={18} /></button>
@@ -561,11 +564,11 @@ export const SecretariaPage: React.FC = () => {
                           type="button"
                           onClick={() => setLinkData({ ...linkData, userId: String(user.id) })}
                           className={`w-full p-3.5 rounded-xl border text-left flex items-center justify-between transition-all duration-150 transform hover:scale-[1.01] cursor-pointer ${
-                            isUserSelected ? 'border-[#0033cc] bg-blue-50 text-[#0033cc] ring-2 ring-blue-100 font-black' : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
+                            isUserSelected ? 'border-[#4f46e5] bg-blue-50 text-[#4f46e5] ring-2 ring-blue-100 font-black' : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
                           }`}
                         >
                           <div className="flex items-center gap-2.5 min-w-0">
-                            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-black text-xs ${isUserSelected ? 'bg-[#0033cc] text-white' : 'bg-slate-100 text-slate-400'}`}>
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-black text-xs ${isUserSelected ? 'bg-[#4f46e5] text-white' : 'bg-slate-100 text-slate-400'}`}>
                               {user.name.charAt(0).toUpperCase()}
                             </div>
                             <div className="truncate">
@@ -611,14 +614,14 @@ export const SecretariaPage: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex justify-end gap-2 pt-3 border-t border-slate-100"><button type="button" onClick={() => setIsLinkModalOpen(false)} className="px-5 py-2.5 bg-slate-100 text-slate-500 rounded-xl font-black uppercase text-xs cursor-pointer">Cancelar</button><button type="submit" disabled={availableUsers.length === 0 || refreshing} className="px-5 py-2.5 bg-[#0033cc] hover:bg-blue-700 text-white rounded-xl font-black uppercase text-xs cursor-pointer transition flex items-center justify-center gap-1.5">{refreshing && <RefreshCw size={12} className="animate-spin" />} Asignar e Integrar</button></div>
+              <div className="flex justify-end gap-2 pt-3 border-t border-slate-100"><button type="button" onClick={() => setIsLinkModalOpen(false)} className="px-5 py-2.5 bg-slate-100 text-slate-500 rounded-xl font-black uppercase text-xs cursor-pointer">Cancelar</button><button type="submit" disabled={availableUsers.length === 0 || refreshing} className="px-5 py-2.5 bg-[#4f46e5] hover:bg-blue-700 text-white rounded-xl font-black uppercase text-xs cursor-pointer transition flex items-center justify-center gap-1.5">{refreshing && <RefreshCw size={12} className="animate-spin" />} Asignar e Integrar</button></div>
             </form>
           </div>
         </div>
       )}
 
       {isCreateMemberModalOpen && (
-        <div className="fixed inset-0 bg-[#0033cc]/10 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-fadeIn">
+        <div className="fixed inset-0 bg-[#4f46e5]/10 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-fadeIn">
           <div className="bg-white w-full max-w-md p-6 rounded-3xl border border-slate-200 space-y-4">
             <div className="flex justify-between items-center border-b border-slate-100 pb-2.5">
               <div className="flex items-center gap-2">
@@ -628,20 +631,20 @@ export const SecretariaPage: React.FC = () => {
               <button type="button" onClick={() => setIsCreateMemberModalOpen(false)} className="text-slate-400 hover:bg-slate-100 p-1.5 rounded-lg transition cursor-pointer"><X size={18} /></button>
             </div>
             <form onSubmit={handleCreateAndLinkSubmit} className="space-y-4 text-xs font-bold text-slate-600">
-              <div className="space-y-1"><label className="text-[11px] font-black text-slate-400 uppercase tracking-wider block">Nombre Completo *</label><div className="relative"><span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400"><UserIcon size={14} /></span><input type="text" required placeholder="Ej: Gabriel Espinoza" value={newMemberForm.name} onChange={(e) => setNewMemberForm({...newMemberForm, name: e.target.value})} className="w-full pl-10 p-3 bg-slate-50 border-2 border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:border-[#0033cc] focus:bg-white transition" /></div></div>
+              <div className="space-y-1"><label className="text-[11px] font-black text-slate-400 uppercase tracking-wider block">Nombre Completo *</label><div className="relative"><span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400"><UserIcon size={14} /></span><input type="text" required placeholder="Ej: Gabriel Espinoza" value={newMemberForm.name} onChange={(e) => setNewMemberForm({...newMemberForm, name: e.target.value})} className="w-full pl-10 p-3 bg-slate-50 border-2 border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:border-[#4f46e5] focus:bg-white transition" /></div></div>
               
               <div className="space-y-1">
                 <label className="text-[11px] font-black text-slate-400 uppercase tracking-wider block">Correo Electrónico *</label>
                 <div className="relative flex gap-2">
                   <div className="relative flex-1">
                     <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400"><Mail size={14} /></span>
-                    <input type="text" required placeholder="ejemplo" value={newMemberForm.email} onChange={(e) => setNewMemberForm({...newMemberForm, email: e.target.value})} className="w-full pl-10 p-3 bg-slate-50 border-2 border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:border-[#0033cc] focus:bg-white transition" />
+                    <input type="text" required placeholder="ejemplo" value={newMemberForm.email} onChange={(e) => setNewMemberForm({...newMemberForm, email: e.target.value})} className="w-full pl-10 p-3 bg-slate-50 border-2 border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:border-[#4f46e5] focus:bg-white transition" />
                   </div>
                   {!newMemberForm.email.includes('@') && newMemberForm.email.trim().length > 0 && (
                     <button 
                       type="button" 
                       onClick={appendGmailSuffix}
-                      className="px-3.5 bg-blue-50 border-2 border-blue-200 text-[#0033cc] rounded-xl font-black text-xs transition-colors hover:bg-blue-100 cursor-pointer"
+                      className="px-3.5 bg-blue-50 border-2 border-blue-200 text-[#4f46e5] rounded-xl font-black text-xs transition-colors hover:bg-blue-100 cursor-pointer"
                     >
                       + @gmail.com
                     </button>
@@ -650,7 +653,7 @@ export const SecretariaPage: React.FC = () => {
               </div>
 
               <div className="space-y-2">
-                <div className="space-y-1"><label className="text-[11px] font-black text-slate-400 uppercase tracking-wider block">Fecha de Nacimiento</label><input type="date" value={newMemberForm.birthDate} onChange={(e) => setNewMemberForm({...newMemberForm, birthDate: e.target.value})} className="w-full p-3 bg-slate-50 border-2 border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:border-[#0033cc] bg-white transition" /></div>
+                <div className="space-y-1"><label className="text-[11px] font-black text-slate-400 uppercase tracking-wider block">Fecha de Nacimiento</label><input type="date" value={newMemberForm.birthDate} onChange={(e) => setNewMemberForm({...newMemberForm, birthDate: e.target.value})} className="w-full p-3 bg-slate-50 border-2 border-slate-200 rounded-xl text-sm font-bold text-slate-800 focus:outline-none focus:border-[#4f46e5] bg-white transition" /></div>
                 
                 <div className="space-y-1.5">
                   <label className="text-[11px] font-black text-slate-400 uppercase tracking-wider block">Cargo Asignado</label>
@@ -682,7 +685,7 @@ export const SecretariaPage: React.FC = () => {
 
               <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
                 <button type="button" onClick={() => setIsCreateMemberModalOpen(false)} className="px-5 py-2.5 bg-slate-100 text-slate-600 rounded-xl font-black uppercase text-xs cursor-pointer">Volver</button>
-                <button type="submit" disabled={refreshing} className="px-5 py-2.5 bg-[#0033cc] hover:bg-blue-700 text-white rounded-xl font-black uppercase text-xs cursor-pointer transition flex items-center justify-center gap-1.5">
+                <button type="submit" disabled={refreshing} className="px-5 py-2.5 bg-[#4f46e5] hover:bg-blue-700 text-white rounded-xl font-black uppercase text-xs cursor-pointer transition flex items-center justify-center gap-1.5">
                   {refreshing && <RefreshCw size={12} className="animate-spin" />} Registrar e Integrar
                 </button>
               </div>
@@ -692,9 +695,9 @@ export const SecretariaPage: React.FC = () => {
       )}
 
       {alertConfig.isOpen && (
-        <div className="fixed inset-0 bg-[#0033cc]/10 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-fadeIn">
+        <div className="fixed inset-0 bg-[#4f46e5]/10 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-fadeIn">
           <div className="bg-white w-full max-w-sm p-6 rounded-3xl border border-slate-200 text-center space-y-4">
-            <div className={`w-14 h-14 mx-auto rounded-full flex items-center justify-center bg-blue-50 text-[#0033cc] border border-blue-100`}>
+            <div className={`w-14 h-14 mx-auto rounded-full flex items-center justify-center bg-blue-50 text-[#4f46e5] border border-blue-100`}>
               {alertConfig.type === 'success' ? <CheckCircle2 size={28} /> : <AlertTriangle size={28} />}
             </div>
             <div className="space-y-1">
@@ -703,7 +706,7 @@ export const SecretariaPage: React.FC = () => {
             </div>
             <button 
               onClick={() => setAlertConfig({ ...alertConfig, isOpen: false })} 
-              className="w-full py-3 text-white font-black text-xs rounded-xl uppercase tracking-wider cursor-pointer bg-[#0033cc] hover:bg-blue-700 transition-colors"
+              className="w-full py-3 text-white font-black text-xs rounded-xl uppercase tracking-wider cursor-pointer bg-[#4f46e5] hover:bg-blue-700 transition-colors"
             >
               Entendido
             </button>

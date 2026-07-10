@@ -24,6 +24,13 @@ function App() {
 
   useEffect(() => {
     loadFromStorage();
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    const root = window.document.documentElement;
+    if (savedTheme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
   }, [loadFromStorage]);
 
   return (

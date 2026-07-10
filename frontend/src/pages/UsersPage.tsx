@@ -13,6 +13,7 @@ import {
   Power,
   PowerOff
 } from 'lucide-react';
+import { Loader } from '../components/Loader';
 
 type AccessProfile = 'ADMIN' | 'LIDER_GP' | 'USUARIO';
 
@@ -34,8 +35,8 @@ const ACCESS_PROFILE_OPTIONS: {
     key: 'LIDER_GP',
     label: 'Lider GP',
     subtitle: 'Gestion de GP',
-    badgeClass: 'bg-blue-50 text-blue-700 border-blue-200',
-    selectClass: 'bg-blue-50 text-blue-700 border-blue-200'
+    badgeClass: 'bg-indigo-50 text-indigo-700 border-indigo-200',
+    selectClass: 'bg-indigo-50 text-indigo-700 border-indigo-200'
   },
   {
     key: 'USUARIO',
@@ -148,7 +149,7 @@ export const UsersPage: React.FC = () => {
   if (!currentUser) {
     return (
       <div className="rounded-3xl border border-slate-200 bg-white p-10 text-center">
-        <div className="inline-flex items-center gap-2 text-sm font-black uppercase text-blue-600">
+        <div className="inline-flex items-center gap-2 text-sm font-black uppercase text-indigo-600">
           <RefreshCw size={16} className="animate-spin" /> Verificando sesion...
         </div>
       </div>
@@ -166,20 +167,24 @@ export const UsersPage: React.FC = () => {
     );
   }
 
+  if (loading) {
+    return <Loader text="Cargando Información..." />;
+  }
+
   return (
     <div className="space-y-6">
-      <section className="relative overflow-hidden rounded-3xl border border-blue-100 bg-gradient-to-r from-[#002ec4] via-blue-700 to-indigo-700 p-6 shadow-xl shadow-blue-900/10">
+      <section className="relative overflow-hidden rounded-3xl border border-indigo-100 bg-gradient-to-r from-[#3730a3] via-indigo-700 to-indigo-700 p-6 shadow-xl shadow-indigo-900/10">
         <div className="absolute -right-12 -top-12 h-36 w-36 rounded-full bg-white/10 blur-2xl" />
         <div className="absolute -bottom-12 left-20 h-40 w-40 rounded-full bg-cyan-300/15 blur-2xl" />
         <div className="relative z-10 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-3 py-1 text-xs font-black uppercase tracking-widest text-blue-100">
+            <div className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-3 py-1 text-xs font-black uppercase tracking-widest text-indigo-100">
               <ShieldCheck size={14} /> Zona Administrativa
             </div>
             <h1 className="text-2xl font-black tracking-tight text-white md:text-3xl">
               Control de Usuarios
             </h1>
-            <p className="text-xs font-semibold uppercase tracking-wider text-blue-100 md:text-sm">
+            <p className="text-xs font-semibold uppercase tracking-wider text-indigo-100 md:text-sm">
               Asigna perfiles de acceso y administra activaciones desde un solo panel.
             </p>
           </div>
@@ -197,7 +202,7 @@ export const UsersPage: React.FC = () => {
       <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5">
         <StatCard label="Total Usuarios" value={stats.total} icon={<Users size={16} />} className="from-slate-50 to-slate-100 text-slate-700 border-slate-200" />
         <StatCard label="Administradores" value={stats.admins} icon={<Crown size={16} />} className="from-violet-50 to-violet-100 text-violet-700 border-violet-200" />
-        <StatCard label="Lideres GP" value={stats.lideres} icon={<UserCog size={16} />} className="from-blue-50 to-blue-100 text-blue-700 border-blue-200" />
+        <StatCard label="Lideres GP" value={stats.lideres} icon={<UserCog size={16} />} className="from-indigo-50 to-indigo-100 text-indigo-700 border-indigo-200" />
         <StatCard label="Usuarios" value={stats.usuarios} icon={<UserCircle2 size={16} />} className="from-emerald-50 to-emerald-100 text-emerald-700 border-emerald-200" />
         <StatCard label="Inactivos" value={stats.inactivos} icon={<PowerOff size={16} />} className="from-rose-50 to-rose-100 text-rose-700 border-rose-200" />
       </section>
@@ -210,7 +215,7 @@ export const UsersPage: React.FC = () => {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Buscar por nombre o correo..."
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2 pl-9 pr-3 text-sm font-semibold text-slate-700 outline-none transition focus:border-blue-500 focus:bg-white"
+              className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2 pl-9 pr-3 text-sm font-semibold text-slate-700 outline-none transition focus:border-indigo-500 focus:bg-white"
             />
           </div>
 
@@ -221,8 +226,8 @@ export const UsersPage: React.FC = () => {
                 onClick={() => setProfileFilter(filterValue)}
                 className={`rounded-xl border px-3 py-2 text-[11px] font-black uppercase tracking-wider transition ${
                   profileFilter === filterValue
-                    ? 'border-blue-500 bg-blue-600 text-white shadow-md shadow-blue-600/20'
-                    : 'border-slate-200 bg-white text-slate-500 hover:border-blue-300 hover:text-blue-600'
+                    ? 'border-indigo-500 bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
+                    : 'border-slate-200 bg-white text-slate-500 hover:border-indigo-300 hover:text-indigo-600'
                 }`}
               >
                 {filterValue === 'LIDER_GP' ? 'Lider GP' : filterValue}
@@ -249,15 +254,7 @@ export const UsersPage: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 bg-white">
-              {loading ? (
-                <tr>
-                  <td colSpan={5} className="px-4 py-10 text-center">
-                    <div className="inline-flex items-center gap-2 text-sm font-black uppercase text-blue-600">
-                      <RefreshCw size={16} className="animate-spin" /> Cargando usuarios...
-                    </div>
-                  </td>
-                </tr>
-              ) : filteredUsers.length === 0 ? (
+              {filteredUsers.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-4 py-10 text-center text-sm font-bold text-slate-400">
                     No hay registros para los filtros seleccionados.
@@ -271,16 +268,16 @@ export const UsersPage: React.FC = () => {
                   const isActionLoading = actionLoadingId === user.id;
 
                   return (
-                    <tr key={user.id} className="transition hover:bg-blue-50/40">
+                    <tr key={user.id} className="transition hover:bg-indigo-50/40">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
-                          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 text-xs font-black text-white shadow-sm">
+                          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600 text-xs font-black text-white shadow-sm">
                             {user.name?.charAt(0).toUpperCase() || 'U'}
                           </div>
                           <div>
                             <p className="text-sm font-black text-slate-800">{user.name}</p>
                             {isSelf && (
-                              <span className="text-[10px] font-black uppercase tracking-wider text-blue-600">
+                              <span className="text-[10px] font-black uppercase tracking-wider text-indigo-600">
                                 Tu cuenta
                               </span>
                             )}

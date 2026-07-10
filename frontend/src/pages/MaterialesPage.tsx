@@ -1,11 +1,11 @@
 import React from 'react';
-import { FolderOpen, FileText, Download } from 'lucide-react';
+import { FileText, Download } from 'lucide-react';
 
 export const MaterialesPage: React.FC = () => {
   return (
     <div className="space-y-6 font-sans text-slate-800 animate-fadeIn">
       <div className="space-y-0.5 px-1">
-        <h1 className="text-2xl font-black text-[#002ec4] tracking-tight flex items-center gap-2">
+        <h1 className="text-2xl font-black text-[#3730a3] tracking-tight flex items-center gap-2">
           <span className="text-3xl font-light text-slate-300">|</span> Materiales Académicos
         </h1>
         <p className="text-xs text-slate-500 font-medium">Repositorio de recursos didácticos, guías de liderazgo y archivos multimedia</p>
@@ -20,7 +20,7 @@ export const MaterialesPage: React.FC = () => {
               <p className="text-[10px] text-slate-400 font-medium">PDF - 2.4 MB</p>
             </div>
           </div>
-          <button className="p-2 text-blue-600 hover:bg-blue-50 rounded-xl transition"><Download size={16} /></button>
+          <button className="p-2 text-indigo-600 hover:bg-indigo-50 rounded-xl transition"><Download size={16} /></button>
         </div>
       </div>
     </div>
