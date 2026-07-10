@@ -103,7 +103,10 @@ export class SecretariaService {
 
   async getAvailableUsers() {
     return await prisma.user.findMany({
-      where: { isActive: true },
+      where: { 
+        isActive: true,
+        groupSmallId: null
+      },
       select: { id: true, name: true, email: true },
       orderBy: { name: 'asc' }
     });
