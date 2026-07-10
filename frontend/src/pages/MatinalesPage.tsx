@@ -139,14 +139,14 @@ export const MatinalesPage: React.FC = () => {
   };
 
   const getAvatarColorClass = (id: number) => {
-    if (id % 4 === 1) return 'bg-blue-50 text-blue-600 border-blue-100/70';
+    if (id % 4 === 1) return 'bg-indigo-50 text-indigo-600 border-indigo-100/70';
     if (id % 4 === 2) return 'bg-emerald-50 text-emerald-600 border-emerald-100/70';
     if (id % 4 === 3) return 'bg-purple-50 text-purple-600 border-purple-100/70';
     return 'bg-rose-50 text-rose-600 border-rose-100/70';
   };
 
   return (
-    <div className="space-y-6 font-sans text-slate-800 bg-[#f4f6fc] p-4 sm:p-6 min-h-screen relative selection:bg-blue-500 selection:text-white">
+    <div className="space-y-6 font-sans text-slate-800 bg-[#f4f6fc] p-4 sm:p-6 min-h-screen relative selection:bg-indigo-500 selection:text-white">
       
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white/40 p-2 rounded-2xl backdrop-blur-xs">
         <div className="flex items-center gap-3.5">
@@ -154,21 +154,21 @@ export const MatinalesPage: React.FC = () => {
             <BookOpen size={28} />
           </div>
           <div>
-            <h1 className="text-2xl font-black text-[#1e3a8a] tracking-tight bg-gradient-to-r from-[#1e3a8a] to-blue-700 bg-clip-text text-transparent">
+            <h1 className="text-2xl font-black text-[#1e1b4b] tracking-tight bg-gradient-to-r from-[#1e1b4b] to-indigo-700 bg-clip-text text-transparent">
               Matinales por Edades
             </h1>
             <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-0.5">Distribución Devocional de Aulas</p>
           </div>
         </div>
         <div className="flex items-center gap-2 bg-white px-4 py-2 rounded-xl border border-slate-200/60 shadow-xs text-[11px] font-black uppercase tracking-wider text-slate-500">
-          <Shield size={14} className={currentUserRole === 'ADMIN' ? 'text-blue-600 animate-pulse' : 'text-slate-400'} />
-          Módulo: <span className={currentUserRole === 'ADMIN' ? 'text-blue-600' : 'text-slate-700'}>{currentUserRole}</span>
+          <Shield size={14} className={currentUserRole === 'ADMIN' ? 'text-indigo-600 animate-pulse' : 'text-slate-400'} />
+          Módulo: <span className={currentUserRole === 'ADMIN' ? 'text-indigo-600' : 'text-slate-700'}>{currentUserRole}</span>
         </div>
       </div>
 
       {loading && (
         <div className="flex flex-col items-center justify-center py-20 space-y-3">
-          <div className="w-8 h-8 border-3 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+          <div className="w-8 h-8 border-3 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
           <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Sincronizando registros devocionales...</p>
         </div>
       )}
@@ -186,7 +186,7 @@ export const MatinalesPage: React.FC = () => {
             {currentUserRole === 'ADMIN' && (
               <button
                 onClick={() => openEditModal(mat)}
-                className="absolute top-5 right-5 z-30 p-2 bg-slate-50 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl border border-slate-200/40 transition-all duration-200 shadow-2xs hover:scale-110 cursor-pointer pointer-events-auto"
+                className="absolute top-5 right-5 z-30 p-2 bg-slate-50 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl border border-slate-200/40 transition-all duration-200 shadow-2xs hover:scale-110 cursor-pointer pointer-events-auto"
                 title="Configurar Tarjeta"
               >
                 <SlidersHorizontal size={16} />
@@ -199,7 +199,7 @@ export const MatinalesPage: React.FC = () => {
               </div>
               <div className="space-y-2 flex-1 min-w-0 pr-6">
                 <div className="flex items-center flex-wrap gap-2">
-                  <h3 className="text-lg font-black text-[#1e3a8a] uppercase tracking-tight truncate">{mat.category}</h3>
+                  <h3 className="text-lg font-black text-[#1e1b4b] uppercase tracking-tight truncate">{mat.category}</h3>
                   <span className="text-[10px] bg-slate-100 border border-slate-200/40 text-slate-500 px-2.5 py-0.5 rounded-lg font-extrabold tracking-wide">
                     {mat.range}
                   </span>
@@ -212,7 +212,7 @@ export const MatinalesPage: React.FC = () => {
                 </div>
                 <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 pt-1 text-[10px] text-slate-400 font-bold uppercase tracking-wider">
                   <span className="bg-white px-2 py-1 rounded-md border border-slate-100">Responsable: <span className="text-slate-700 font-black">{mat.responsible}</span></span>
-                  <span className="bg-white px-2 py-1 rounded-md border border-slate-100">Próxima Fecha: <span className="text-blue-600 font-black font-mono">{mat.nextDate}</span></span>
+                  <span className="bg-white px-2 py-1 rounded-md border border-slate-100">Próxima Fecha: <span className="text-indigo-600 font-black font-mono">{mat.nextDate}</span></span>
                 </div>
               </div>
             </div>
@@ -230,7 +230,7 @@ export const MatinalesPage: React.FC = () => {
               )}
 
               {currentUserRole === 'ADMIN' && (
-                <label className={`flex items-center gap-1.5 py-2.5 px-4 bg-blue-50 hover:bg-blue-100 text-[#002ec4] rounded-xl cursor-pointer text-xs font-black uppercase tracking-wider border border-blue-100 transition-all duration-200 active:scale-95 ${actionLoading ? 'opacity-50 pointer-events-none' : ''}`}>
+                <label className={`flex items-center gap-1.5 py-2.5 px-4 bg-indigo-50 hover:bg-indigo-100 text-[#3730a3] rounded-xl cursor-pointer text-xs font-black uppercase tracking-wider border border-indigo-100 transition-all duration-200 active:scale-95 ${actionLoading ? 'opacity-50 pointer-events-none' : ''}`}>
                   <Upload size={13} /> {actionLoading === `upload-${mat.id}` ? 'Subiendo...' : 'Cargar PDF'}
                   <input type="file" accept="application/pdf" className="hidden" onChange={(e) => handleFileUpload(mat.id, e)} />
                 </label>
@@ -307,7 +307,7 @@ export const MatinalesPage: React.FC = () => {
         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-fadeIn">
           <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden transform transition-all duration-300">
             
-            <div className="bg-[#0033cc] p-5 text-white flex justify-between items-center">
+            <div className="bg-[#4f46e5] p-5 text-white flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <SlidersHorizontal size={18} />
                 <h3 className="font-black text-sm uppercase tracking-wider">Configurar Contenido</h3>
@@ -326,7 +326,7 @@ export const MatinalesPage: React.FC = () => {
                     required
                     value={formFields.category}
                     onChange={(e) => setFormFields({ ...formFields, category: e.target.value })}
-                    className="w-full text-xs font-black border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:border-blue-600 uppercase transition-colors"
+                    className="w-full text-xs font-black border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:border-indigo-600 uppercase transition-colors"
                   />
                 </div>
                 <div className="space-y-1">
@@ -336,7 +336,7 @@ export const MatinalesPage: React.FC = () => {
                     required
                     value={formFields.range}
                     onChange={(e) => setFormFields({ ...formFields, range: e.target.value })}
-                    className="w-full text-xs font-bold border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:border-blue-600 transition-colors"
+                    className="w-full text-xs font-bold border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:border-indigo-600 transition-colors"
                   />
                 </div>
               </div>
@@ -348,7 +348,7 @@ export const MatinalesPage: React.FC = () => {
                   required
                   value={formFields.currentTheme}
                   onChange={(e) => setFormFields({ ...formFields, currentTheme: e.target.value })}
-                  className="w-full text-xs font-medium border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:border-blue-600 transition-colors"
+                  className="w-full text-xs font-medium border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:border-indigo-600 transition-colors"
                 />
               </div>
 
@@ -360,7 +360,7 @@ export const MatinalesPage: React.FC = () => {
                     required
                     value={formFields.responsible}
                     onChange={(e) => setFormFields({ ...formFields, responsible: e.target.value })}
-                    className="w-full text-xs font-black border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:border-blue-600 uppercase transition-colors"
+                    className="w-full text-xs font-black border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:border-indigo-600 uppercase transition-colors"
                   />
                 </div>
                 <div className="space-y-1">
@@ -370,7 +370,7 @@ export const MatinalesPage: React.FC = () => {
                     required
                     value={formFields.nextDate}
                     onChange={(e) => setFormFields({ ...formFields, nextDate: e.target.value })}
-                    className="w-full text-xs font-mono font-bold border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:border-blue-600 transition-colors"
+                    className="w-full text-xs font-mono font-bold border border-slate-200 px-3 py-2.5 rounded-xl focus:outline-none focus:border-indigo-600 transition-colors"
                   />
                 </div>
               </div>
@@ -387,7 +387,7 @@ export const MatinalesPage: React.FC = () => {
                 <button
                   type="submit"
                   disabled={actionLoading === 'update'}
-                  className="flex items-center gap-1 px-5 py-2 bg-[#0033cc] text-white rounded-xl text-xs font-black uppercase hover:bg-blue-700 transition shadow-md shadow-blue-700/10 disabled:opacity-50"
+                  className="flex items-center gap-1 px-5 py-2 bg-[#4f46e5] text-white rounded-xl text-xs font-black uppercase hover:bg-indigo-700 transition shadow-md shadow-indigo-700/10 disabled:opacity-50"
                 >
                   <Check size={14} /> {actionLoading === 'update' ? 'Guardando...' : 'Guardar Cambios'}
                 </button>

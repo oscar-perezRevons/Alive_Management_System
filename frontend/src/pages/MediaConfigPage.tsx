@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { configService } from '../services/api';
 import { Upload, Image, Shield, RefreshCw, CheckCircle, AlertCircle } from 'lucide-react';
+import { Loader } from '../components/Loader';
 
 export const MediaConfigPage: React.FC = () => {
   const [logoFile, setLogoFile] = useState<File | null>(null);
@@ -82,12 +83,7 @@ export const MediaConfigPage: React.FC = () => {
   };
 
   if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-24 bg-white rounded-2xl border border-gray-100 shadow-sm">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        <p className="text-xs text-slate-400 mt-4 font-bold uppercase tracking-wider">Verificando Identidad de Marca...</p>
-      </div>
-    );
+    return <Loader text="Cargando Información..." />;
   }
 
   return (

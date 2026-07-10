@@ -186,9 +186,9 @@ export const EventosPage: React.FC = () => {
       
       <div className="flex justify-between items-center bg-white p-5 rounded-3xl border border-slate-100 shadow-xs">
         <div className="flex items-center gap-3">
-          <div className="bg-[#002ec4] p-3 text-white rounded-2xl shadow-md"><Calendar size={24} /></div>
+          <div className="bg-[#3730a3] p-3 text-white rounded-2xl shadow-md"><Calendar size={24} /></div>
           <div>
-            <h1 className="text-xl font-black text-[#1e3a8a] tracking-tight">Eventos</h1>
+            <h1 className="text-xl font-black text-[#1e1b4b] tracking-tight">Eventos</h1>
             <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Sistema de Convocatorias y Participación</p>
           </div>
         </div>
@@ -201,7 +201,7 @@ export const EventosPage: React.FC = () => {
             <div className="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center border border-indigo-100 shrink-0 shadow-2xs"><Users size={24} /></div>
             <div className="space-y-1">
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Elige una categoría</span>
-              <h3 className="font-black text-sm text-[#1e3a8a] uppercase tracking-tight">1. Eventos Recreativos</h3>
+              <h3 className="font-black text-sm text-[#1e1b4b] uppercase tracking-tight">1. Eventos Recreativos</h3>
               <p className="text-[11px] text-slate-400 font-bold leading-tight">Campamentos, confraternizaciones y más.</p>
               <button className="text-[10px] font-black text-indigo-600 uppercase flex items-center gap-1 pt-1 hover:text-indigo-800 transition-colors">Ver Eventos Recreativos <ArrowRight size={11} /></button>
             </div>
@@ -210,7 +210,7 @@ export const EventosPage: React.FC = () => {
             <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center border border-emerald-100 shrink-0 shadow-2xs"><Trophy size={24} /></div>
             <div className="space-y-1">
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Elige una categoría</span>
-              <h3 className="font-black text-sm text-[#1e3a8a] uppercase tracking-tight">2. Deportes</h3>
+              <h3 className="font-black text-sm text-[#1e1b4b] uppercase tracking-tight">2. Deportes</h3>
               <p className="text-[11px] text-slate-400 font-bold leading-tight">Campeonatos, torneos y competencias GP.</p>
               <button className="text-[10px] font-black text-emerald-600 uppercase flex items-center gap-1 pt-1 hover:text-emerald-800 transition-colors">Ver Eventos Deportivos <ArrowRight size={11} /></button>
             </div>
@@ -218,7 +218,7 @@ export const EventosPage: React.FC = () => {
         </div>
 
         <div className="xl:col-span-4 bg-white p-5 rounded-3xl border border-slate-100 shadow-xs space-y-4">
-          <h3 className="text-xs font-black text-[#1e3a8a] uppercase px-1 flex items-center gap-1.5 tracking-wider"><Layers size={14} className="text-blue-600" /> Resumen General</h3>
+          <h3 className="text-xs font-black text-[#1e1b4b] uppercase px-1 flex items-center gap-1.5 tracking-wider"><Layers size={14} className="text-blue-600" /> Resumen General</h3>
           <div className="grid grid-cols-2 gap-3">
             <div className="bg-slate-50/70 border border-slate-100 p-3 rounded-2xl text-center shadow-2xs">
               <p className="text-xl font-black text-blue-700 leading-none">{kpis.eventosProgramados}</p>
@@ -251,7 +251,7 @@ export const EventosPage: React.FC = () => {
         
         <div className="lg:col-span-5 bg-white p-5 rounded-3xl border border-slate-100 shadow-xs flex flex-col gap-4">
           <div className="flex justify-between items-center border-b border-slate-50 pb-2">
-            <h2 className="font-black text-[#1e3a8a] text-xs uppercase tracking-tight">Eventos Recreativos</h2>
+            <h2 className="font-black text-[#1e1b4b] text-xs uppercase tracking-tight">Eventos Recreativos</h2>
             {userCanManageEvents && (
               <button onClick={() => openCreateModal('RECREATIVO')} className="py-1.5 px-3 bg-indigo-50 text-indigo-700 text-[10px] font-black rounded-xl border border-indigo-100 hover:bg-indigo-100 transition shadow-2xs flex items-center gap-1"><Plus size={12} /> Convocar</button>
             )}
@@ -283,7 +283,7 @@ export const EventosPage: React.FC = () => {
                       </div>
                     )}
                   </div>
-                  <h3 className="font-black text-xs text-[#1e3a8a] tracking-tight truncate">{ev.title}</h3>
+                  <h3 className="font-black text-xs text-[#1e1b4b] tracking-tight truncate">{ev.title}</h3>
                   <p className="text-[11px] text-slate-500 font-medium line-clamp-1 leading-tight">{ev.description || 'Sin descripción.'}</p>
                   <div className="flex flex-wrap gap-x-2 gap-y-0.5 text-[9px] text-slate-400 font-extrabold uppercase tracking-wide">
                     <span className="flex items-center gap-0.5 text-slate-500"><CalendarDays size={10} className="text-blue-600" /> {ev.startDate}</span>
@@ -304,7 +304,7 @@ export const EventosPage: React.FC = () => {
 
         <div className="lg:col-span-5 bg-white p-5 rounded-3xl border border-slate-100 shadow-xs flex flex-col gap-4">
           <div className="flex justify-between items-center border-b border-slate-50 pb-2">
-            <h2 className="font-black text-[#1e3a8a] text-xs uppercase tracking-tight">Deportes</h2>
+            <h2 className="font-black text-[#1e1b4b] text-xs uppercase tracking-tight">Deportes</h2>
             {userCanManageEvents && (
               <button onClick={() => openCreateModal('DEPORTE')} className="py-1.5 px-3 bg-emerald-50 text-emerald-700 text-[10px] font-black rounded-xl border border-emerald-100 hover:bg-emerald-100 transition shadow-2xs flex items-center gap-1"><Plus size={12} /> Convocar</button>
             )}
@@ -337,7 +337,7 @@ export const EventosPage: React.FC = () => {
                       </div>
                     )}
                   </div>
-                  <h3 className="font-black text-xs text-[#1e3a8a] tracking-tight truncate">{ev.title}</h3>
+                  <h3 className="font-black text-xs text-[#1e1b4b] tracking-tight truncate">{ev.title}</h3>
                   <p className="text-[11px] text-slate-500 font-medium line-clamp-1 leading-tight">{ev.description || 'Sin descripción.'}</p>
                   <div className="flex flex-wrap gap-x-2 gap-y-0.5 text-[9px] text-slate-400 font-extrabold uppercase tracking-wide">
                     <span className="flex items-center gap-0.5 text-slate-500"><CalendarDays size={10} className="text-emerald-600" /> {ev.startDate}</span>
@@ -373,7 +373,7 @@ export const EventosPage: React.FC = () => {
 
       <div className="bg-white p-5 rounded-3xl border border-slate-100 shadow-xs space-y-4">
         <div>
-          <h2 className="font-black text-[#1e3a8a] text-sm uppercase tracking-tight">Mis Participaciones (GP)</h2>
+          <h2 className="font-black text-[#1e1b4b] text-sm uppercase tracking-tight">Mis Participaciones (GP)</h2>
           <p className="text-[11px] text-slate-400 font-bold">Bitácora institucional de eventos y torneos correspondientes a tu aula o grupo asignado</p>
         </div>
         <div className="overflow-x-auto rounded-2xl border border-slate-100 shadow-2xs">
@@ -392,7 +392,7 @@ export const EventosPage: React.FC = () => {
             <tbody className="divide-y divide-slate-100 font-bold text-slate-700 bg-white">
               {myParticipations.map((part) => (
                 <tr key={part.id} className="hover:bg-slate-50/40 transition">
-                  <td className="p-4 font-black text-[#1e3a8a]">{part.event?.title}</td>
+                  <td className="p-4 font-black text-[#1e1b4b]">{part.event?.title}</td>
                   <td className="p-4"><span className="bg-blue-50 text-blue-700 border border-blue-100 px-2.5 py-0.5 rounded-md font-black">{part.groupSmall?.name || 'Mi Grupo'}</span></td>
                   <td className="p-4"><span className={`px-2 py-0.5 text-[10px] rounded-md font-black uppercase ${part.event?.category === 'DEPORTE' ? 'bg-emerald-50 text-emerald-600' : 'bg-indigo-50 text-indigo-600'}`}>{part.event?.category}</span></td>
                   <td className="p-4 text-slate-500 font-mono">{part.event?.startDate}</td>
@@ -454,7 +454,7 @@ export const EventosPage: React.FC = () => {
       {isDetailsModalOpen && selectedDetails && (
         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-fadeIn">
           <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden transform transition-all duration-300">
-            <div className="bg-[#1e3a8a] p-5 text-white flex justify-between items-center">
+            <div className="bg-[#1e1b4b] p-5 text-white flex justify-between items-center">
               <div className="flex items-center gap-2">
                 <Info size={18} />
                 <h3 className="font-black text-sm uppercase tracking-wider">Ficha Técnica de Participación</h3>
@@ -464,7 +464,7 @@ export const EventosPage: React.FC = () => {
             <div className="p-6 space-y-4 text-xs">
               <div className="space-y-1">
                 <span className="text-[9px] font-black uppercase px-2 py-0.5 bg-blue-50 text-blue-700 rounded-md">{selectedDetails.event?.category}</span>
-                <h2 className="text-base font-black text-[#1e3a8a] mt-1">{selectedDetails.event?.title}</h2>
+                <h2 className="text-base font-black text-[#1e1b4b] mt-1">{selectedDetails.event?.title}</h2>
               </div>
               <div className="bg-slate-50 border border-slate-100 rounded-xl p-3 text-slate-600 font-medium leading-relaxed">
                 {selectedDetails.event?.description || "Este evento no cuenta con una descripción extendida registrada en la convocatoria."}
@@ -513,7 +513,7 @@ export const EventosPage: React.FC = () => {
       {isModalOpen && (
         <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-fadeIn">
           <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-slate-100 overflow-hidden transform transition-all duration-300">
-            <div className="bg-[#0033cc] p-5 text-white flex justify-between items-center">
+            <div className="bg-[#4f46e5] p-5 text-white flex justify-between items-center">
               <h3 className="font-black text-sm uppercase tracking-wider">{editingEvent ? 'Configurar Convocatoria' : 'Nueva Convocatoria'}</h3>
               <button onClick={() => setIsModalOpen(false)} className="text-white/80 hover:text-white p-1 rounded-lg hover:bg-white/10"><X size={18} /></button>
             </div>
@@ -562,7 +562,7 @@ export const EventosPage: React.FC = () => {
               </div>
               <div className="flex items-center justify-end gap-2 pt-3 border-t border-slate-100 mt-4">
                 <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 bg-slate-100 text-slate-500 rounded-xl font-black uppercase tracking-wider hover:bg-slate-200 transition-colors">Cancelar</button>
-                <button type="submit" className="px-5 py-2 bg-[#0033cc] text-white rounded-xl font-black uppercase tracking-wider hover:bg-blue-700 shadow-md transition-colors">Guardar Convocatoria</button>
+                <button type="submit" className="px-5 py-2 bg-[#4f46e5] text-white rounded-xl font-black uppercase tracking-wider hover:bg-blue-700 shadow-md transition-colors">Guardar Convocatoria</button>
               </div>
             </form>
           </div>

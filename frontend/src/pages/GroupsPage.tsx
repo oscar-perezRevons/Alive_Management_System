@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { groupsService } from '../services/api';
 import { useAuthStore } from '../stores/authStore';
 import { Trophy, Calendar, Shield, Star, HelpCircle, Lock, Eye, Download, RefreshCw, AlertTriangle, Users } from 'lucide-react';
+import { Loader } from '../components/Loader';
 
 interface LeaderboardItem {
   id: number;
@@ -69,12 +70,7 @@ export const GroupsPage: React.FC = () => {
   };
 
   if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center py-24 bg-white rounded-2xl border border-gray-100 shadow-sm">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
-        <p className="text-xs text-gray-400 mt-4 font-bold uppercase tracking-wider">Sincronizando Marcadores Reales...</p>
-      </div>
-    );
+    return <Loader text="Cargando Información..." />;
   }
 
   return (
@@ -207,7 +203,7 @@ export const GroupsPage: React.FC = () => {
           <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
             <div className="p-4 bg-slate-900 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
               <span className="text-xs font-black text-white tracking-wide uppercase flex items-center gap-1.5">
-                <Lock size={14} className="text-blue-400" /> VISTA DEL ORGANIZADOR (RANKING COMPLETO)
+                <Lock size={14} className="text-indigo-400" /> VISTA DEL ORGANIZADOR (RANKING COMPLETO)
               </span>
               <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
                 {currentUser?.role === 'ADMIN' && (
@@ -215,7 +211,7 @@ export const GroupsPage: React.FC = () => {
                     <Eye size={12} /> Panel de Control
                   </button>
                 )}
-                <button className="flex items-center gap-1 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold rounded-xl shadow-md transition">
+                <button className="flex items-center gap-1 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-bold rounded-xl shadow-md transition">
                   <Download size={12} /> Exportar Ranking
                 </button>
               </div>

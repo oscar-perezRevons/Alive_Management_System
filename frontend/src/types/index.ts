@@ -3,8 +3,10 @@ export interface User {
   email: string;
   name: string;
   role: 'ADMIN' | 'USER';
+  groupRole?: string;
   isActive: boolean;
   createdAt: string;
+  avatarUrl?: string;
 }
 
 export interface GroupSmall {

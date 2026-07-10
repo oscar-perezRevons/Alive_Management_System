@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { activitiesService, groupsService, usersService } from '../services/api';
 import { useAuthStore } from '../stores/authStore';
 import { Activity as ActivityType, GroupSmall, User } from '../types';
-import { Calendar, Plus, Trophy, RefreshCw, X, ShieldAlert, CheckCircle2 } from 'lucide-react';
+import { Calendar, Plus, Trophy, RefreshCw, X, CheckCircle2 } from 'lucide-react';
+import { Loader } from '../components/Loader';
 
 export const ActivitiesPage: React.FC = () => {
   const [activities, setActivities] = useState<ActivityType[]>([]);
@@ -32,11 +33,7 @@ export const ActivitiesPage: React.FC = () => {
 
   const currentUser = useAuthStore((state) => state.user);
 
-  useEffect(() => {
-    loadInitialData();
-  }, []);
-
-  const loadInitialData = async () => {
+  const loadInitialData = useCallback(async () => {
     try {
       setLoading(true);
       setError('');
@@ -59,7 +56,11 @@ export const ActivitiesPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentUser?.role]);
+
+  useEffect(() => {
+    loadInitialData();
+  }, [loadInitialData]);
 
   const handleCreateActivity = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -280,10 +281,7 @@ export const ActivitiesPage: React.FC = () => {
       )}
 
       {loading && (
-        <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600 mx-auto"></div>
-          <p className="text-sm text-gray-500 mt-4 font-medium">Consultando grilla general de actividades...</p>
-        </div>
+        <Loader text="Cargando Información..." />
       )}
 
       {!loading && activities.length === 0 && (
