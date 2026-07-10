@@ -3,10 +3,9 @@ import { Link } from 'react-router-dom';
 import { dashboardService } from '../services/api';
 import { DashboardHomeData } from '../types';
 import {
-  Megaphone, Calendar, Clock, Trophy, Info,
+  Megaphone, Calendar, Clock, Trophy,
   Users, Star, RefreshCw, AlertTriangle, X
 } from 'lucide-react';
-import logoImage from '../assets/logo.png';
 import bannerImage from '../assets/banner-default.png';
 import { Loader } from '../components/Loader';
 
