@@ -85,3 +85,108 @@ body {
 .transition-premium {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+/* ═══════ Custom Premium Select Styling ═══════ */
+.select-premium {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237c3aed' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px;
+  padding-right: 40px !important;
+  cursor: pointer;
+}
+
+.select-premium:focus {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238b5cf6' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+}
+
+.dark .select-premium {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a78bfa' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+}
+
+.dark .select-premium:focus {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23c4b5fd' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+}
+
+.select-premium option {
+  font-weight: 700;
+  padding: 10px 14px;
+  background: white;
+  color: #1e293b;
+}
+
+.dark .select-premium option {
+  background: #0f172a;
+  color: #e2e8f0;
+}
+
+.select-premium option:checked {
+  background: linear-gradient(90deg, #8b5cf6, #6366f1);
+  color: white;
+}
+
+.select-premium option:hover {
+  background: linear-gradient(90deg, #ede9fe, #e0e7ff);
+}
+
+/* Scale up animation */
+.animate-scaleUp {
+  animation: scaleUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes scaleUp {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* ═══════ Custom Date Input Styling ═══════ */
+.date-premium {
+  cursor: pointer;
+}
+
+.date-premium::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 4px;
+  background-color: rgba(139, 92, 246, 0.1);
+  transition: all 0.2s ease;
+  filter: invert(38%) sepia(60%) saturate(3000%) hue-rotate(240deg) brightness(100%) contrast(100%);
+}
+
+.date-premium::-webkit-calendar-picker-indicator:hover {
+  background-color: rgba(139, 92, 246, 0.2);
+  transform: scale(1.1);
+}
+
+.dark .date-premium::-webkit-calendar-picker-indicator {
+  filter: invert(70%) sepia(60%) saturate(2000%) hue-rotate(220deg) brightness(110%) contrast(90%);
+  background-color: rgba(139, 92, 246, 0.15);
+}
+
+.date-premium::-webkit-datetime-edit {
+  font-weight: 700;
+}
+
+.date-premium::-webkit-datetime-edit-fields-wrapper {
+  font-weight: 700;
+}
+
+.date-premium::-webkit-datetime-edit-month-field,
+.date-premium::-webkit-datetime-edit-day-field,
+.date-premium::-webkit-datetime-edit-year-field {
+  font-weight: 700;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.date-premium::-webkit-datetime-edit-month-field:focus,
+.date-premium::-webkit-datetime-edit-day-field:focus,
+.date-premium::-webkit-datetime-edit-year-field:focus {
+  background-color: rgba(139, 92, 246, 0.15);
+  color: #7c3aed;
+  outline: none;
+}

@@ -948,7 +948,11 @@ export const SecretariaPage: React.FC = () => {
               <div className="space-y-2">
                 <div className="space-y-1">
                   <label className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest block">Fecha de Nacimiento</label>
-                  <input type="date" value={newMemberForm.birthDate} onChange={(e) => setNewMemberForm({...newMemberForm, birthDate: e.target.value})} className="w-full p-2.5 bg-slate-55 dark:bg-slate-955 border-2 border-slate-200 dark:border-slate-808 rounded-xl text-xs font-bold text-slate-808 dark:text-white focus:outline-none focus:border-[#4f46e5] dark:focus:border-indigo-500 bg-white dark:bg-slate-955 transition" />
+                  <div className="relative">
+                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-[#4f46e5] to-indigo-600 rounded-l-xl" />
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 w-7 h-7 bg-gradient-to-br from-indigo-500/15 to-indigo-600/15 dark:from-[#4f46e5]/20 dark:to-indigo-500/20 rounded-lg flex items-center justify-center"><Calendar size={13} className="text-[#4f46e5] dark:text-indigo-400" /></div>
+                    <input type="date" value={newMemberForm.birthDate} onChange={(e) => setNewMemberForm({...newMemberForm, birthDate: e.target.value})} className="date-premium w-full p-2.5 pl-12 bg-slate-55 dark:bg-slate-955 border-2 border-slate-200 dark:border-slate-808 rounded-xl text-xs font-bold text-slate-888 dark:text-white focus:outline-none focus:border-[#4f46e5] dark:focus:border-indigo-500 bg-white dark:bg-slate-955 transition-all duration-200 focus:ring-2 focus:ring-indigo-500/20 hover:border-indigo-300 dark:hover:border-indigo-700 cursor-pointer" />
+                  </div>
                 </div>
                 
                 <div className="space-y-1.5">

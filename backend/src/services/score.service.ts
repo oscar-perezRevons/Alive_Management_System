@@ -144,6 +144,23 @@ export class ScoreService {
     });
   }
 
+  async updateCategory(id: number, name: string) {
+    return await prisma.pointCategory.update({
+      where: { id },
+      data: { name }
+    });
+  }
+
+  async deleteCategory(id: number) {
+    // Note: Due to foreign key constraints, Prisma will fail if there are related Activities 
+    // unless Cascade deletion is set up in schema. Prisma schema handles relations.
+    // If cascade is not configured, we might need to manually delete activities first, 
+    // but typically standard Prisma schema handles this or the controller returns a 400.
+    return await prisma.pointCategory.delete({
+      where: { id }
+    });
+  }
+
   async createActivity(categoryId: number, name: string, points: number) {
     return await prisma.activity.create({
       data: {
