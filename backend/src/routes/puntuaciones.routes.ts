@@ -79,6 +79,29 @@ router.post('/categories', async (req: AuthRequest, res: Response) => {
   }
 });
 
+router.put('/categories/:id', async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { name } = req.body;
+    if (!name) return res.status(400).json({ error: 'El nombre de la categoría es requerido.' });
+
+    const updatedCategory = await scoreService.updateCategory(Number(id), name);
+    return res.json({ message: 'Categoría actualizada con éxito.', data: updatedCategory });
+  } catch (error) {
+    return res.status(500).json({ error: 'Error al actualizar la categoría.' });
+  }
+});
+
+router.delete('/categories/:id', async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    await scoreService.deleteCategory(Number(id));
+    return res.json({ message: 'Categoría eliminada con éxito.' });
+  } catch (error) {
+    return res.status(400).json({ error: 'No se puede eliminar la categoría porque tiene actividades vinculadas u ocurrió un error.' });
+  }
+});
+
 router.post('/activities', async (req: AuthRequest, res: Response) => {
   try {
     const { categoryId, name, points } = req.body;
