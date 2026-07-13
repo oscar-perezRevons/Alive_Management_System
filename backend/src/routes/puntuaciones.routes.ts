@@ -116,4 +116,28 @@ router.post('/activities', async (req: AuthRequest, res: Response) => {
   }
 });
 
+router.put('/activities/:id', async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    const { name, points } = req.body;
+    if (!name || points === undefined) {
+      return res.status(400).json({ error: 'Nombre y puntos son obligatorios.' });
+    }
+    const updated = await scoreService.updateActivity(Number(id), name, Number(points));
+    return res.json({ message: 'Subcriterio actualizado con éxito.', data: updated });
+  } catch (error) {
+    return res.status(500).json({ error: 'Error al actualizar el subcriterio.' });
+  }
+});
+
+router.delete('/activities/:id', async (req: AuthRequest, res: Response) => {
+  try {
+    const { id } = req.params;
+    await scoreService.deleteActivity(Number(id));
+    return res.json({ message: 'Subcriterio eliminado con éxito.' });
+  } catch (error) {
+    return res.status(400).json({ error: 'No se pudo eliminar el subcriterio.' });
+  }
+});
+
 export default router;

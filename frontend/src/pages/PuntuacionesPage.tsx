@@ -3,7 +3,7 @@ import { scoreService, secretariaService } from '../services/api';
 import { 
   Trophy, BarChart3, AlertTriangle, RefreshCw, Star, Shield,
   Clock, ShieldAlert, PlusCircle, CheckCircle2, ListFilter, 
-  HelpCircle, Users, X, Layers, Plus, Calendar, ChevronLeft, ChevronRight, Edit2, Trash2
+  HelpCircle, Users, X, Layers, Plus, Calendar, ChevronLeft, ChevronRight, Edit2, Trash2, Eye, Zap
 } from 'lucide-react';
 import { Loader } from '../components/Loader';
 
@@ -29,6 +29,9 @@ export const PuntuacionesPage: React.FC = () => {
   const [newCategoryName, setNewCategoryName] = useState('');
   const [editingCategory, setEditingCategory] = useState<{ id: number, name: string } | null>(null);
   const [categoryToDelete, setCategoryToDelete] = useState<{ id: number, name: string } | null>(null);
+  const [viewingCategory, setViewingCategory] = useState<any | null>(null);
+  const [editingActivity, setEditingActivity] = useState<{ id: number, name: string, points: number } | null>(null);
+  const [activityToDelete, setActivityToDelete] = useState<{ id: number, name: string } | null>(null);
   const [selectedCategoryIdForActivity, setSelectedCategoryIdForActivity] = useState<number | ''>('');
   const [newActivityName, setNewActivityName] = useState('');
   const [newActivityPoints, setNewActivityPoints] = useState('');
@@ -36,6 +39,7 @@ export const PuntuacionesPage: React.FC = () => {
   const [alertConfig, setAlertConfig] = useState({ isOpen: false, type: 'success' as 'success' | 'error', title: '', message: '' });
 
   const [showCalendar, setShowCalendar] = useState(false);
+  const [openDropdown, setOpenDropdown] = useState<'gp' | 'cat' | 'act' | null>(null);
   const [currentMonth, setCurrentMonth] = useState(new Date().getMonth());
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
 
@@ -151,6 +155,37 @@ export const PuntuacionesPage: React.FC = () => {
       loadAllModuleData();
     } catch (err) {
       showAlert('error', 'Error', 'No se pudo eliminar la categoría. Es posible que existan subcriterios vinculados a ella.');
+    }
+  };
+
+  const handleSaveActivity = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editingActivity) return;
+    try {
+      await scoreService.updateActivity(editingActivity.id, { name: editingActivity.name, points: editingActivity.points });
+      showAlert('success', '¡Subcriterio Actualizado!', 'El criterio ha sido modificado correctamente.');
+      setEditingActivity(null);
+      const refreshed = await scoreService.getCategories();
+      const updatedCat = (refreshed.data as any[]).find((c: any) => c.id === viewingCategory?.id);
+      if (updatedCat) setViewingCategory(updatedCat);
+      loadAllModuleData();
+    } catch (err) {
+      showAlert('error', 'Error', 'No se pudo actualizar el subcriterio.');
+    }
+  };
+
+  const handleDeleteActivity = async () => {
+    if (!activityToDelete) return;
+    try {
+      await scoreService.deleteActivity(activityToDelete.id);
+      showAlert('success', '¡Subcriterio Eliminado!', 'El criterio ha sido eliminado de la categoría.');
+      setActivityToDelete(null);
+      const refreshed = await scoreService.getCategories();
+      const updatedCat = (refreshed.data as any[]).find((c: any) => c.id === viewingCategory?.id);
+      if (updatedCat) setViewingCategory(updatedCat);
+      loadAllModuleData();
+    } catch (err) {
+      showAlert('error', 'Error', 'No se pudo eliminar el subcriterio.');
     }
   };
 
@@ -299,8 +334,7 @@ export const PuntuacionesPage: React.FC = () => {
               </div>
             </div>
             <div className="flex gap-2">
-              <button onClick={() => setIsCategoryModalOpen(true)} className="flex items-center gap-1.5 text-[11px] font-black bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-750 text-slate-700 dark:text-slate-300 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700/60 transition-all cursor-pointer shadow-sm hover:scale-105 hover:-translate-y-0.5"><Plus size={13} /> Nueva Categoría</button>
-              <button onClick={() => setIsActivityModalOpen(true)} className="flex items-center gap-1.5 text-[11px] font-black bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white px-4 py-2.5 rounded-xl transition-all shadow-lg shadow-indigo-500/25 cursor-pointer hover:scale-105 hover:-translate-y-0.5"><PlusCircle size={13} /> Agregar Subcriterio</button>
+              <button onClick={() => setIsCategoryModalOpen(true)} className="flex items-center gap-1.5 text-[11px] font-black bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white px-5 py-2.5 rounded-xl transition-all cursor-pointer shadow-lg shadow-fuchsia-500/30 hover:shadow-fuchsia-500/50 hover:scale-105 hover:-translate-y-0.5"><Plus size={14} className="stroke-[3]" /> Nueva Categoría</button>
             </div>
           </div>
 
@@ -314,6 +348,7 @@ export const PuntuacionesPage: React.FC = () => {
                   <div className={`h-1.5 bg-gradient-to-r ${borderColor}`} />
                   <div className="p-4 space-y-4 flex flex-col flex-1 relative">
                     <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button onClick={() => setViewingCategory(cat)} className="p-1.5 text-slate-400 hover:text-violet-500 hover:bg-violet-50 dark:hover:bg-violet-900/30 rounded-md transition-colors" title="Ver Criterios"><Eye size={13} /></button>
                       <button onClick={() => { setEditingCategory(cat); setNewCategoryName(cat.name); setIsCategoryModalOpen(true); }} className="p-1.5 text-slate-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-md transition-colors" title="Editar Categoría"><Edit2 size={13} /></button>
                       <button onClick={() => setCategoryToDelete({ id: cat.id, name: cat.name })} className="p-1.5 text-slate-400 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/30 rounded-md transition-colors" title="Eliminar Categoría"><Trash2 size={13} /></button>
                     </div>
@@ -335,12 +370,21 @@ export const PuntuacionesPage: React.FC = () => {
                       )}
                     </div>
                     
-                    <button 
-                      onClick={() => { setSelectedCategoryIdForActivity(cat.id); setIsActivityModalOpen(true); }}
-                      className="text-[10px] text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 font-black text-center block w-full pt-2 uppercase tracking-wider cursor-pointer border-t border-dashed border-slate-200 dark:border-slate-800 group-hover:text-fuchsia-600 dark:group-hover:text-fuchsia-400 transition-colors"
-                    >
-                      + Añadir Criterio
-                    </button>
+                    {/* Footer actions */}
+                    <div className="flex items-center justify-between pt-2 border-t border-dashed border-slate-200 dark:border-slate-800">
+                      <button
+                        onClick={() => setViewingCategory(cat)}
+                        className="flex items-center gap-1 text-[10px] text-slate-400 hover:text-violet-600 dark:hover:text-violet-400 font-black uppercase tracking-wider cursor-pointer transition-colors"
+                      >
+                        <Eye size={11} /> Ver todo
+                      </button>
+                      <button
+                        onClick={() => { setSelectedCategoryIdForActivity(cat.id); setIsActivityModalOpen(true); }}
+                        className="flex items-center gap-1 text-[10px] text-violet-600 dark:text-violet-400 hover:text-fuchsia-600 dark:hover:text-fuchsia-400 font-black uppercase tracking-wider cursor-pointer transition-colors"
+                      >
+                        <Plus size={11} /> Añadir
+                      </button>
+                    </div>
                   </div>
                 </div>
               )})}
@@ -409,57 +453,165 @@ export const PuntuacionesPage: React.FC = () => {
           {/* ═══════ FORMULARIO REGISTRAR PUNTUACIÓN ═══════ */}
           <div className="xl:col-span-4 bg-white dark:bg-slate-900/50 rounded-3xl shadow-lg border border-slate-200/80 dark:border-slate-800/80 p-5 space-y-4 relative z-40">
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-500 rounded-t-3xl" />
-            <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider border-b border-slate-100 dark:border-slate-800 pb-3 flex items-center gap-2">
-              <div className="p-1.5 bg-gradient-to-br from-emerald-400 to-teal-600 rounded-lg text-white shadow-md shadow-emerald-500/20"><PlusCircle size={13} /></div> Registrar Puntuación
-            </h3>
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+              <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
+                <div className="p-1.5 bg-gradient-to-br from-emerald-400 to-teal-600 rounded-lg text-white shadow-md shadow-emerald-500/20"><PlusCircle size={13} /></div> Registrar Puntuación
+              </h3>
+              {(selectedGroup || selectedCategory || selectedActivity || observation) && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedGroup('');
+                    setSelectedCategory('');
+                    setSelectedActivity(null);
+                    setObservation('');
+                    setScoreDate(new Date().toISOString().split('T')[0]);
+                    setOpenDropdown(null);
+                  }}
+                  className="flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-bold text-rose-500 bg-rose-50 dark:bg-rose-500/10 hover:bg-rose-100 dark:hover:bg-rose-500/20 rounded-lg transition-colors cursor-pointer active:scale-95"
+                  title="Limpiar formulario"
+                >
+                  <RefreshCw size={10} className="stroke-[3]" /> Limpiar
+                </button>
+              )}
+            </div>
             <form onSubmit={handleScoreSubmit} className="space-y-4 text-xs font-bold text-slate-600 dark:text-slate-350">
-              <div className="space-y-1.5">
+              {/* Backdrop invisible para cerrar los dropdowns al hacer clic fuera */}
+              {openDropdown && (
+                <div 
+                  className="fixed inset-0 z-40" 
+                  onClick={() => setOpenDropdown(null)} 
+                  title="Cerrar opciones"
+                />
+              )}
+              
+              {/* ── Selector GP (custom) ── */}
+              <div className={`space-y-1.5 ${openDropdown === 'gp' ? 'relative z-50' : 'relative z-30'}`}>
                 <label className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider flex items-center gap-1.5"><span className="w-4 h-4 bg-gradient-to-r from-violet-500 to-indigo-500 rounded-full text-white flex items-center justify-center text-[8px] font-black">1</span> Seleccionar GP</label>
                 <div className="relative">
-                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-violet-500 to-indigo-500 rounded-l-xl" />
-                  <div className="absolute left-3 top-1/2 -translate-y-1/2 w-7 h-7 bg-gradient-to-br from-violet-500/15 to-indigo-500/15 dark:from-violet-500/20 dark:to-indigo-500/20 rounded-lg flex items-center justify-center"><Users size={13} className="text-violet-600 dark:text-violet-400" /></div>
-                  <select value={selectedGroup} onChange={(e) => setSelectedGroup(e.target.value)} className="select-premium w-full p-3 pl-12 bg-slate-50/80 dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-800 rounded-xl font-bold text-slate-800 dark:text-white focus:outline-none focus:border-violet-500 dark:focus:border-violet-500 focus:bg-white dark:focus:bg-slate-950 transition-all duration-200 focus:ring-2 focus:ring-violet-500/20 focus:shadow-lg focus:shadow-violet-500/10 hover:border-violet-300 dark:hover:border-violet-700">
-                    <option value="">🎯 Elige un grupo</option>
-                    {groups.map(g => (<option key={g.id} value={g.id}>🛡️ GP {g.name.toUpperCase()}</option>))}
-                  </select>
+                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-violet-500 to-indigo-500 rounded-l-xl z-10" />
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 w-7 h-7 bg-gradient-to-br from-violet-500/15 to-indigo-500/15 rounded-lg flex items-center justify-center z-10"><Users size={13} className="text-violet-600 dark:text-violet-400" /></div>
+                  <button
+                    type="button"
+                    onClick={() => setOpenDropdown(openDropdown === 'gp' ? null : 'gp')}
+                    className={`w-full p-3 pl-12 pr-10 bg-slate-50/80 dark:bg-slate-950 border-2 rounded-xl font-bold text-left text-xs transition-all duration-200 flex items-center ${
+                      selectedGroup ? 'text-slate-800 dark:text-white border-violet-400 dark:border-violet-600' : 'text-slate-400 dark:text-slate-500 border-slate-200 dark:border-slate-800'
+                    } hover:border-violet-400 dark:hover:border-violet-600 focus:outline-none`}
+                  >
+                    {selectedGroup ? `GP ${groups.find(g => String(g.id) === selectedGroup)?.name?.toUpperCase() || ''}` : 'Elige un grupo...'}
+                  </button>
+                  <ChevronRight size={14} className={`absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 transition-transform duration-200 pointer-events-none ${openDropdown === 'gp' ? 'rotate-90' : ''}`} />
+                  {openDropdown === 'gp' && (
+                    <div className="absolute left-0 right-0 top-full mt-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-xl z-50 overflow-hidden">
+                      {groups.map(g => (
+                        <button
+                          key={g.id} type="button"
+                          onClick={() => { setSelectedGroup(String(g.id)); setOpenDropdown(null); }}
+                          className={`w-full text-left px-4 py-2.5 text-xs font-bold flex items-center gap-2.5 transition-all hover:bg-violet-50 dark:hover:bg-violet-950/30 ${
+                            String(g.id) === selectedGroup ? 'bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300' : 'text-slate-700 dark:text-slate-300'
+                          }`}
+                        >
+                          <span className="w-5 h-5 rounded-full bg-gradient-to-br from-violet-500 to-indigo-500 text-white flex items-center justify-center text-[8px] font-black shrink-0">GP</span>
+                          {g.name.toUpperCase()}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 
-              <div className="space-y-1.5">
+              {/* ── Selector Categoría (custom) ── */}
+              <div className={`space-y-1.5 ${openDropdown === 'cat' ? 'relative z-50' : 'relative z-20'}`}>
                 <label className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider flex items-center gap-1.5"><span className="w-4 h-4 bg-gradient-to-r from-fuchsia-500 to-pink-500 rounded-full text-white flex items-center justify-center text-[8px] font-black">2</span> Seleccionar Categoría</label>
                 <div className="relative">
-                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-fuchsia-500 to-pink-500 rounded-l-xl" />
-                  <div className="absolute left-3 top-1/2 -translate-y-1/2 w-7 h-7 bg-gradient-to-br from-fuchsia-500/15 to-pink-500/15 dark:from-fuchsia-500/20 dark:to-pink-500/20 rounded-lg flex items-center justify-center"><Layers size={13} className="text-fuchsia-600 dark:text-fuchsia-400" /></div>
-                  <select value={selectedCategory} onChange={(e) => handleCategoryChange(Number(e.target.value))} className="select-premium w-full p-3 pl-12 bg-slate-50/80 dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-800 rounded-xl font-bold text-slate-800 dark:text-white focus:outline-none focus:border-fuchsia-500 dark:focus:border-fuchsia-500 focus:bg-white dark:focus:bg-slate-950 transition-all duration-200 focus:ring-2 focus:ring-fuchsia-500/20 focus:shadow-lg focus:shadow-fuchsia-500/10 hover:border-fuchsia-300 dark:hover:border-fuchsia-700">
-                    <option value="">📋 Criterios institucionales</option>
-                    {categories.map(c => (<option key={c.id} value={c.id}>📂 {c.name}</option>))}
-                  </select>
+                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-fuchsia-500 to-pink-500 rounded-l-xl z-10" />
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 w-7 h-7 bg-gradient-to-br from-fuchsia-500/15 to-pink-500/15 rounded-lg flex items-center justify-center z-10"><Layers size={13} className="text-fuchsia-600 dark:text-fuchsia-400" /></div>
+                  <button
+                    type="button"
+                    onClick={() => setOpenDropdown(openDropdown === 'cat' ? null : 'cat')}
+                    className={`w-full p-3 pl-12 pr-10 bg-slate-50/80 dark:bg-slate-950 border-2 rounded-xl font-bold text-left text-xs transition-all duration-200 ${
+                      selectedCategory ? 'text-slate-800 dark:text-white border-fuchsia-400 dark:border-fuchsia-600' : 'text-slate-400 dark:text-slate-500 border-slate-200 dark:border-slate-800'
+                    } hover:border-fuchsia-400 dark:hover:border-fuchsia-600 focus:outline-none`}
+                  >
+                    {selectedCategory ? categories.find(c => c.id === selectedCategory)?.name || '' : 'Elige una categoría...'}
+                  </button>
+                  <ChevronRight size={14} className={`absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 transition-transform duration-200 pointer-events-none ${openDropdown === 'cat' ? 'rotate-90' : ''}`} />
+                  {openDropdown === 'cat' && (
+                    <div className="absolute left-0 right-0 top-full mt-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-xl z-50 overflow-hidden">
+                      {categories.map(c => (
+                        <button
+                          key={c.id} type="button"
+                          onClick={() => { handleCategoryChange(c.id); setOpenDropdown(null); }}
+                          className={`w-full text-left px-4 py-2.5 text-xs font-bold flex items-center gap-2.5 transition-all hover:bg-fuchsia-50 dark:hover:bg-fuchsia-950/30 ${
+                            c.id === selectedCategory ? 'bg-fuchsia-100 dark:bg-fuchsia-900/40 text-fuchsia-700 dark:text-fuchsia-300' : 'text-slate-700 dark:text-slate-300'
+                          }`}
+                        >
+                          <span className="w-5 h-5 rounded-full bg-gradient-to-br from-fuchsia-500 to-pink-500 text-white flex items-center justify-center text-[8px] font-black shrink-0"><Layers size={9} /></span>
+                          {c.name}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 
+              {/* ── Selector Actividad (custom) ── */}
               {selectedCategory && (
-                <div className="space-y-1.5 animate-fadeIn">
+                <div className={`space-y-1.5 animate-fadeIn ${openDropdown === 'act' ? 'relative z-50' : 'relative z-10'}`}>
                   <label className="text-[10px] font-black uppercase text-slate-400 dark:text-slate-500 tracking-wider flex items-center gap-1.5"><span className="w-4 h-4 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full text-white flex items-center justify-center text-[8px] font-black">3</span> Seleccionar Actividad / Logro</label>
                   <div className="relative">
-                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-amber-400 to-orange-500 rounded-l-xl" />
-                    <div className="absolute left-3 top-1/2 -translate-y-1/2 w-7 h-7 bg-gradient-to-br from-amber-400/15 to-orange-500/15 dark:from-amber-400/20 dark:to-orange-500/20 rounded-lg flex items-center justify-center"><Star size={13} className="text-amber-600 dark:text-amber-400" /></div>
-                    <select 
-                      onChange={(e) => setSelectedActivity(categories.find(c => c.id === selectedCategory)?.activities?.find((a: any) => a.id === Number(e.target.value)))}
-                      className="select-premium w-full p-3 pl-12 bg-slate-50/80 dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-800 rounded-xl font-bold text-slate-800 dark:text-white focus:outline-none focus:border-amber-500 dark:focus:border-amber-500 focus:bg-white dark:focus:bg-slate-950 transition-all duration-200 focus:ring-2 focus:ring-amber-500/20 focus:shadow-lg focus:shadow-amber-500/10 hover:border-amber-300 dark:hover:border-amber-700"
+                    <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-amber-400 to-orange-500 rounded-l-xl z-10" />
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 w-7 h-7 bg-gradient-to-br from-amber-400/15 to-orange-500/15 rounded-lg flex items-center justify-center z-10"><Star size={13} className="text-amber-600 dark:text-amber-400" /></div>
+                    <button
+                      type="button"
+                      onClick={() => setOpenDropdown(openDropdown === 'act' ? null : 'act')}
+                      className={`w-full p-3 pl-12 pr-10 bg-slate-50/80 dark:bg-slate-950 border-2 rounded-xl font-bold text-left text-xs transition-all duration-200 flex items-center ${
+                        selectedActivity ? 'text-slate-800 dark:text-white border-amber-400 dark:border-amber-600' : 'text-slate-400 dark:text-slate-500 border-slate-200 dark:border-slate-800'
+                      } hover:border-amber-400 dark:hover:border-amber-600 focus:outline-none`}
                     >
-                      <option value="">⭐ Elige el logro alcanzado</option>
-                      {categories.find(c => c.id === selectedCategory)?.activities?.map((a: any) => (
-                        <option key={a.id} value={a.id}>🏅 {a.name} (+{a.points} pts)</option>
-                      ))}
-                    </select>
+                      {selectedActivity ? (
+                        <div className="flex items-center justify-between w-full">
+                          <span className="truncate pr-3">{selectedActivity.name}</span>
+                          <span className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white px-2 py-0.5 rounded text-[10px] font-black shrink-0 shadow-sm shadow-emerald-500/20">+{selectedActivity.points} pts</span>
+                        </div>
+                      ) : (
+                        'Elige el logro alcanzado...'
+                      )}
+                    </button>
+                    <ChevronRight size={14} className={`absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 transition-transform duration-200 pointer-events-none ${openDropdown === 'act' ? 'rotate-90' : ''}`} />
+                    {openDropdown === 'act' && (
+                      <div className="absolute left-0 right-0 top-full mt-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-xl z-50 overflow-hidden max-h-48 overflow-y-auto">
+                        {categories.find(c => c.id === selectedCategory)?.activities?.map((a: any) => (
+                          <button
+                            key={a.id} type="button"
+                            onClick={() => { setSelectedActivity(a); setOpenDropdown(null); }}
+                            className={`w-full text-left px-4 py-2.5 text-xs font-bold flex items-center justify-between gap-2 transition-all hover:bg-amber-50 dark:hover:bg-amber-950/30 ${
+                              selectedActivity?.id === a.id ? 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300' : 'text-slate-700 dark:text-slate-300'
+                            }`}
+                          >
+                            <span className="flex items-center gap-2 pr-3"><Star size={12} className="text-amber-500 shrink-0" />{a.name}</span>
+                            <span className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-black font-mono text-xs px-2.5 py-1 rounded-lg shadow-sm shadow-emerald-500/20 shrink-0">+{a.points} pts</span>
+                          </button>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
 
               {selectedActivity && (
-                <div className="bg-gradient-to-r from-amber-50 to-emerald-50 dark:from-amber-950/20 dark:to-emerald-950/20 border border-amber-300/40 dark:border-amber-700/30 p-4 rounded-2xl text-center space-y-1 animate-scaleUp">
-                  <span className="text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase block tracking-wider">⚡ Puntos Automatizados Asignados</span>
-                  <span className="text-3xl font-mono font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500">+{selectedActivity.points}</span>
+                <div className="relative overflow-hidden bg-gradient-to-br from-emerald-50 to-teal-50/50 dark:from-emerald-950/30 dark:to-teal-950/20 border-2 border-emerald-400/40 dark:border-emerald-500/30 p-6 rounded-3xl text-center space-y-3 animate-scaleUp shadow-xl shadow-emerald-500/10 mt-2">
+                  <div className="absolute top-0 right-0 p-2 opacity-[0.07] dark:opacity-[0.04] rotate-12 pointer-events-none">
+                     <Star size={100} className="text-emerald-600 dark:text-emerald-400" />
+                  </div>
+                  <span className="text-[11px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest relative z-10 flex items-center justify-center gap-2">
+                    <span className="w-7 h-7 rounded-full bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center shadow-inner"><Zap size={14} className="text-emerald-600 dark:text-emerald-400" /></span> 
+                    Puntuación del Logro
+                  </span>
+                  <div className="relative z-10 flex items-baseline justify-center gap-1.5">
+                    <span className="text-6xl font-mono font-black text-transparent bg-clip-text bg-gradient-to-r from-emerald-500 to-teal-500 drop-shadow-sm">+{selectedActivity.points}</span>
+                    <span className="text-emerald-600/80 dark:text-emerald-400/80 font-bold text-xl tracking-tighter">pts</span>
+                  </div>
                 </div>
               )}
 
@@ -767,6 +919,156 @@ export const PuntuacionesPage: React.FC = () => {
         </div>
       )}
 
+      {/* ═══════ MODAL VER CRITERIOS ═══════ */}
+      {viewingCategory && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/70 backdrop-blur-sm">
+          <div className="bg-white dark:bg-slate-900 w-full max-w-xl rounded-3xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xl mx-4 overflow-hidden animate-scaleUp">
+            {/* Gradient top bar */}
+            <div className="h-2 bg-gradient-to-r from-violet-500 via-indigo-500 to-cyan-400" />
+
+            <div className="p-6 space-y-5">
+              {/* Header */}
+              <div className="flex justify-between items-start">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 bg-gradient-to-br from-violet-500 to-indigo-600 rounded-xl text-white shadow-lg shadow-violet-500/25">
+                    <Eye size={16} />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">{viewingCategory.name}</h3>
+                    <p className="text-[10px] text-transparent bg-clip-text bg-gradient-to-r from-violet-500 to-indigo-500 font-black uppercase tracking-wider">
+                      Bloque Operativo · {viewingCategory.activities?.length || 0} criterio{viewingCategory.activities?.length !== 1 ? 's' : ''}
+                    </p>
+                  </div>
+                </div>
+                <button onClick={() => setViewingCategory(null)} className="text-slate-400 dark:text-slate-500 p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer transition hover:text-slate-600 dark:hover:text-slate-300"><X size={16} /></button>
+              </div>
+
+              {/* Stats strip */}
+              {viewingCategory.activities && viewingCategory.activities.length > 0 && (
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="bg-violet-50 dark:bg-violet-950/30 rounded-2xl p-3 border border-violet-200/50 dark:border-violet-800/30">
+                    <p className="text-[9px] font-black text-violet-400 uppercase tracking-widest">Criterios</p>
+                    <p className="text-lg font-black text-violet-700 dark:text-violet-300">{viewingCategory.activities.length}</p>
+                  </div>
+                  <div className="bg-emerald-50 dark:bg-emerald-950/30 rounded-2xl p-3 border border-emerald-200/50 dark:border-emerald-800/30">
+                    <p className="text-[9px] font-black text-emerald-400 uppercase tracking-widest">Puntos Totales</p>
+                    <p className="text-lg font-black text-emerald-700 dark:text-emerald-300">{viewingCategory.activities.reduce((s: number, a: any) => s + a.points, 0).toLocaleString()}</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Lista de criterios */}
+              <div className="space-y-2 max-h-64 overflow-y-auto pr-0.5">
+                {viewingCategory.activities && viewingCategory.activities.length > 0 ? (
+                  viewingCategory.activities.map((act: any, aidx: number) => (
+                    <div key={act.id} className="flex items-center gap-3 p-3 bg-gradient-to-r from-slate-50 to-violet-50/30 dark:from-slate-950/60 dark:to-violet-950/10 rounded-2xl border border-slate-200/60 dark:border-slate-800 hover:border-violet-300/50 dark:hover:border-violet-700/30 hover:shadow-md hover:shadow-violet-500/5 transition-all duration-200">
+                      {/* Número */}
+                      <span className="w-6 h-6 rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 text-white flex items-center justify-center text-[9px] font-black shrink-0 shadow-sm">{aidx + 1}</span>
+
+                      {/* Nombre */}
+                      <span className="text-xs font-bold text-slate-700 dark:text-slate-200 flex-1 min-w-0">{act.name}</span>
+
+                      {/* Puntos badge */}
+                      <span className="bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-black font-mono text-[10px] px-2.5 py-1 rounded-lg shadow-sm shrink-0">+{act.points} pts</span>
+
+                      {/* Acciones — siempre visibles */}
+                      <div className="flex items-center gap-1 shrink-0">
+                        <button
+                          onClick={() => setEditingActivity({ id: act.id, name: act.name, points: act.points })}
+                          className="p-1.5 bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 hover:bg-blue-200 dark:hover:bg-blue-800/60 rounded-lg transition-all hover:scale-110 cursor-pointer"
+                          title="Editar criterio"
+                        >
+                          <Edit2 size={11} />
+                        </button>
+                        <button
+                          onClick={() => setActivityToDelete({ id: act.id, name: act.name })}
+                          className="p-1.5 bg-rose-100 dark:bg-rose-900/40 text-rose-600 dark:text-rose-400 hover:bg-rose-200 dark:hover:bg-rose-800/60 rounded-lg transition-all hover:scale-110 cursor-pointer"
+                          title="Eliminar criterio"
+                        >
+                          <Trash2 size={11} />
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-12 space-y-3">
+                    <div className="w-14 h-14 mx-auto bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-850 rounded-2xl flex items-center justify-center shadow-inner">
+                      <Layers size={22} className="text-slate-400" />
+                    </div>
+                    <p className="text-xs text-slate-400 dark:text-slate-500 font-semibold">Esta categoría aún no tiene criterios.</p>
+                    <p className="text-[10px] text-slate-300 dark:text-slate-600">Haz clic en "Añadir Criterio" para comenzar.</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Footer */}
+              <div className="flex justify-end pt-1">
+                <button
+                  type="button"
+                  onClick={() => { setViewingCategory(null); setSelectedCategoryIdForActivity(viewingCategory.id); setIsActivityModalOpen(true); }}
+                  className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white rounded-xl font-black uppercase text-[10px] tracking-wider shadow-lg shadow-indigo-500/25 cursor-pointer hover:scale-105 hover:-translate-y-0.5 transition-all"
+                >
+                  <Plus size={12} /> Añadir Criterio
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ═══════ MODAL EDITAR SUBCRITERIO ═══════ */}
+      {editingActivity && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/60">
+          <div className="bg-white dark:bg-slate-900 w-full max-w-sm rounded-3xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xl mx-4 overflow-hidden animate-scaleUp">
+            <div className="h-1.5 bg-gradient-to-r from-blue-500 via-indigo-500 to-violet-500" />
+            <div className="p-6 space-y-4">
+              <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-2">
+                <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase flex items-center gap-1.5"><div className="p-1 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-md text-white shadow-sm"><Edit2 size={11} /></div> Editar Subcriterio</h3>
+                <button onClick={() => setEditingActivity(null)} className="text-slate-400 dark:text-slate-500 p-1.5 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition"><X size={16} /></button>
+              </div>
+              <form onSubmit={handleSaveActivity} className="space-y-4 text-xs font-bold">
+                <div className="relative">
+                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-blue-500 to-indigo-500 rounded-l-xl" />
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 w-7 h-7 bg-gradient-to-br from-blue-500/15 to-indigo-500/15 rounded-lg flex items-center justify-center"><Star size={13} className="text-blue-600 dark:text-blue-400" /></div>
+                  <input type="text" required placeholder="Nombre del criterio..." value={editingActivity.name} onChange={(e) => setEditingActivity({ ...editingActivity, name: e.target.value })} className="w-full p-3 pl-12 bg-slate-50/80 dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-800 rounded-xl font-bold text-slate-800 dark:text-white focus:outline-none focus:border-blue-500 dark:focus:border-blue-500 focus:bg-white dark:focus:bg-slate-950 transition-all duration-200 focus:ring-2 focus:ring-blue-500/20 hover:border-blue-300 dark:hover:border-blue-700" />
+                </div>
+                <div className="relative">
+                  <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-indigo-500 to-violet-500 rounded-l-xl" />
+                  <div className="absolute left-3 top-1/2 -translate-y-1/2 w-7 h-7 bg-gradient-to-br from-indigo-500/15 to-violet-500/15 rounded-lg flex items-center justify-center"><Trophy size={13} className="text-indigo-600 dark:text-indigo-400" /></div>
+                  <input type="number" required placeholder="Puntos asignados..." value={editingActivity.points} onChange={(e) => setEditingActivity({ ...editingActivity, points: Number(e.target.value) })} className="w-full p-3 pl-12 bg-slate-50/80 dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-800 rounded-xl font-bold text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500 dark:focus:border-indigo-500 focus:bg-white dark:focus:bg-slate-950 transition-all duration-200 focus:ring-2 focus:ring-indigo-500/20 hover:border-indigo-300 dark:hover:border-indigo-700" />
+                </div>
+                <div className="flex justify-end gap-2">
+                  <button type="button" onClick={() => setEditingActivity(null)} className="px-4 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-350 rounded-xl font-black uppercase text-[10px] cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition duration-200 active:scale-95">Cancelar</button>
+                  <button type="submit" className="px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-black uppercase text-[10px] shadow-lg shadow-indigo-500/20 cursor-pointer hover:scale-105 transition-all">Guardar</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ═══════ MODAL CONFIRMAR ELIMINAR SUBCRITERIO ═══════ */}
+      {activityToDelete && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-950/60">
+          <div className="bg-white dark:bg-slate-900 w-full max-w-sm rounded-3xl border border-slate-200/80 dark:border-slate-800/80 shadow-2xl mx-4 overflow-hidden animate-scaleUp">
+            <div className="h-1.5 bg-gradient-to-r from-rose-500 to-red-500" />
+            <div className="p-6 space-y-4 text-center">
+              <div className="mx-auto w-12 h-12 bg-rose-100 dark:bg-rose-500/20 rounded-full flex items-center justify-center mb-2">
+                <Trash2 size={22} className="text-rose-600 dark:text-rose-400" />
+              </div>
+              <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">Eliminar Subcriterio</h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold leading-relaxed">
+                ¿Eliminar <span className="text-slate-800 dark:text-slate-200 font-black">"{activityToDelete.name}"</span>? Esta acción <span className="text-rose-500">no se puede deshacer</span>.
+              </p>
+              <div className="flex justify-center gap-2 pt-2">
+                <button type="button" onClick={() => setActivityToDelete(null)} className="px-5 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-350 rounded-xl font-black uppercase text-[10px] cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-700 transition duration-200 active:scale-95">Cancelar</button>
+                <button type="button" onClick={handleDeleteActivity} className="px-5 py-2.5 bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 text-white rounded-xl font-black uppercase text-[10px] shadow-lg shadow-rose-500/20 cursor-pointer hover:scale-105 transition-all">Sí, Eliminar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ═══════ MODAL NUEVO SUBCRITERIO ═══════ */}
       {isActivityModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60">
@@ -781,10 +1083,18 @@ export const PuntuacionesPage: React.FC = () => {
                 <div className="relative">
                   <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-emerald-400 to-teal-500 rounded-l-xl" />
                   <div className="absolute left-3 top-1/2 -translate-y-1/2 w-7 h-7 bg-gradient-to-br from-teal-500/15 to-cyan-500/15 dark:from-teal-500/20 dark:to-cyan-500/20 rounded-lg flex items-center justify-center"><Layers size={13} className="text-teal-600 dark:text-teal-400" /></div>
-                  <select required value={selectedCategoryIdForActivity} onChange={(e) => setSelectedCategoryIdForActivity(Number(e.target.value))} className="select-premium w-full p-3 pl-12 bg-slate-50/80 dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-800 rounded-xl font-bold text-slate-800 dark:text-white focus:outline-none focus:border-teal-500 dark:focus:border-teal-500 focus:bg-white dark:focus:bg-slate-950 transition-all duration-200 focus:ring-2 focus:ring-teal-500/20 focus:shadow-lg focus:shadow-teal-500/10 hover:border-teal-300 dark:hover:border-teal-700">
-                    <option value="">📋 Elige Columna Destino</option>
-                    {categories.map(c => (<option key={c.id} value={c.id}>📂 {c.name}</option>))}
-                  </select>
+                  {selectedCategoryIdForActivity !== '' ? (
+                    /* Categoría bloqueada: vino desde el botón de la tarjeta */
+                    <div className="w-full p-3 pl-12 bg-teal-50/60 dark:bg-teal-950/20 border-2 border-teal-300/60 dark:border-teal-700/40 rounded-xl font-bold text-teal-800 dark:text-teal-300 select-none cursor-not-allowed opacity-90">
+                      📂 {categories.find(c => c.id === selectedCategoryIdForActivity)?.name || ''}
+                    </div>
+                  ) : (
+                    /* Sin categoría preseleccionada: mostrar select sin opción vacía */
+                    <select required value={selectedCategoryIdForActivity} onChange={(e) => setSelectedCategoryIdForActivity(Number(e.target.value))} className="select-premium w-full p-3 pl-12 bg-slate-50/80 dark:bg-slate-950 border-2 border-slate-200 dark:border-slate-800 rounded-xl font-bold text-slate-800 dark:text-white focus:outline-none focus:border-teal-500 dark:focus:border-teal-500 focus:bg-white dark:focus:bg-slate-950 transition-all duration-200 focus:ring-2 focus:ring-teal-500/20 focus:shadow-lg focus:shadow-teal-500/10 hover:border-teal-300 dark:hover:border-teal-700">
+                      <option value="" disabled>📋 Selecciona una columna</option>
+                      {categories.map(c => (<option key={c.id} value={c.id}>📂 {c.name}</option>))}
+                    </select>
+                  )}
                 </div>
                 <div className="relative">
                   <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-teal-400 to-cyan-500 rounded-l-xl" />

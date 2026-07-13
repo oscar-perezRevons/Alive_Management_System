@@ -99,7 +99,9 @@ export const scoreService = {
   createCategory: (data: { name: string }) => apiClient.post('/puntuaciones/categories', data),
   updateCategory: (id: number, data: { name: string }) => apiClient.put(`/puntuaciones/categories/${id}`, data),
   deleteCategory: (id: number) => apiClient.delete(`/puntuaciones/categories/${id}`),
-  createActivity: (data: any) => apiClient.post('/puntuaciones/activities', data)
+  createActivity: (data: any) => apiClient.post('/puntuaciones/activities', data),
+  updateActivity: (id: number, data: { name: string; points: number }) => apiClient.put(`/puntuaciones/activities/${id}`, data),
+  deleteActivity: (id: number) => apiClient.delete(`/puntuaciones/activities/${id}`),
 };
 
 export const programService = {

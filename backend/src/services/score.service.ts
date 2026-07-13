@@ -172,4 +172,17 @@ export class ScoreService {
       }
     });
   }
+
+  async updateActivity(id: number, name: string, points: number) {
+    return await prisma.activity.update({
+      where: { id },
+      data: { name, points }
+    });
+  }
+
+  async deleteActivity(id: number) {
+    return await prisma.activity.delete({
+      where: { id }
+    });
+  }
 }
