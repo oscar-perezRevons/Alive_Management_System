@@ -172,50 +172,52 @@ export const UsersPage: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <section className="relative overflow-hidden rounded-3xl border border-indigo-100 bg-gradient-to-r from-[#3730a3] via-indigo-700 to-indigo-700 p-6 shadow-xl shadow-indigo-900/10">
-        <div className="absolute -right-12 -top-12 h-36 w-36 rounded-full bg-white/10 blur-2xl" />
-        <div className="absolute -bottom-12 left-20 h-40 w-40 rounded-full bg-cyan-300/15 blur-2xl" />
-        <div className="relative z-10 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-3 py-1 text-xs font-black uppercase tracking-widest text-indigo-100">
-              <ShieldCheck size={14} /> Zona Administrativa
+    <div className="space-y-6 bg-[#f0f2fc] min-h-screen p-4 sm:p-6 font-sans">
+      <style>{`@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }`}</style>
+      {/* HEADER PREMIUM */}
+      <div className="relative bg-white rounded-3xl border border-slate-200/80 shadow-lg overflow-hidden">
+        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-500 via-indigo-500 via-violet-500 via-fuchsia-500 to-orange-400" style={{backgroundSize: '200% 100%', animation: 'shimmer 4s linear infinite'}} />
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-5 pt-7">
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <div className="bg-gradient-to-br from-violet-600 to-fuchsia-600 p-3 rounded-2xl shadow-lg shadow-violet-500/30">
+                <ShieldCheck size={26} className="text-white" />
+              </div>
+              <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-rose-500 rounded-full border-2 border-white animate-pulse" />
             </div>
-            <h1 className="text-2xl font-black tracking-tight text-white md:text-3xl">
-              Control de Usuarios
-            </h1>
-            <p className="text-xs font-semibold uppercase tracking-wider text-indigo-100 md:text-sm">
-              Asigna perfiles de acceso y administra activaciones desde un solo panel.
-            </p>
+            <div>
+              <h1 className="text-2xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 to-violet-700">Control de Usuarios</h1>
+              <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-0.5">Zona administrativa — Asigna perfiles y administra activaciones</p>
+            </div>
           </div>
           <button
             onClick={loadUsers}
             disabled={loading}
-            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/20 bg-white/15 px-4 py-2 text-xs font-black uppercase tracking-wider text-white transition hover:bg-white/25 disabled:cursor-not-allowed disabled:opacity-60"
+            className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white text-xs font-black uppercase tracking-wider rounded-2xl shadow-lg shadow-violet-500/25 hover:scale-[1.02] active:scale-95 transition-all duration-200 disabled:opacity-50"
           >
             <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
             Sincronizar
           </button>
         </div>
+      </div>
+
+      <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
+        <StatCard label="Total Usuarios" value={stats.total} icon={<Users size={18} />} gradient="from-indigo-500 to-violet-500" />
+        <StatCard label="Administradores" value={stats.admins} icon={<Crown size={18} />} gradient="from-violet-600 to-fuchsia-600" />
+        <StatCard label="Lideres GP" value={stats.lideres} icon={<UserCog size={18} />} gradient="from-blue-500 to-indigo-600" />
+        <StatCard label="Usuarios" value={stats.usuarios} icon={<UserCircle2 size={18} />} gradient="from-emerald-500 to-teal-600" />
+        <StatCard label="Inactivos" value={stats.inactivos} icon={<PowerOff size={18} />} gradient="from-rose-500 to-rose-600" />
       </section>
 
-      <section className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-5">
-        <StatCard label="Total Usuarios" value={stats.total} icon={<Users size={16} />} className="from-slate-50 to-slate-100 text-slate-700 border-slate-200" />
-        <StatCard label="Administradores" value={stats.admins} icon={<Crown size={16} />} className="from-violet-50 to-violet-100 text-violet-700 border-violet-200" />
-        <StatCard label="Lideres GP" value={stats.lideres} icon={<UserCog size={16} />} className="from-indigo-50 to-indigo-100 text-indigo-700 border-indigo-200" />
-        <StatCard label="Usuarios" value={stats.usuarios} icon={<UserCircle2 size={16} />} className="from-emerald-50 to-emerald-100 text-emerald-700 border-emerald-200" />
-        <StatCard label="Inactivos" value={stats.inactivos} icon={<PowerOff size={16} />} className="from-rose-50 to-rose-100 text-rose-700 border-rose-200" />
-      </section>
-
-      <section className="rounded-3xl border border-slate-200 bg-white p-4 shadow-sm md:p-5">
+      <section className="rounded-3xl border border-slate-200/80 bg-white p-5 shadow-lg md:p-6">
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
           <div className="relative w-full lg:max-w-md">
-            <Search size={14} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+            <Search size={14} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-violet-400" />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Buscar por nombre o correo..."
-              className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2 pl-9 pr-3 text-sm font-semibold text-slate-700 outline-none transition focus:border-indigo-500 focus:bg-white"
+              className="w-full rounded-xl border-2 border-slate-200 bg-slate-50 py-2.5 pl-9 pr-3 text-sm font-semibold text-slate-700 outline-none transition focus:border-violet-500 focus:bg-white focus:ring-4 focus:ring-violet-500/20"
             />
           </div>
 
@@ -224,10 +226,10 @@ export const UsersPage: React.FC = () => {
               <button
                 key={filterValue}
                 onClick={() => setProfileFilter(filterValue)}
-                className={`rounded-xl border px-3 py-2 text-[11px] font-black uppercase tracking-wider transition ${
+                className={`rounded-2xl border px-3 py-2 text-[11px] font-black uppercase tracking-wider transition-all duration-200 ${
                   profileFilter === filterValue
-                    ? 'border-indigo-500 bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
-                    : 'border-slate-200 bg-white text-slate-500 hover:border-indigo-300 hover:text-indigo-600'
+                    ? 'border-transparent bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white shadow-lg shadow-violet-500/25'
+                    : 'border-slate-200 bg-white text-slate-500 hover:border-violet-300 hover:text-violet-600'
                 }`}
               >
                 {filterValue === 'LIDER_GP' ? 'Lider GP' : filterValue}
@@ -242,15 +244,15 @@ export const UsersPage: React.FC = () => {
           </div>
         )}
 
-        <div className="mt-4 overflow-x-auto rounded-2xl border border-slate-200">
+        <div className="mt-4 overflow-x-auto rounded-2xl border border-slate-200/60 shadow-inner">
           <table className="w-full min-w-[920px] text-left">
-            <thead className="bg-slate-50">
-              <tr className="text-[10px] font-black uppercase tracking-wider text-slate-400">
-                <th className="px-4 py-3">Usuario</th>
-                <th className="px-4 py-3">Correo</th>
-                <th className="px-4 py-3">Perfil de acceso</th>
-                <th className="px-4 py-3 text-center">Estado</th>
-                <th className="px-4 py-3 text-center">Acciones</th>
+            <thead className="bg-gradient-to-r from-slate-50 to-slate-100/80 border-b border-slate-200">
+              <tr className="text-[10px] font-black uppercase tracking-widest text-slate-400">
+                <th className="px-5 py-4">Usuario</th>
+                <th className="px-5 py-4">Correo</th>
+                <th className="px-5 py-4">Perfil de acceso</th>
+                <th className="px-5 py-4 text-center">Estado</th>
+                <th className="px-5 py-4 text-center">Acciones</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 bg-white">
@@ -268,27 +270,27 @@ export const UsersPage: React.FC = () => {
                   const isActionLoading = actionLoadingId === user.id;
 
                   return (
-                    <tr key={user.id} className="transition hover:bg-indigo-50/40">
-                      <td className="px-4 py-3">
+                    <tr key={user.id} className={`transition hover:bg-violet-50/30 border-b border-slate-100 last:border-0 ${isSelf ? 'bg-indigo-50/20' : ''}`}>
+                      <td className="px-5 py-3.5">
                         <div className="flex items-center gap-3">
-                          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600 text-xs font-black text-white shadow-sm">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-fuchsia-600 text-sm font-black text-white shadow-md shadow-violet-500/20">
                             {user.name?.charAt(0).toUpperCase() || 'U'}
                           </div>
                           <div>
                             <p className="text-sm font-black text-slate-800">{user.name}</p>
                             {isSelf && (
-                              <span className="text-[10px] font-black uppercase tracking-wider text-indigo-600">
+                              <span className="text-[10px] font-black uppercase tracking-wider text-violet-600 bg-violet-50 px-1.5 py-0.5 rounded-md border border-violet-100">
                                 Tu cuenta
                               </span>
                             )}
                           </div>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-sm font-semibold text-slate-600">{user.email}</td>
-                      <td className="px-4 py-3">
+                      <td className="px-5 py-3.5 text-sm font-semibold text-slate-500 font-mono">{user.email}</td>
+                      <td className="px-5 py-3.5">
                         <div className="flex items-center gap-2">
                           <span
-                            className={`inline-flex items-center rounded-full border px-2.5 py-1 text-[10px] font-black uppercase tracking-wider ${profileOption.badgeClass}`}
+                            className={`inline-flex items-center rounded-2xl border px-2.5 py-1 text-[10px] font-black uppercase tracking-wider ${profileOption.badgeClass}`}
                           >
                             {profileOption.label}
                           </span>
@@ -296,7 +298,7 @@ export const UsersPage: React.FC = () => {
                             disabled={isSelf || isActionLoading}
                             value={profile}
                             onChange={(e) => updateAccessProfile(user, e.target.value as AccessProfile)}
-                            className={`rounded-xl border px-3 py-1.5 text-xs font-black uppercase tracking-wider outline-none transition disabled:cursor-not-allowed disabled:opacity-60 ${profileOption.selectClass}`}
+                            className={`rounded-xl border-2 px-3 py-1.5 text-xs font-black uppercase tracking-wider outline-none transition disabled:cursor-not-allowed disabled:opacity-60 focus:ring-2 focus:ring-violet-500/20 ${profileOption.selectClass}`}
                           >
                             {ACCESS_PROFILE_OPTIONS.map((option) => (
                               <option key={option.key} value={option.key}>
@@ -306,26 +308,26 @@ export const UsersPage: React.FC = () => {
                           </select>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-center">
+                      <td className="px-5 py-3.5 text-center">
                         <span
-                          className={`inline-flex items-center gap-1 rounded-full border px-3 py-1 text-[10px] font-black uppercase tracking-wider ${
+                          className={`inline-flex items-center gap-1.5 rounded-2xl border px-3 py-1.5 text-[10px] font-black uppercase tracking-wider shadow-sm ${
                             user.isActive
                               ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
                               : 'border-rose-200 bg-rose-50 text-rose-700'
                           }`}
                         >
-                          {user.isActive ? <Power size={12} /> : <PowerOff size={12} />}
+                          {user.isActive ? <Power size={11} /> : <PowerOff size={11} />}
                           {user.isActive ? 'Activo' : 'Inactivo'}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-center">
+                      <td className="px-5 py-3.5 text-center">
                         <button
                           disabled={isSelf || isActionLoading}
                           onClick={() => toggleUserStatus(user)}
-                          className={`rounded-xl border px-3 py-1.5 text-[11px] font-black uppercase tracking-wider transition disabled:cursor-not-allowed disabled:opacity-50 ${
+                          className={`rounded-2xl border px-4 py-2 text-[11px] font-black uppercase tracking-wider transition-all duration-200 hover:scale-[1.02] active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 shadow-sm ${
                             user.isActive
-                              ? 'border-rose-200 bg-rose-50 text-rose-700 hover:bg-rose-100'
-                              : 'border-emerald-200 bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
+                              ? 'border-rose-200 bg-gradient-to-r from-rose-50 to-rose-100 text-rose-700 hover:from-rose-100 hover:to-rose-200'
+                              : 'border-emerald-200 bg-gradient-to-r from-emerald-50 to-emerald-100 text-emerald-700 hover:from-emerald-100 hover:to-emerald-200'
                           }`}
                         >
                           {isActionLoading ? 'Procesando...' : user.isActive ? 'Desactivar' : 'Activar'}
@@ -347,17 +349,17 @@ interface StatCardProps {
   label: string;
   value: number;
   icon: React.ReactNode;
-  className: string;
+  gradient: string;
 }
 
-const StatCard: React.FC<StatCardProps> = ({ label, value, icon, className }) => {
+const StatCard: React.FC<StatCardProps> = ({ label, value, icon, gradient }) => {
   return (
-    <div className={`rounded-2xl border bg-gradient-to-br p-4 shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-md ${className}`}>
+    <div className="rounded-3xl border border-slate-200/60 bg-white p-5 shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl">
       <div className="flex items-start justify-between">
-        <p className="text-[10px] font-black uppercase tracking-widest opacity-80">{label}</p>
-        <span className="rounded-lg bg-white/70 p-2">{icon}</span>
+        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">{label}</p>
+        <span className={`rounded-2xl bg-gradient-to-br ${gradient} p-2.5 text-white shadow-md`}>{icon}</span>
       </div>
-      <p className="mt-3 text-3xl font-black leading-none">{value}</p>
+      <p className="mt-4 text-3xl font-black leading-none text-slate-800">{value}</p>
     </div>
   );
 };

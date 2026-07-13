@@ -181,14 +181,28 @@ export const RankingPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 bg-[#f8fafc] min-h-screen text-slate-800 p-4 sm:p-6 font-sans antialiased select-none relative">
+    <div className="space-y-6 bg-[#f0f2fc] min-h-screen text-slate-800 p-4 sm:p-6 font-sans antialiased select-none relative">
+      <style>{`@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }`}</style>
       
-      <div className="flex justify-between items-center bg-white p-5 rounded-3xl border border-slate-200/60 shadow-premium">
-        <div className="flex items-center gap-3">
-          <div className="bg-gradient-to-tr from-indigo-600 to-purple-700 p-3 text-white rounded-2xl shadow-md"><Trophy size={24} /></div>
-          <div>
-            <h1 className="text-2xl font-extrabold text-indigo-950 tracking-tight">Ranking</h1>
-            <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">Sistema Oficial de Clasificación de Grupos Pequeños (GP)</p>
+      {/* HEADER PREMIUM */}
+      <div className="relative bg-white rounded-3xl border border-slate-200/80 shadow-lg overflow-hidden">
+        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-500 via-indigo-500 via-violet-500 via-fuchsia-500 to-orange-400" style={{backgroundSize: '200% 100%', animation: 'shimmer 4s linear infinite'}} />
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-5 pt-7">
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <div className="bg-gradient-to-br from-amber-500 to-orange-500 p-3 rounded-2xl shadow-lg shadow-amber-500/30">
+                <Trophy size={26} className="text-white fill-white" />
+              </div>
+              <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-emerald-400 rounded-full border-2 border-white animate-pulse" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-amber-600 to-orange-600">Ranking</h1>
+              <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-0.5">Sistema Oficial de Clasificación de Grupos Pequeños (GP)</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 bg-amber-50 px-4 py-2 rounded-xl border border-amber-100 text-[11px] font-black uppercase tracking-wider text-amber-600">
+            <Star size={13} className="fill-amber-500 animate-pulse" />
+            Clasificaciones Oficiales
           </div>
         </div>
       </div>
@@ -198,40 +212,43 @@ export const RankingPage: React.FC = () => {
       )}
 
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
-        <div className="xl:col-span-9 bg-white p-5 rounded-3xl border border-slate-200/60 shadow-premium space-y-4">
-          <h3 className="text-xs font-bold text-indigo-650 uppercase tracking-wider px-1">¿Cómo funciona el Ranking?</h3>
+        <div className="xl:col-span-9 bg-white p-5 rounded-3xl border border-slate-200/60 shadow-md hover:shadow-xl transition-all duration-300 space-y-4">
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 bg-indigo-50 rounded-lg border border-indigo-100"><Info size={14} className="text-indigo-600" /></div>
+            <h3 className="text-xs font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 to-violet-700 uppercase tracking-widest">¿Cómo funciona el Ranking?</h3>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm font-semibold text-slate-600 leading-relaxed">
-            <div className="flex items-start gap-3 bg-slate-50/60 p-4 rounded-2xl border border-slate-100">
-              <div className="w-10 h-10 bg-indigo-50 text-indigo-600 rounded-xl flex items-center justify-center shrink-0 border border-indigo-100/50"><Users size={18} /></div>
+            <div className="flex items-start gap-3 bg-indigo-50/60 p-4 rounded-2xl border border-indigo-100/50 hover:bg-indigo-50 transition">
+              <div className="w-10 h-10 bg-indigo-600 text-white rounded-xl flex items-center justify-center shrink-0 shadow-md shadow-indigo-500/20"><Users size={18} /></div>
               <p className="text-xs font-semibold text-slate-500 mt-1">Cada GP solo puede ver sus propios puntos y progreso.</p>
             </div>
-            <div className="flex items-start gap-3 bg-slate-50/60 p-4 rounded-2xl border border-slate-100">
-              <div className="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center shrink-0 border border-emerald-100"><Lock size={18} /></div>
+            <div className="flex items-start gap-3 bg-emerald-50/60 p-4 rounded-2xl border border-emerald-100/50 hover:bg-emerald-50 transition">
+              <div className="w-10 h-10 bg-emerald-600 text-white rounded-xl flex items-center justify-center shrink-0 shadow-md shadow-emerald-500/20"><Lock size={18} /></div>
               <p className="text-xs font-semibold text-slate-500 mt-1">El ranking completo de todos los GP solo lo puede ver el organizador.</p>
             </div>
-            <div className="flex items-start gap-3 bg-slate-50/60 p-4 rounded-2xl border border-purple-100/60">
-              <div className="w-10 h-10 bg-purple-50 text-purple-650 rounded-xl flex items-center justify-center shrink-0 border border-purple-100/50"><Calendar size={18} className="text-purple-650" /></div>
+            <div className="flex items-start gap-3 bg-violet-50/60 p-4 rounded-2xl border border-violet-100/50 hover:bg-violet-50 transition">
+              <div className="w-10 h-10 bg-violet-600 text-white rounded-xl flex items-center justify-center shrink-0 shadow-md shadow-violet-500/20"><Calendar size={18} /></div>
               <p className="text-xs font-semibold text-slate-500 mt-1">El ranking general se mostrará en fechas determinadas (mensual, trimestral o especial).</p>
             </div>
           </div>
         </div>
 
-        <div className="xl:col-span-3 bg-white p-5 rounded-3xl border border-slate-200/60 shadow-premium flex flex-col justify-center relative overflow-hidden group">
-          <div className="absolute -right-6 -bottom-6 text-amber-500/10 pointer-events-none transform scale-125 transition-transform duration-300">
+        <div className="xl:col-span-3 bg-white p-5 rounded-3xl border border-slate-200/60 shadow-md hover:shadow-xl transition-all duration-300 flex flex-col justify-center relative overflow-hidden group">
+          <div className="absolute -right-6 -bottom-6 text-amber-400/10 pointer-events-none transform scale-125 transition-transform duration-300">
             <Trophy size={120} className="fill-current" />
           </div>
           <div className="flex items-center gap-3 relative z-10">
-            <div className="bg-amber-500 text-white p-3 rounded-2xl shadow-md"><Trophy size={22} className="fill-current" /></div>
+            <div className="bg-gradient-to-br from-amber-500 to-orange-500 text-white p-3 rounded-2xl shadow-md shadow-amber-500/25"><Trophy size={22} className="fill-current" /></div>
             <div className="space-y-1 flex-1 min-w-0">
               <div className="flex justify-between items-center">
-                <p className="text-[9px] text-indigo-600 font-bold uppercase tracking-wider truncate">Próxima publicación del Ranking</p>
+                <p className="text-[9px] text-amber-700 font-black uppercase tracking-wider truncate">Próxima publicación del Ranking</p>
                 {isAdmin && (
-                  <button onClick={openDateConfigModal} className="text-slate-400 hover:text-indigo-600 transition-colors p-0.5" title="Configurar Fechas">
+                  <button onClick={openDateConfigModal} className="text-slate-400 hover:text-amber-600 transition-colors p-0.5" title="Configurar Fechas">
                     <Settings2 size={13} />
                   </button>
                 )}
               </div>
-              <h4 className="text-xl font-extrabold text-slate-900 tracking-tight">{fechaPublicacion}</h4>
+              <h4 className="text-xl font-black text-slate-900 tracking-tight">{fechaPublicacion}</h4>
               <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wide truncate">Cierre de periodo: {fechaCierre}</p>
             </div>
           </div>
@@ -240,18 +257,18 @@ export const RankingPage: React.FC = () => {
 
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
         
-        <div className="xl:col-span-5 bg-white p-6 rounded-3xl border border-slate-200/60 shadow-premium space-y-6">
+        <div className="xl:col-span-5 bg-white p-6 rounded-3xl border border-slate-200/60 shadow-md hover:shadow-xl transition-all duration-300 space-y-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 border-b border-slate-100 pb-3">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 bg-emerald-50 border border-emerald-200 text-emerald-600 rounded-xl flex items-center justify-center"><Shield size={16} className="fill-current" /></div>
-              <h2 className="font-extrabold text-sm text-[#1e3a8a] uppercase tracking-wider">Mi Progreso (Sólo para tu GP)</h2>
+              <div className="w-9 h-9 bg-gradient-to-br from-emerald-500 to-teal-600 text-white rounded-xl flex items-center justify-center shadow-md shadow-emerald-500/20"><Shield size={16} className="fill-current" /></div>
+              <h2 className="font-black text-sm text-transparent bg-clip-text bg-gradient-to-r from-emerald-700 to-teal-700 uppercase tracking-wider">Mi Progreso (Sólo para tu GP)</h2>
             </div>
             
             {grupos.length > 0 && isAdmin && (
               <select 
                 value={selectedGroupId} 
                 onChange={(e) => setSelectedGroupId(Number(e.target.value))}
-                className="text-xs bg-white border border-slate-200 text-slate-800 font-bold rounded-xl px-3 py-1.5 focus:outline-none focus:border-indigo-500 cursor-pointer shadow-sm tracking-wider uppercase"
+                className="text-xs bg-white border-2 border-slate-200 text-slate-800 font-black rounded-xl px-3 py-1.5 focus:outline-none focus:border-violet-500 focus:ring-4 focus:ring-violet-500/20 cursor-pointer shadow-sm tracking-wider uppercase"
               >
                 {grupos.map((g: any) => <option key={g.id} value={g.id}>GP: {g.name.toUpperCase()}</option>)}
               </select>
@@ -259,52 +276,53 @@ export const RankingPage: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-3 gap-3">
-            <div className="bg-slate-50 border border-slate-100 p-4 rounded-2xl text-center space-y-1 shadow-sm">
-              <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Mis Puntos Acumulados</p>
-              <p className="text-3xl font-extrabold text-emerald-600 leading-none pt-1">{grupoProgreso.grupoInfo?.totalPoints} <span className="text-xs font-semibold text-slate-400">pts</span></p>
+            <div className="bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-100 p-4 rounded-2xl text-center space-y-1 shadow-sm hover:shadow-md transition">
+              <p className="text-[9px] font-black text-emerald-700 uppercase tracking-wider">Mis Puntos</p>
+              <p className="text-3xl font-black text-emerald-600 leading-none pt-1">{grupoProgreso.grupoInfo?.totalPoints} <span className="text-xs font-semibold text-slate-400">pts</span></p>
               
               {grupoProgreso.grupoInfo?.variation >= 0 ? (
-                <span className="inline-flex text-[10px] font-bold text-emerald-600 bg-emerald-50/70 px-2.5 py-1 rounded-md border border-emerald-100 mt-2.5 items-center gap-0.5">
+                <span className="inline-flex text-[10px] font-black text-emerald-600 bg-emerald-100 px-2.5 py-1 rounded-lg border border-emerald-200 mt-2.5 items-center gap-0.5">
                   <ArrowUp size={12} /> +{grupoProgreso.grupoInfo?.variation} mes
                 </span>
               ) : (
-                <span className="inline-flex text-[10px] font-bold text-rose-600 bg-rose-50/70 px-2.5 py-1 rounded-md border border-rose-100 mt-2.5 items-center gap-0.5">
+                <span className="inline-flex text-[10px] font-black text-rose-600 bg-rose-100 px-2.5 py-1 rounded-lg border border-rose-200 mt-2.5 items-center gap-0.5">
                   <ArrowDown size={12} /> -{Math.abs(grupoProgreso.grupoInfo?.variation)} mes
                 </span>
               )}
             </div>
 
-            <div className="bg-slate-50 border border-slate-100 p-4 rounded-2xl text-center flex flex-col justify-between items-center space-y-1 shadow-sm">
-              <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Posición Actual</p>
-              <div className={`w-11 h-11 rounded-full flex items-center justify-center font-extrabold text-sm shadow-md ring-4 ring-slate-100 ${getPodiumBadgeClass(Number(grupoProgreso.grupoInfo?.posicionActual))}`}>
+            <div className="bg-gradient-to-br from-indigo-50 to-violet-50 border border-indigo-100 p-4 rounded-2xl text-center flex flex-col justify-between items-center space-y-1 shadow-sm hover:shadow-md transition">
+              <p className="text-[9px] font-black text-indigo-700 uppercase tracking-wider">Posición Actual</p>
+              <div className={`w-11 h-11 rounded-full flex items-center justify-center font-black text-sm shadow-md ring-4 ring-indigo-50 ${getPodiumBadgeClass(Number(grupoProgreso.grupoInfo?.posicionActual))}`}>
                 {grupoProgreso.grupoInfo?.posicionActual}
               </div>
-              <p className="text-[9px] text-slate-400 font-bold uppercase tracking-wide">Puesto General</p>
+              <p className="text-[9px] text-slate-400 font-black uppercase tracking-wide">Puesto General</p>
             </div>
 
-            <div className="bg-slate-50 border border-slate-100 p-4 rounded-2xl text-center space-y-1 shadow-sm">
-              <p className="text-[9px] font-bold text-slate-400 uppercase tracking-wider">Nivel Actual</p>
-              <div className="w-8 h-8 mx-auto bg-emerald-600 text-white rounded-full flex items-center justify-center shadow-md border-2 border-emerald-250">
-                <Star size={14} className="fill-current" />
+            <div className="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100 p-4 rounded-2xl text-center space-y-1 shadow-sm hover:shadow-md transition">
+              <p className="text-[9px] font-black text-amber-700 uppercase tracking-wider">Nivel Actual</p>
+              <div className="w-9 h-9 mx-auto bg-gradient-to-br from-amber-500 to-orange-500 text-white rounded-full flex items-center justify-center shadow-md">
+                <Star size={15} className="fill-current" />
               </div>
-              <p className="text-xs font-bold text-emerald-700 leading-none mt-2.5">Nivel {grupoProgreso.grupoInfo?.nivel}</p>
-              <p className="text-[9px] text-slate-400 font-bold mt-1 uppercase tracking-wide">{grupoProgreso.grupoInfo?.etiquetaNivel}</p>
+              <p className="text-xs font-black text-amber-700 leading-none mt-2.5">Nivel {grupoProgreso.grupoInfo?.nivel}</p>
+              <p className="text-[9px] text-slate-400 font-black mt-1 uppercase tracking-wide">{grupoProgreso.grupoInfo?.etiquetaNivel}</p>
             </div>
           </div>
 
           <div className="space-y-4">
-            <h4 className="text-xs font-bold text-indigo-950 uppercase tracking-wider px-0.5">Desglose de Puntos por Área</h4>
+            <h4 className="text-xs font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 to-violet-700 uppercase tracking-widest px-0.5">Desglose de Puntos por Área</h4>
             <div className="space-y-3.5">
-              {grupoProgreso.desgloseAreas.map((area: any) => {
+              {grupoProgreso.desgloseAreas.map((area: any, i: number) => {
                 const pct = Math.min(100, (area.puntos / (area.max || 600)) * 100);
+                const gradients = ['from-indigo-500 to-violet-600', 'from-emerald-500 to-teal-600', 'from-fuchsia-500 to-pink-600', 'from-amber-500 to-orange-500', 'from-rose-500 to-rose-600'];
                 return (
                   <div key={area.id} className="space-y-2">
-                    <div className="flex justify-between text-xs font-bold uppercase tracking-tight">
-                      <span className="text-slate-650">{area.name}</span>
-                      <span className="text-slate-900 font-mono font-bold">{area.puntos} PTS</span>
+                    <div className="flex justify-between text-xs font-black uppercase tracking-tight">
+                      <span className="text-slate-600">{area.name}</span>
+                      <span className="text-slate-900 font-mono font-black">{area.puntos} PTS</span>
                     </div>
-                    <div className="w-full bg-slate-100 h-2.5 rounded-full overflow-hidden border border-slate-200/20 shadow-inner">
-                      <div className="bg-indigo-600 h-full rounded-full transition-all duration-500 shadow-sm" style={{ width: `${pct}%` }}></div>
+                    <div className="w-full bg-slate-100 h-3 rounded-full overflow-hidden border border-slate-200/20 shadow-inner">
+                      <div className={`bg-gradient-to-r ${gradients[i % gradients.length]} h-full rounded-full transition-all duration-700 shadow-sm`} style={{ width: `${pct}%` }}></div>
                     </div>
                   </div>
                 );
@@ -341,21 +359,21 @@ export const RankingPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="xl:col-span-7 bg-white p-6 rounded-3xl border border-slate-200/60 shadow-premium space-y-4 flex flex-col justify-between">
+        <div className="xl:col-span-7 bg-white p-6 rounded-3xl border border-slate-200/60 shadow-sm hover:shadow-md transition-all duration-300 space-y-4 flex flex-col justify-between">
           <div className="space-y-4">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 border-b border-slate-100 pb-3.5">
               <div className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-indigo-50 border border-indigo-100/50 text-indigo-600 rounded-xl flex items-center justify-center"><Layers size={15} /></div>
-                <h2 className="font-bold text-xs text-indigo-950 uppercase tracking-wider">Vista del Organizador (Ranking Completo)</h2>
+                <div className="w-9 h-9 bg-gradient-to-br from-indigo-500 to-violet-600 text-white rounded-xl flex items-center justify-center shadow-md shadow-indigo-500/20"><Layers size={16} /></div>
+                <h2 className="font-black text-xs text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 to-violet-700 uppercase tracking-wider">Vista del Organizador (Ranking Completo)</h2>
               </div>
               <div className="flex gap-2 w-full sm:w-auto">
                 {isAdmin && (
-                  <button onClick={ejecutarExportacionPDF} className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 py-2 px-3.5 bg-slate-50 border border-slate-200 text-slate-700 text-xs font-bold rounded-xl hover:bg-slate-100 transition shadow-sm cursor-pointer">
+                  <button onClick={ejecutarExportacionPDF} className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 py-2 px-3.5 bg-slate-50 border-2 border-slate-200 text-slate-700 text-xs font-black rounded-xl hover:bg-slate-100 transition-all hover:scale-[1.02] active:scale-95 shadow-sm cursor-pointer">
                     <Download size={14} /> Exportar PDF
                   </button>
                 )}
                 {isAdmin && (
-                  <button onClick={() => setIsControlModalOpen(true)} className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 py-2 px-3.5 bg-indigo-50 border border-indigo-200 text-indigo-650 text-xs font-bold rounded-xl hover:bg-indigo-100/60 transition shadow-sm cursor-pointer">
+                  <button onClick={() => setIsControlModalOpen(true)} className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 py-2 px-3.5 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white text-xs font-black rounded-xl transition-all shadow-lg shadow-violet-500/20 hover:scale-[1.02] active:scale-95 cursor-pointer">
                     <Settings2 size={14} /> Panel de Control
                   </button>
                 )}
@@ -465,34 +483,38 @@ export const RankingPage: React.FC = () => {
       </div>
 
       {notification.isOpen && (
-        <div className="fixed bottom-5 right-5 z-50 max-w-sm w-full bg-white rounded-2xl shadow-premium border border-slate-100 p-4 flex items-center justify-between gap-3.5 animate-slideUp">
+        <div className="fixed bottom-5 right-5 z-50 max-w-sm w-full bg-white rounded-2xl shadow-2xl border border-violet-100 p-4 flex items-center justify-between gap-3.5 animate-slideUp overflow-hidden">
+          <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-amber-400 to-orange-500" />
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-indigo-50 text-indigo-600"><Trophy size={18} /></div>
-            <p className="text-xs font-semibold text-slate-700">{notification.message}</p>
+            <div className="p-2 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 text-white shadow-md"><Trophy size={18} /></div>
+            <p className="text-xs font-black text-slate-700">{notification.message}</p>
           </div>
-          <button onClick={() => setNotification({ isOpen: false, message: '' })} className="text-slate-400 hover:text-slate-650"><X size={14} /></button>
+          <button onClick={() => setNotification({ isOpen: false, message: '' })} className="text-slate-400 hover:text-slate-600 p-1 hover:bg-slate-100 rounded-lg transition"><X size={14} /></button>
         </div>
       )}
 
       {isDateConfigOpen && (
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-fadeIn">
-          <div className="bg-white rounded-3xl max-w-sm w-full shadow-premium overflow-hidden border border-slate-200/60">
-            <div className="bg-gradient-to-r from-indigo-600 to-indigo-700 p-5 text-white flex justify-between items-center">
-              <h3 className="font-bold text-xs uppercase tracking-wider">Configurar Calendario</h3>
-              <button onClick={() => setIsDateConfigOpen(false)} className="text-white/80 hover:text-white"><X size={18} /></button>
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
+          <div className="bg-white rounded-3xl max-w-sm w-full shadow-2xl overflow-hidden border border-slate-200/60">
+            <div className="bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 p-5 text-white flex justify-between items-center">
+              <div className="flex items-center gap-3">
+                <div className="bg-white/20 p-2 rounded-xl"><Calendar size={18} /></div>
+                <h3 className="font-black text-sm uppercase tracking-wider">Configurar Calendario</h3>
+              </div>
+              <button onClick={() => setIsDateConfigOpen(false)} className="text-white/80 hover:text-white p-1 hover:bg-white/10 rounded-lg transition"><X size={18} /></button>
             </div>
             <form onSubmit={guardarConfiguracionFechas} className="p-6 space-y-4 text-xs font-bold text-slate-600">
               <div className="space-y-1.5">
-                <label className="text-[9px] font-bold uppercase text-slate-400 tracking-wider">Próxima Emisión General</label>
-                <input type="text" required value={tempFechaPublicacion} onChange={(e) => setTempFechaPublicacion(e.target.value)} className="w-full border border-slate-200 px-3 py-2.5 rounded-xl font-bold focus:outline-none focus:border-indigo-500" />
+                <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Próxima Emisión General</label>
+                <input type="text" required value={tempFechaPublicacion} onChange={(e) => setTempFechaPublicacion(e.target.value)} className="w-full border-2 border-slate-200 px-3.5 py-3 rounded-xl font-bold focus:outline-none focus:border-violet-500 focus:ring-4 focus:ring-violet-500/20 shadow-inner" />
               </div>
               <div className="space-y-1.5">
-                <label className="text-[9px] font-bold uppercase text-slate-400 tracking-wider">Cierre de Periodo Actual</label>
-                <input type="text" required value={tempFechaCierre} onChange={(e) => setTempFechaCierre(e.target.value)} className="w-full border border-slate-200 px-3 py-2.5 rounded-xl font-bold focus:outline-none focus:border-indigo-500" />
+                <label className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Cierre de Periodo Actual</label>
+                <input type="text" required value={tempFechaCierre} onChange={(e) => setTempFechaCierre(e.target.value)} className="w-full border-2 border-slate-200 px-3.5 py-3 rounded-xl font-bold focus:outline-none focus:border-violet-500 focus:ring-4 focus:ring-violet-500/20 shadow-inner" />
               </div>
               <div className="flex gap-2 pt-2">
-                <button type="button" onClick={() => setIsDateConfigOpen(false)} className="flex-1 py-2.5 bg-slate-100 text-slate-500 rounded-xl font-bold uppercase cursor-pointer">Cancelar</button>
-                <button type="submit" className="flex-1 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold uppercase shadow-md cursor-pointer transition-all active:scale-98">Aplicar Fechas</button>
+                <button type="button" onClick={() => setIsDateConfigOpen(false)} className="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-500 rounded-2xl font-black uppercase text-xs cursor-pointer transition-all">Cancelar</button>
+                <button type="submit" className="flex-1 py-3 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white rounded-2xl font-black uppercase text-xs shadow-lg shadow-violet-500/25 cursor-pointer transition-all active:scale-95">Aplicar Fechas</button>
               </div>
             </form>
           </div>
@@ -500,42 +522,47 @@ export const RankingPage: React.FC = () => {
       )}
 
       {isControlModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-fadeIn">
-          <div className="bg-white rounded-3xl max-w-md w-full shadow-premium overflow-hidden border border-slate-200/60">
-            <div className="bg-gradient-to-r from-indigo-600 to-indigo-700 p-5 text-white flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <Settings2 size={16} />
-                <h3 className="font-bold text-xs uppercase tracking-wider">Panel de Control Administrativo</h3>
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
+          <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl overflow-hidden border border-slate-200/60">
+            <div className="bg-gradient-to-r from-violet-600 via-purple-600 to-fuchsia-600 p-5 text-white flex justify-between items-center">
+              <div className="flex items-center gap-3">
+                <div className="bg-white/20 p-2 rounded-xl"><Settings2 size={18} /></div>
+                <h3 className="font-black text-sm uppercase tracking-wider">Panel de Control Administrativo</h3>
               </div>
-              <button onClick={() => setIsControlModalOpen(false)} className="text-white/80 hover:text-white"><X size={18} /></button>
+              <button onClick={() => setIsControlModalOpen(false)} className="text-white/80 hover:text-white p-1 hover:bg-white/10 rounded-lg transition"><X size={18} /></button>
             </div>
-            <div className="p-6 space-y-4 text-xs font-semibold text-slate-650">
-              <p className="leading-relaxed">Herramienta de auditoría del sistema para recalcular variaciones algorítmicas mensuales e inyectar bonificaciones.</p>
-              <button type="button" onClick={() => { setIsControlModalOpen(false); cargarRankingGlobal(); }} className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold uppercase shadow-md cursor-pointer transition-all active:scale-98">Forzar Sincronización Inmediata</button>
+            <div className="p-6 space-y-4 text-xs font-semibold text-slate-600">
+              <p className="leading-relaxed text-sm">Herramienta de auditoría del sistema para recalcular variaciones algorítmicas mensuales e inyectar bonificaciones.</p>
+              <button type="button" onClick={() => { setIsControlModalOpen(false); cargarRankingGlobal(); }} className="w-full py-3 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white rounded-2xl text-xs font-black uppercase shadow-lg shadow-violet-500/25 cursor-pointer transition-all active:scale-95">Forzar Sincronización Inmediata</button>
             </div>
           </div>
         </div>
       )}
 
       {isHistoryModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center z-50 p-4 animate-fadeIn">
-          <div className="bg-white rounded-3xl max-w-md w-full shadow-premium p-5 border border-slate-200/60 flex flex-col max-h-[80vh]">
-            <div className="flex justify-between items-center border-b border-slate-100 pb-3">
-              <h3 className="text-xs font-bold text-indigo-950 uppercase flex items-center gap-2"><Layers size={16}/> Historial Completo</h3>
-              <button onClick={() => setIsHistoryModalOpen(false)} className="text-slate-400 hover:text-slate-600"><X size={16} /></button>
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
+          <div className="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-slate-200/60 flex flex-col max-h-[80vh] overflow-hidden">
+            <div className="bg-gradient-to-r from-emerald-500 to-teal-600 p-5 text-white flex justify-between items-center shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="bg-white/20 p-2 rounded-xl"><Layers size={18} /></div>
+                <h3 className="text-sm font-black uppercase tracking-wider">Historial Completo</h3>
+              </div>
+              <button onClick={() => setIsHistoryModalOpen(false)} className="text-white/80 hover:text-white p-1 hover:bg-white/10 rounded-lg transition"><X size={16} /></button>
             </div>
-            <div className="overflow-y-auto my-4 space-y-2 pr-1 flex-1 custom-scrollbar">
+            <div className="overflow-y-auto p-5 space-y-2 flex-1">
               {grupoProgreso.historialReciente.map((h: any) => (
-                <div key={h.id} className="p-3 bg-slate-50 border border-slate-100 rounded-xl flex justify-between items-center text-xs font-semibold">
+                <div key={h.id} className="p-3 bg-slate-50 border border-slate-100 rounded-xl flex justify-between items-center text-xs font-semibold hover:bg-emerald-50/30 hover:border-emerald-100/50 transition">
                   <div>
-                    <p className="text-slate-900 font-bold text-sm">{h.actividad}</p>
-                    <p className="text-[9px] text-slate-450 mt-0.5 uppercase font-bold">{h.area} • {h.fecha}</p>
+                    <p className="text-slate-900 font-black text-sm">{h.actividad}</p>
+                    <p className="text-[9px] text-slate-400 mt-0.5 uppercase font-bold">{h.area} • {h.fecha}</p>
                   </div>
-                  <span className="text-emerald-605 font-mono font-bold text-sm text-emerald-600">+{h.puntos} pts</span>
+                  <span className="text-emerald-600 font-mono font-black text-sm bg-emerald-50 px-2 py-1 rounded-lg border border-emerald-100">+{h.puntos} pts</span>
                 </div>
               ))}
             </div>
-            <button onClick={() => setIsHistoryModalOpen(false)} className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-500 font-bold uppercase text-xs rounded-xl cursor-pointer">Cerrar Historial</button>
+            <div className="p-4 border-t border-slate-100 shrink-0">
+              <button onClick={() => setIsHistoryModalOpen(false)} className="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-500 font-black uppercase text-xs rounded-2xl cursor-pointer transition-all">Cerrar Historial</button>
+            </div>
           </div>
         </div>
       )}

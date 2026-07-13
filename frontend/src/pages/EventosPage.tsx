@@ -182,14 +182,28 @@ export const EventosPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 bg-[#f4f6fc] min-h-screen text-slate-800 p-4 sm:p-6 font-sans antialiased selection:bg-blue-500 selection:text-white">
+    <div className="space-y-6 bg-[#f0f2fc] min-h-screen text-slate-800 p-4 sm:p-6 font-sans antialiased selection:bg-violet-500 selection:text-white">
+      <style>{`@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }`}</style>
       
-      <div className="flex justify-between items-center bg-white p-5 rounded-3xl border border-slate-100 shadow-xs">
-        <div className="flex items-center gap-3">
-          <div className="bg-[#3730a3] p-3 text-white rounded-2xl shadow-md"><Calendar size={24} /></div>
-          <div>
-            <h1 className="text-xl font-black text-[#1e1b4b] tracking-tight">Eventos</h1>
-            <p className="text-xs text-slate-400 font-bold uppercase tracking-wider">Sistema de Convocatorias y Participación</p>
+      {/* HEADER PREMIUM */}
+      <div className="relative bg-white rounded-3xl border border-slate-200/80 shadow-lg overflow-hidden">
+        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-500 via-indigo-500 via-violet-500 via-fuchsia-500 to-orange-400" style={{backgroundSize: '200% 100%', animation: 'shimmer 4s linear infinite'}} />
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-5 pt-7">
+          <div className="flex items-center gap-4">
+            <div className="relative">
+              <div className="bg-gradient-to-br from-indigo-600 to-violet-600 p-3 rounded-2xl shadow-lg shadow-indigo-500/30">
+                <Calendar size={26} className="text-white" />
+              </div>
+              <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-emerald-400 rounded-full border-2 border-white animate-pulse" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 to-violet-700">Eventos</h1>
+              <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-0.5">Sistema de Convocatorias y Participación GP</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 bg-indigo-50 px-4 py-2 rounded-xl border border-indigo-100 text-[11px] font-black uppercase tracking-wider text-indigo-600">
+            <Layers size={13} className="animate-pulse" />
+            Gestión de Eventos
           </div>
         </div>
       </div>
@@ -197,43 +211,50 @@ export const EventosPage: React.FC = () => {
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
         
         <div className="xl:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-5">
-          <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-xs flex items-center gap-4 group hover:shadow-md transition-all duration-300">
-            <div className="w-14 h-14 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center border border-indigo-100 shrink-0 shadow-2xs"><Users size={24} /></div>
+          <div className="bg-white p-6 rounded-3xl border-l-[5px] border-l-indigo-600 border-t border-r border-b border-slate-200/60 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center gap-4 group">
+            <div className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-violet-600 text-white rounded-2xl flex items-center justify-center shrink-0 shadow-lg shadow-indigo-500/20">
+              <Users size={24} />
+            </div>
             <div className="space-y-1">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Elige una categoría</span>
-              <h3 className="font-black text-sm text-[#1e1b4b] uppercase tracking-tight">1. Eventos Recreativos</h3>
+              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Elige una categoría</span>
+              <h3 className="font-black text-sm text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 to-violet-700 uppercase tracking-tight">1. Eventos Recreativos</h3>
               <p className="text-[11px] text-slate-400 font-bold leading-tight">Campamentos, confraternizaciones y más.</p>
               <button className="text-[10px] font-black text-indigo-600 uppercase flex items-center gap-1 pt-1 hover:text-indigo-800 transition-colors">Ver Eventos Recreativos <ArrowRight size={11} /></button>
             </div>
           </div>
-          <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-xs flex items-center gap-4 group hover:shadow-md transition-all duration-300">
-            <div className="w-14 h-14 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center border border-emerald-100 shrink-0 shadow-2xs"><Trophy size={24} /></div>
+          <div className="bg-white p-6 rounded-3xl border-l-[5px] border-l-emerald-600 border-t border-r border-b border-slate-200/60 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex items-center gap-4 group">
+            <div className="w-14 h-14 bg-gradient-to-br from-emerald-500 to-teal-600 text-white rounded-2xl flex items-center justify-center shrink-0 shadow-lg shadow-emerald-500/20">
+              <Trophy size={24} />
+            </div>
             <div className="space-y-1">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Elige una categoría</span>
-              <h3 className="font-black text-sm text-[#1e1b4b] uppercase tracking-tight">2. Deportes</h3>
+              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Elige una categoría</span>
+              <h3 className="font-black text-sm text-transparent bg-clip-text bg-gradient-to-r from-emerald-700 to-teal-700 uppercase tracking-tight">2. Deportes</h3>
               <p className="text-[11px] text-slate-400 font-bold leading-tight">Campeonatos, torneos y competencias GP.</p>
               <button className="text-[10px] font-black text-emerald-600 uppercase flex items-center gap-1 pt-1 hover:text-emerald-800 transition-colors">Ver Eventos Deportivos <ArrowRight size={11} /></button>
             </div>
           </div>
         </div>
 
-        <div className="xl:col-span-4 bg-white p-5 rounded-3xl border border-slate-100 shadow-xs space-y-4">
-          <h3 className="text-xs font-black text-[#1e1b4b] uppercase px-1 flex items-center gap-1.5 tracking-wider"><Layers size={14} className="text-blue-600" /> Resumen General</h3>
+        <div className="xl:col-span-4 bg-white p-5 rounded-3xl border border-slate-200/60 shadow-md space-y-4">
+          <div className="flex items-center gap-2">
+            <div className="p-1.5 bg-indigo-50 rounded-lg border border-indigo-100"><Layers size={14} className="text-indigo-600" /></div>
+            <h3 className="text-xs font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 to-violet-700 uppercase tracking-widest">Resumen General</h3>
+          </div>
           <div className="grid grid-cols-2 gap-3">
-            <div className="bg-slate-50/70 border border-slate-100 p-3 rounded-2xl text-center shadow-2xs">
-              <p className="text-xl font-black text-blue-700 leading-none">{kpis.eventosProgramados}</p>
+            <div className="bg-gradient-to-br from-indigo-50 to-violet-50 border border-indigo-100 p-3.5 rounded-2xl text-center shadow-sm hover:shadow-md transition">
+              <p className="text-xl font-black text-indigo-700 leading-none">{kpis.eventosProgramados}</p>
               <p className="text-[9px] font-black text-slate-400 uppercase tracking-wide mt-1.5">Eventos Programados</p>
             </div>
-            <div className="bg-slate-50/70 border border-slate-100 p-3 rounded-2xl text-center shadow-2xs">
-              <p className="text-xl font-black text-emerald-600 leading-none">{kpis.gpInscritosMes}</p>
+            <div className="bg-gradient-to-br from-emerald-50 to-teal-50 border border-emerald-100 p-3.5 rounded-2xl text-center shadow-sm hover:shadow-md transition">
+              <p className="text-xl font-black text-emerald-700 leading-none">{kpis.gpInscritosMes}</p>
               <p className="text-[9px] font-black text-slate-400 uppercase tracking-wide mt-1.5">GP Inscritos Este Mes</p>
             </div>
-            <div className="bg-slate-50/70 border border-slate-100 p-3 rounded-2xl text-center shadow-2xs">
-              <p className="text-xl font-black text-amber-500 leading-none">{kpis.eventosProximos}</p>
+            <div className="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-100 p-3.5 rounded-2xl text-center shadow-sm hover:shadow-md transition">
+              <p className="text-xl font-black text-amber-700 leading-none">{kpis.eventosProximos}</p>
               <p className="text-[9px] font-black text-slate-400 uppercase tracking-wide mt-1.5">Eventos Próximos</p>
             </div>
-            <div className="bg-slate-50/70 border border-slate-100 p-3 rounded-2xl text-center shadow-2xs">
-              <p className="text-xl font-black text-purple-600 leading-none">{kpis.participacionesTotales}</p>
+            <div className="bg-gradient-to-br from-fuchsia-50 to-violet-50 border border-fuchsia-100 p-3.5 rounded-2xl text-center shadow-sm hover:shadow-md transition">
+              <p className="text-xl font-black text-fuchsia-700 leading-none">{kpis.participacionesTotales}</p>
               <p className="text-[9px] font-black text-slate-400 uppercase tracking-wide mt-1.5">Participaciones Totales</p>
             </div>
           </div>
@@ -249,24 +270,27 @@ export const EventosPage: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
-        <div className="lg:col-span-5 bg-white p-5 rounded-3xl border border-slate-100 shadow-xs flex flex-col gap-4">
-          <div className="flex justify-between items-center border-b border-slate-50 pb-2">
-            <h2 className="font-black text-[#1e1b4b] text-xs uppercase tracking-tight">Eventos Recreativos</h2>
+        <div className="lg:col-span-5 bg-white p-5 rounded-3xl border border-slate-200/60 shadow-md flex flex-col gap-4">
+          <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-violet-600 text-white rounded-xl flex items-center justify-center shadow-md shadow-indigo-500/20"><Users size={16} /></div>
+              <h2 className="font-black text-xs text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 to-violet-700 uppercase tracking-wide">Eventos Recreativos</h2>
+            </div>
             {userCanManageEvents && (
-              <button onClick={() => openCreateModal('RECREATIVO')} className="py-1.5 px-3 bg-indigo-50 text-indigo-700 text-[10px] font-black rounded-xl border border-indigo-100 hover:bg-indigo-100 transition shadow-2xs flex items-center gap-1"><Plus size={12} /> Convocar</button>
+              <button onClick={() => openCreateModal('RECREATIVO')} className="py-2 px-4 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white text-[10px] font-black rounded-xl shadow-md shadow-indigo-500/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-1"><Plus size={12} /> Convocar</button>
             )}
           </div>
           <div className="flex gap-1 bg-slate-50 p-1 rounded-xl border border-slate-100">
             {(['Próximos', 'En Curso', 'Finalizados'] as const).map(tab => (
-              <button key={tab} onClick={() => setActiveTabRecreativos(tab)} className={`flex-1 text-center text-[10px] py-2 rounded-lg font-black uppercase tracking-wider transition-all duration-200 ${activeTabRecreativos === tab ? 'bg-blue-600 text-white shadow-xs' : 'text-slate-400 hover:text-slate-700'}`}>{tab}</button>
+              <button key={tab} onClick={() => setActiveTabRecreativos(tab)} className={`flex-1 text-center text-[10px] py-2 rounded-lg font-black uppercase tracking-wider transition-all duration-200 ${activeTabRecreativos === tab ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-700'}`}>{tab}</button>
             ))}
           </div>
           <div className="space-y-4 max-h-[460px] overflow-y-auto pr-1">
             {filterEvents('RECREATIVO', activeTabRecreativos).map(ev => (
-              <div key={ev.id} className="border border-slate-100 rounded-2xl p-4 bg-slate-50/30 hover:bg-white hover:shadow-md transition-all duration-300 relative group flex gap-3">
-                <div className="w-24 h-24 bg-gradient-to-br from-indigo-500/20 to-purple-500/20 rounded-xl border border-slate-100 flex flex-col items-center justify-center shrink-0 text-indigo-600 shadow-2xs">
-                  <Calendar size={22} className="opacity-80" />
-                  <span className="text-[8px] font-black uppercase tracking-widest mt-1 text-indigo-800/80">JA EVENT</span>
+              <div key={ev.id} className="border-l-[4px] border-l-indigo-500 border-t border-r border-b border-slate-200/60 rounded-2xl p-4 bg-white hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 relative group flex gap-3 shadow-sm">
+                <div className="w-24 h-24 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-xl flex flex-col items-center justify-center shrink-0 text-white shadow-md shadow-indigo-500/20">
+                  <Calendar size={22} className="opacity-90" />
+                  <span className="text-[8px] font-black uppercase tracking-widest mt-1 text-white/90">JA EVENT</span>
                 </div>
                 <div className="flex-1 space-y-2 min-w-0">
                   <div className="flex justify-between items-start">
@@ -283,15 +307,15 @@ export const EventosPage: React.FC = () => {
                       </div>
                     )}
                   </div>
-                  <h3 className="font-black text-xs text-[#1e1b4b] tracking-tight truncate">{ev.title}</h3>
+                  <h3 className="font-black text-xs text-slate-800 tracking-tight truncate">{ev.title}</h3>
                   <p className="text-[11px] text-slate-500 font-medium line-clamp-1 leading-tight">{ev.description || 'Sin descripción.'}</p>
                   <div className="flex flex-wrap gap-x-2 gap-y-0.5 text-[9px] text-slate-400 font-extrabold uppercase tracking-wide">
-                    <span className="flex items-center gap-0.5 text-slate-500"><CalendarDays size={10} className="text-blue-600" /> {ev.startDate}</span>
-                    <span className="flex items-center gap-0.5 text-slate-500"><MapPin size={10} className="text-blue-600" /> {ev.location}</span>
+                    <span className="flex items-center gap-0.5 text-slate-500"><CalendarDays size={10} className="text-indigo-600" /> {ev.startDate}</span>
+                    <span className="flex items-center gap-0.5 text-slate-500"><MapPin size={10} className="text-indigo-600" /> {ev.location}</span>
                   </div>
                   <div className="flex justify-between items-center pt-2 border-t border-slate-100">
                     <span className="text-[10px] text-indigo-600 font-black uppercase tracking-wider">Inscritos: {ev.participations?.length || 0} / {ev.maxSpots} GP</span>
-                    {ev.status === 'Abierto' && <button onClick={() => handleJoin(ev.id)} className="py-1 px-3 bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-black uppercase rounded-lg tracking-wider transition shadow-2xs">Participar</button>}
+                    {ev.status === 'Abierto' && <button onClick={() => handleJoin(ev.id)} className="py-1.5 px-3 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white text-[10px] font-black uppercase rounded-xl tracking-wider transition shadow-md shadow-indigo-500/20 hover:scale-[1.02] active:scale-95">Participar</button>}
                   </div>
                 </div>
               </div>
@@ -302,25 +326,28 @@ export const EventosPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="lg:col-span-5 bg-white p-5 rounded-3xl border border-slate-100 shadow-xs flex flex-col gap-4">
-          <div className="flex justify-between items-center border-b border-slate-50 pb-2">
-            <h2 className="font-black text-[#1e1b4b] text-xs uppercase tracking-tight">Deportes</h2>
+        <div className="lg:col-span-5 bg-white p-5 rounded-3xl border border-slate-200/60 shadow-md flex flex-col gap-4">
+          <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-teal-600 text-white rounded-xl flex items-center justify-center shadow-md shadow-emerald-500/20"><Trophy size={16} /></div>
+              <h2 className="font-black text-xs text-transparent bg-clip-text bg-gradient-to-r from-emerald-700 to-teal-700 uppercase tracking-wide">Deportes</h2>
+            </div>
             {userCanManageEvents && (
-              <button onClick={() => openCreateModal('DEPORTE')} className="py-1.5 px-3 bg-emerald-50 text-emerald-700 text-[10px] font-black rounded-xl border border-emerald-100 hover:bg-emerald-100 transition shadow-2xs flex items-center gap-1"><Plus size={12} /> Convocar</button>
+              <button onClick={() => openCreateModal('DEPORTE')} className="py-2 px-4 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-[10px] font-black rounded-xl shadow-md shadow-emerald-500/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-1"><Plus size={12} /> Convocar</button>
             )}
           </div>
           <div className="flex gap-1 bg-slate-50 p-1 rounded-xl border border-slate-100">
             {(['Próximos', 'En Curso', 'Finalizados'] as const).map(tab => (
-              <button key={tab} onClick={() => setActiveTabDeportes(tab)} className={`flex-1 text-center text-[10px] py-2 rounded-lg font-black uppercase tracking-wider transition-all duration-200 ${activeTabDeportes === tab ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-400 hover:text-slate-700'}`}>{tab}</button>
+              <button key={tab} onClick={() => setActiveTabDeportes(tab)} className={`flex-1 text-center text-[10px] py-2 rounded-lg font-black uppercase tracking-wider transition-all duration-200 ${activeTabDeportes === tab ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md' : 'text-slate-400 hover:text-slate-700'}`}>{tab}</button>
             ))}
           </div>
           <div className="space-y-4 max-h-[460px] overflow-y-auto pr-1">
             {filterEvents('DEPORTE', activeTabDeportes).map(ev => (
-              <div key={ev.id} className="border border-slate-100 rounded-2xl p-4 bg-slate-50/30 hover:bg-white hover:shadow-md transition-all duration-300 relative group flex gap-3">
+              <div key={ev.id} className="border-l-[4px] border-l-emerald-500 border-t border-r border-b border-slate-200/60 rounded-2xl p-4 bg-white hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 relative group flex gap-3 shadow-sm">
 
-                <div className="w-24 h-24 bg-gradient-to-br from-emerald-500/20 to-teal-500/20 rounded-xl border border-slate-100 flex flex-col items-center justify-center shrink-0 text-emerald-600 shadow-2xs">
-                  <Trophy size={22} className="opacity-80" />
-                  <span className="text-[8px] font-black uppercase tracking-widest mt-1 text-emerald-800/80">JA MATCH</span>
+                <div className="w-24 h-24 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-xl flex flex-col items-center justify-center shrink-0 text-white shadow-md shadow-emerald-500/20">
+                  <Trophy size={22} className="opacity-90" />
+                  <span className="text-[8px] font-black uppercase tracking-widest mt-1 text-white/90">JA MATCH</span>
                 </div>
                 <div className="flex-1 space-y-2 min-w-0">
                   <div className="flex justify-between items-start">
@@ -337,7 +364,7 @@ export const EventosPage: React.FC = () => {
                       </div>
                     )}
                   </div>
-                  <h3 className="font-black text-xs text-[#1e1b4b] tracking-tight truncate">{ev.title}</h3>
+                  <h3 className="font-black text-xs text-slate-800 tracking-tight truncate">{ev.title}</h3>
                   <p className="text-[11px] text-slate-500 font-medium line-clamp-1 leading-tight">{ev.description || 'Sin descripción.'}</p>
                   <div className="flex flex-wrap gap-x-2 gap-y-0.5 text-[9px] text-slate-400 font-extrabold uppercase tracking-wide">
                     <span className="flex items-center gap-0.5 text-slate-500"><CalendarDays size={10} className="text-emerald-600" /> {ev.startDate}</span>
@@ -345,7 +372,7 @@ export const EventosPage: React.FC = () => {
                   </div>
                   <div className="flex justify-between items-center pt-2 border-t border-slate-100">
                     <span className="text-[10px] text-emerald-600 font-black uppercase tracking-wider">Equipos: {ev.participations?.length || 0} / {ev.maxSpots}</span>
-                    {ev.status === 'Abierto' && <button onClick={() => handleJoin(ev.id)} className="py-1 px-3 bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-black uppercase rounded-lg tracking-wider transition shadow-2xs">Participar</button>}
+                    {ev.status === 'Abierto' && <button onClick={() => handleJoin(ev.id)} className="py-1.5 px-3 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white text-[10px] font-black uppercase rounded-xl tracking-wider transition shadow-md shadow-emerald-500/20 hover:scale-[1.02] active:scale-95">Participar</button>}
                   </div>
                 </div>
               </div>

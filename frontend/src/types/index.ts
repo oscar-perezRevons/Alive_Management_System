@@ -6,7 +6,7 @@ export interface User {
   groupRole?: string;
   isActive: boolean;
   createdAt: string;
-  avatarUrl?: string;
+  avatarUrl?: string | null;
 }
 
 export interface GroupSmall {

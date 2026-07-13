@@ -7,7 +7,7 @@ interface User {
   email: string;
   role: string;
   groupRole?: string;
-  avatarUrl?: string;
+  avatarUrl?: string | null;
 }
 
 interface AuthStore {
