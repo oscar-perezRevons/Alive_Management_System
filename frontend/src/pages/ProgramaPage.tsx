@@ -1,9 +1,11 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { programService } from '../services/api';
+import { useAuthStore } from '../stores/authStore';
 import { 
   Calendar, Clock, Pencil, Trash2,
   X, FileText, Download, ListCollapse, 
-  Plus, Eye
+  Plus, Eye, Upload, FileUp, Sparkles, 
+  Check, ExternalLink, Loader2
 } from 'lucide-react';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -30,8 +32,8 @@ const DEFAULT_PROGRAM_POINTS = [
 ];
 
 export const ProgramaPage: React.FC = () => {
-  // Simulación del rol del usuario. Cambiar a tu estado global de autenticación real si aplica
-  const [currentUserRole] = useState<'ADMIN' | 'USER'>('ADMIN');
+  const { user } = useAuthStore();
+  const currentUserRole = user?.role || 'USER';
 
   const [events, setEvents] = useState<any[]>([]);
   const [programPoints] = useState<string[]>(DEFAULT_PROGRAM_POINTS);
@@ -39,6 +41,14 @@ export const ProgramaPage: React.FC = () => {
   const [isPreviewModalOpen, setIsPreviewModalOpen] = useState(false); 
   const [editingEvent, setEditingEvent] = useState<any>(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState<number | null>(null);
+
+  const [guideUrl, setGuideUrl] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [pdfPreviewEvents, setPdfPreviewEvents] = useState<any[]>([]);
+  const [syncing, setSyncing] = useState(false);
+  const [clearExistingBeforeSync, setClearExistingBeforeSync] = useState(true);
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [clearing, setClearing] = useState(false);
 
   const [form, setForm] = useState({ timeSlot: '', title: '', description: '', responsible: '', order: '0' });
   const [showCustomTitleInput, setShowCustomTitleInput] = useState(false);
@@ -59,9 +69,259 @@ export const ProgramaPage: React.FC = () => {
     }
   }, [showAlert]);
 
+  const loadGuideUrl = useCallback(async () => {
+    try {
+      const res = await programService.getGuideUrl();
+      setGuideUrl(res.data.pdfUrl);
+    } catch (err) {
+      console.error('Error fetching guide PDF:', err);
+    }
+  }, []);
+
   useEffect(() => {
     loadScheduleData();
-  }, [loadScheduleData]);
+    loadGuideUrl();
+  }, [loadScheduleData, loadGuideUrl]);
+
+  const handlePdfUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (file.type !== 'application/pdf') {
+      showAlert('error', 'Formato Inválido', 'El archivo seleccionado debe ser un documento PDF.');
+      return;
+    }
+    const formData = new FormData();
+    formData.append('pdf', file);
+    try {
+      setUploading(true);
+      const res = await programService.uploadGuidePdf(formData);
+      setGuideUrl(res.data.pdfUrl);
+      if (res.data.parsedEvents && res.data.parsedEvents.length > 0) {
+        setPdfPreviewEvents(res.data.parsedEvents);
+        showAlert('success', 'PDF Escaneado con Éxito', `Se detectaron e importaron temporalmente ${res.data.parsedEvents.length} actividades del PDF guía. Revisa el panel de previsualización para realizar cambios.`);
+      } else {
+        showAlert('success', 'Archivo Subido', 'El programa guía oficial (PDF) ha sido cargado con éxito, pero no se detectó ninguna línea de itinerario compatible (formato: HH:MM - Actividad).');
+      }
+    } catch (err: any) {
+      showAlert('error', 'Error al Subir', err.response?.data?.message || 'No se pudo procesar la subida.');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handlePdfDelete = async () => {
+    try {
+      await programService.deleteGuidePdf();
+      setGuideUrl(null);
+      setPdfPreviewEvents([]);
+      showAlert('success', 'PDF Removido', 'El programa guía ha sido eliminado de forma permanente.');
+    } catch (err) {
+      showAlert('error', 'Error al Eliminar', 'No se pudo eliminar el archivo PDF guía.');
+    }
+  };
+
+  const downloadTemplatePDF = () => {
+    const doc = new jsPDF('p', 'mm', 'a4');
+    
+    // Encabezado
+    doc.setFillColor(79, 70, 229); // indigo-600
+    doc.rect(0, 0, 210, 32, 'F');
+    
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('Helvetica', 'bold');
+    doc.setFontSize(14);
+    doc.text('PLANTILLA OFICIAL DE PROGRAMACIÓN SABÁTICA', 105, 13, { align: 'center' });
+    doc.setFontSize(9);
+    doc.text('SISTEMA DE GESTIÓN ALIVE MARANATA - SCANNER COMPATIBLE', 105, 21, { align: 'center' });
+    
+    // Instrucciones
+    doc.setTextColor(15, 23, 42);
+    doc.setFontSize(11);
+    doc.text('INSTRUCCIONES DE USO DEL SCANNER AUTOMÁTICO:', 15, 45);
+    
+    doc.setFont('Helvetica', 'normal');
+    doc.setFontSize(9);
+    const instructions = [
+      '• El lector busca líneas del itinerario basándose en el formato de hora (HH:MM) al inicio de la línea.',
+      '• Formatear cada actividad respetando el separador "-" (ejemplo: 09:15 - Alabanzas).',
+      '• Especificar el Responsable entre paréntesis y con el prefijo "Responsable:". Ejemplo: (Responsable: Juan Pérez)',
+      '• Especificar la Descripción entre corchetes y con el prefijo "Descripción:". Ejemplo: [Descripción: Cantos alegres]',
+      '• Puedes copiar el siguiente ejemplo en Word, modificar las horas y textos, exportarlo como PDF y subirlo.'
+    ];
+    
+    let y = 52;
+    instructions.forEach(line => {
+      doc.text(line, 15, y);
+      y += 6;
+    });
+    
+    // Contenedor formato
+    doc.setFillColor(248, 250, 252);
+    doc.rect(15, y + 2, 180, 22, 'F');
+    doc.setFont('Helvetica', 'bold');
+    doc.text('FORMATO REQUERIDO:', 20, y + 9);
+    doc.setFont('Courier', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(79, 70, 229);
+    doc.text('HH:MM - [Título Actividad] (Responsable: [Nombre]) [Descripción: [Detalle]]', 20, y + 15);
+    
+    // Ejemplo
+    doc.setTextColor(15, 23, 42);
+    doc.setFont('Helvetica', 'bold');
+    doc.setFontSize(11);
+    doc.text('EJEMPLO DE PROGRAMA EN VIVO COMPATIBLE (COPIAR Y EDITAR):', 15, y + 36);
+    
+    doc.setFont('Helvetica', 'normal');
+    doc.setFontSize(9);
+    const examples = [
+      '09:00 - Espacio de cantos (Responsable: Ministerio de Música) [Descripción: Cantos alegres de bienvenida]',
+      '09:15 - Cántico inicial (Responsable: Andreina) [Descripción: Himno congregacional oficial]',
+      '09:20 - Oración inicial (Responsable: Anciano de Turno) [Descripción: Oración de consagración]',
+      '09:25 - Matinal (Responsable: Secretario GP) [Descripción: Lectura diaria del devocional]',
+      '10:00 - Tema central (Responsable: Predicador Asignado) [Descripción: Reflexión y sermón del día]',
+      '10:45 - Cántico final (Responsable: Congregación) [Descripción: Alabanza de cierre]',
+      '10:50 - Oración final (Responsable: Predicador Asignado) [Descripción: Bendición final y salida]'
+    ];
+    
+    y = y + 43;
+    examples.forEach(line => {
+      doc.text(line, 15, y);
+      y += 6;
+    });
+
+    doc.setFont('Helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(100, 116, 139);
+    doc.text('Nota: Puedes pegar este ejemplo en Word u otro editor, personalizar las líneas, guardarlo como PDF y subirlo.', 15, y + 10);
+    
+    doc.save('Plantilla_Formatos_Programa_Alive.pdf');
+    showAlert('success', 'Plantilla Descargada', 'Se ha guardado la plantilla PDF compatible con el scanner en tus descargas.');
+  };
+
+  const handlePreviewEventChange = (index: number, field: string, value: string) => {
+    const updated = [...pdfPreviewEvents];
+    updated[index] = { ...updated[index], [field]: value };
+    setPdfPreviewEvents(updated);
+  };
+
+  const removePreviewEvent = (index: number) => {
+    const updated = pdfPreviewEvents.filter((_, i) => i !== index);
+    setPdfPreviewEvents(updated);
+  };
+
+  const handleSyncPreviewToLive = async () => {
+    try {
+      setSyncing(true);
+      
+      // 1. Limpiar eventos existentes si la opción está activa
+      if (clearExistingBeforeSync) {
+        for (const ev of events) {
+          await programService.deleteEvent(ev.id);
+        }
+      }
+
+      // 2. Insertar todos los eventos de la previsualización
+      for (let i = 0; i < pdfPreviewEvents.length; i++) {
+        const previewEv = pdfPreviewEvents[i];
+        await programService.createEvent({
+          timeSlot: previewEv.timeSlot,
+          title: previewEv.title,
+          description: previewEv.description,
+          responsible: previewEv.responsible,
+          order: i + 1
+        });
+      }
+
+      // 3. Limpiar estado de previsualización y recargar
+      setPdfPreviewEvents([]);
+      loadScheduleData();
+      showAlert('success', 'Programa Sincronizado', 'Se han inyectado todas las actividades del PDF en el programa oficial sabático.');
+    } catch (err) {
+      showAlert('error', 'Error al Sincronizar', 'No se pudieron inyectar todos los puntos al programa en vivo.');
+    } finally {
+      setSyncing(false);
+    }
+  };
+
+  const handleClearAllEventsClick = () => {
+    if (events.length === 0) {
+      showAlert('error', 'Sin Actividades', 'No hay ninguna actividad registrada para limpiar.');
+      return;
+    }
+    setShowClearConfirm(true);
+  };
+
+  const confirmClearAllEvents = async () => {
+    try {
+      setClearing(true);
+      for (const ev of events) {
+        await programService.deleteEvent(ev.id);
+      }
+      setShowClearConfirm(false);
+      loadScheduleData();
+      showAlert('success', 'Programa Vaciado', 'Se ha limpiado por completo el itinerario sabático.');
+    } catch (err) {
+      showAlert('error', 'Error', 'No se pudo vaciar el programa.');
+    } finally {
+      setClearing(false);
+    }
+  };
+
+  const SUGGESTED_GUIDE_POINTS = [
+    { timeSlot: "16:00", title: "Espacio de cantos", description: "Himnos y cantos congregacionales", responsible: "Ministerio de Música" },
+    { timeSlot: "16:15", title: "Cántico inicial", description: "Himno de apertura sabático", responsible: "Directiva Sabática" },
+    { timeSlot: "16:20", title: "Oración inicial", description: "Consagración de la congregación", responsible: "Anciano de Turno" },
+    { timeSlot: "16:25", title: "Matinal", description: "Lectura devocional del día", responsible: "Secretario GP" },
+    { timeSlot: "16:40", title: "Notijoven", description: "Informativo y anuncios semanales", responsible: "Ministerio Joven" },
+    { timeSlot: "17:00", title: "Tema central", description: "Reflexión espiritual y sermón", responsible: "Predicador Asignado" },
+    { timeSlot: "17:45", title: "Cántico final", description: "Alabanza de clausura", responsible: "Congregación" },
+    { timeSlot: "17:50", title: "Oración final", description: "Bendición final y despedida", responsible: "Predicador Asignado" }
+  ];
+
+  const importSuggestedPoint = async (point: typeof SUGGESTED_GUIDE_POINTS[0]) => {
+    try {
+      const nextOrder = events.length + 1;
+      await programService.createEvent({
+        timeSlot: point.timeSlot,
+        title: point.title,
+        description: point.description,
+        responsible: point.responsible,
+        order: nextOrder
+      });
+      loadScheduleData();
+      showAlert('success', 'Punto Importado', `"${point.title}" se agregó al programa.`);
+    } catch (err) {
+      showAlert('error', 'Error de Conexión', 'No se pudo importar la actividad.');
+    }
+  };
+
+  const importAllSuggestedPoints = async () => {
+    try {
+      let importedCount = 0;
+      for (let i = 0; i < SUGGESTED_GUIDE_POINTS.length; i++) {
+        const point = SUGGESTED_GUIDE_POINTS[i];
+        const exists = events.some(e => e.title.toUpperCase() === point.title.toUpperCase());
+        if (!exists) {
+          await programService.createEvent({
+            timeSlot: point.timeSlot,
+            title: point.title,
+            description: point.description,
+            responsible: point.responsible,
+            order: events.length + i + 1
+          });
+          importedCount++;
+        }
+      }
+      loadScheduleData();
+      if (importedCount > 0) {
+        showAlert('success', 'Importación Masiva', 'Se ha rellenado el itinerario con los puntos recomendados de la guía.');
+      } else {
+        showAlert('success', 'Sin Cambios', 'Todos los puntos sugeridos ya existen en el programa actual.');
+      }
+    } catch (err) {
+      showAlert('error', 'Error al Auto-rellenar', 'Ocurrió un error al importar los puntos.');
+    }
+  };
 
   const convertAssetToBase64 = (url: string): Promise<string> => {
     return new Promise((resolve) => {
@@ -272,67 +532,353 @@ export const ProgramaPage: React.FC = () => {
         </button>
       </div>
 
-      {/* PANEL TABLA GENERAL EN ANCHO COMPLETO */}
-      <div className="bg-white dark:bg-slate-900/50 rounded-3xl shadow-lg border border-slate-200/80 dark:border-slate-800/80 overflow-hidden relative">
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-500" />
-        <div className="p-4 bg-gradient-to-r from-slate-50 to-indigo-50/30 dark:from-slate-950/50 dark:to-indigo-950/10 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 px-5">
-          <div className="flex items-center gap-3">
-            <div className="p-1.5 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg text-white shadow-md shadow-indigo-500/20"><FileText size={14} /></div>
-            <div>
-              <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">Puntos de Actividades Registrados</h3>
-              <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold">Gestión continua de eventos e himnos dominicales/sabáticos.</p>
+      {/* ═══════ PANEL DE PREVISUALIZACIÓN DEL PDF DETECTADO ═══════ */}
+      {pdfPreviewEvents.length > 0 && (
+        <div className="bg-gradient-to-br from-indigo-50/60 via-indigo-50/20 to-slate-50/60 dark:from-slate-900/60 dark:via-slate-900/20 dark:to-slate-950/60 rounded-3xl shadow-xl border-2 border-indigo-400 dark:border-indigo-500/50 overflow-hidden relative p-6 space-y-4 animate-fadeIn z-30">
+          <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-fuchsia-500" />
+          
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 pb-3 border-b border-slate-200/50 dark:border-slate-800/50">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 bg-gradient-to-br from-indigo-500 to-fuchsia-500 text-white rounded-xl shadow-lg shadow-indigo-500/20"><Sparkles size={20} className="animate-spin animate-duration-1000" /></div>
+              <div>
+                <h3 className="text-base font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-650 to-fuchsia-600 dark:from-indigo-400 dark:to-fuchsia-400 uppercase tracking-tight">Previsualización del Itinerario PDF Detectado</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-bold">Edita o depura las actividades extraídas de la guía antes de publicarlas en vivo.</p>
+              </div>
+            </div>
+            <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+              <label className="flex items-center gap-2 bg-indigo-50/80 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800/50 px-3.5 py-2.5 rounded-xl text-[10px] font-black uppercase text-indigo-700 dark:text-indigo-300 cursor-pointer shadow-sm transition-all hover:bg-indigo-100/40 dark:hover:bg-indigo-900/30 select-none">
+                <input 
+                  type="checkbox" 
+                  checked={clearExistingBeforeSync} 
+                  onChange={(e) => setClearExistingBeforeSync(e.target.checked)} 
+                  className="rounded border-indigo-300 text-indigo-600 focus:ring-indigo-500/20 w-4 h-4 cursor-pointer"
+                />
+                Limpiar programa en vivo antes de cargar
+              </label>
+              <button 
+                type="button"
+                onClick={() => setPdfPreviewEvents([])} 
+                className="px-4 py-2.5 bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 text-white rounded-xl text-[10px] font-black uppercase transition-all duration-200 active:scale-95 hover:scale-[1.02] shadow-md shadow-rose-500/20 flex items-center gap-1.5 cursor-pointer"
+              >
+                <X size={12} className="stroke-[3]" /> Descartar
+              </button>
+              <button 
+                onClick={handleSyncPreviewToLive} 
+                disabled={syncing}
+                className="px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white rounded-xl text-[10px] font-black uppercase shadow-lg shadow-emerald-500/30 transition-all duration-200 active:scale-95 hover:scale-[1.02] flex items-center gap-1.5 cursor-pointer"
+              >
+                {syncing ? (
+                  <>
+                    <Loader2 size={12} className="animate-spin" /> Guardando...
+                  </>
+                ) : (
+                  <>
+                    <Check size={12} className="stroke-[3]" /> Publicar en Vivo
+                  </>
+                )}
+              </button>
             </div>
           </div>
-          <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end">
-            {currentUserRole === 'ADMIN' && (
-              <button onClick={openCreateModal} className="text-[10px] font-black uppercase text-white bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 py-2 px-4 rounded-xl flex items-center gap-1 transition-all active:scale-95 shadow-md shadow-violet-500/20 hover:scale-[1.02]"><Plus size={13} className="stroke-[3]" /> Agregar Punto</button>
-            )}
-            <button onClick={generatePDFReport} className="text-[10px] font-black uppercase bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white py-2 px-4 rounded-xl flex items-center gap-1.5 shadow-md shadow-amber-500/20 transition-all hover:scale-105 active:scale-95"><Download size={13} className="stroke-[3]" /> Exportar Reporte</button>
+
+          <div className="overflow-x-auto border border-indigo-100 dark:border-slate-800 rounded-2xl shadow-3xs">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-indigo-50/40 dark:bg-slate-950 border-b border-indigo-100 dark:border-slate-800 text-slate-500 dark:text-slate-400 text-[10px] uppercase font-black tracking-wider">
+                  <th className="p-3 text-center w-12 pl-4">#</th>
+                  <th className="p-3 w-28">Horario</th>
+                  <th className="p-3 w-64">Título de la Actividad</th>
+                  <th className="p-3 w-72">Responsable</th>
+                  <th className="p-3">Descripción / Notas</th>
+                  <th className="p-3 text-center w-16 pr-4">Borrar</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-150 dark:divide-slate-850 bg-white dark:bg-slate-900/10 text-xs font-bold text-slate-700">
+                {pdfPreviewEvents.map((event, index) => (
+                  <tr key={index} className="hover:bg-slate-50/50 dark:hover:bg-slate-950/20 transition-all">
+                    <td className="p-3 text-center pl-4 text-slate-400 font-mono text-sm">{index + 1}</td>
+                    <td className="p-3">
+                      <input 
+                        type="time" 
+                        value={event.timeSlot} 
+                        onChange={(e) => handlePreviewEventChange(index, 'timeSlot', e.target.value)} 
+                        className="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-black text-indigo-700 dark:text-indigo-400 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 shadow-inner"
+                      />
+                    </td>
+                    <td className="p-3">
+                      <input 
+                        type="text" 
+                        value={event.title} 
+                        onChange={(e) => handlePreviewEventChange(index, 'title', e.target.value)} 
+                        placeholder="Ej: Cántico Inicial"
+                        className="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 shadow-inner uppercase"
+                      />
+                    </td>
+                    <td className="p-3">
+                      <input 
+                        type="text" 
+                        value={event.responsible} 
+                        onChange={(e) => handlePreviewEventChange(index, 'responsible', e.target.value)} 
+                        placeholder="Ej: Ministerio de Música"
+                        className="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-850 dark:text-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 shadow-inner uppercase"
+                      />
+                    </td>
+                    <td className="p-3">
+                      <input 
+                        type="text" 
+                        value={event.description} 
+                        onChange={(e) => handlePreviewEventChange(index, 'description', e.target.value)} 
+                        placeholder="Ej: Himno congregacional"
+                        className="w-full p-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-200 focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 shadow-inner"
+                      />
+                    </td>
+                    <td className="p-3 text-center pr-4">
+                      <button 
+                        type="button"
+                        onClick={() => removePreviewEvent(index)}
+                        className="p-2 text-rose-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/20 dark:text-rose-400 dark:hover:text-rose-300 rounded-xl transition-all cursor-pointer hover:scale-110 shadow-3xs"
+                        title="Remover Fila"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* ═══════ SECCIÓN CENTRAL DE TRABAJO E ITINERARIOS ═══════ */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+        
+        {/* PANEL TABLA GENERAL EN ANCHO 2/3 */}
+        <div className="lg:col-span-2 bg-white dark:bg-slate-900/50 rounded-3xl shadow-lg border border-slate-200/80 dark:border-slate-800/80 overflow-hidden relative">
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-500" />
+          <div className="p-4 bg-gradient-to-r from-slate-50 to-indigo-50/30 dark:from-slate-950/50 dark:to-indigo-950/10 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 px-5">
+            <div className="flex items-center gap-3">
+              <div className="p-1.5 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg text-white shadow-md shadow-indigo-500/20"><FileText size={14} /></div>
+              <div>
+                <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">Puntos de Actividades Registrados</h3>
+                <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold">Gestión continua de eventos e himnos dominicales/sabáticos.</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end flex-wrap">
+              {currentUserRole === 'ADMIN' && (
+                <>
+                  <button onClick={openCreateModal} className="text-[10px] font-black uppercase text-white bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 py-2.5 px-4 rounded-xl flex items-center gap-1 transition-all active:scale-95 shadow-md shadow-indigo-500/20 hover:scale-[1.02] cursor-pointer"><Plus size={13} className="stroke-[3]" /> Agregar Punto</button>
+                  <button onClick={handleClearAllEventsClick} className="text-[10px] font-black uppercase text-white bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 py-2.5 px-4 rounded-xl flex items-center gap-1 transition-all active:scale-95 shadow-md shadow-rose-500/20 hover:scale-[1.02] cursor-pointer"><Trash2 size={13} /> Limpiar Programa</button>
+                </>
+              )}
+              <button onClick={generatePDFReport} className="text-[10px] font-black uppercase bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white py-2.5 px-4 rounded-xl flex items-center gap-1.5 shadow-md shadow-amber-500/20 transition-all hover:scale-105 active:scale-95 cursor-pointer"><Download size={13} className="stroke-[3]" /> Exportar Reporte</button>
+            </div>
+          </div>
+
+          <div className="overflow-x-auto text-xs font-bold scrollbar-none">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-gradient-to-r from-slate-50/50 to-indigo-50/20 dark:from-slate-950/20 dark:to-indigo-950/5 border-b border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-500 text-[10px] uppercase font-black tracking-wider">
+                  <th className="p-4 text-center w-12 pl-6">#</th>
+                  <th className="p-4 w-32">Horario</th>
+                  <th className="p-4">Punto del Programa</th>
+                  <th className="p-4">Responsable</th>
+                  {currentUserRole === 'ADMIN' && <th className="p-4 text-center w-24 pr-6">Acciones</th>}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-900/10 text-xs">
+                {events.map((event, index) => (
+                  <tr key={event.id} className={`hover:bg-indigo-50/30 dark:hover:bg-indigo-950/10 transition-all ${!event.isActive ? 'opacity-40 line-through' : ''}`}>
+                    <td className="p-4 pl-6 text-center">
+                      <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white text-xs font-black shadow-lg shadow-indigo-500/30">{index + 1}</span>
+                    </td>
+                    <td className="p-4">
+                      <div className="inline-flex items-center gap-2 bg-indigo-50/50 dark:bg-slate-900 border border-indigo-100 dark:border-indigo-500/20 px-3 py-1.5 rounded-xl shadow-xs">
+                        <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse shrink-0" />
+                        <span className="font-mono text-indigo-700 dark:text-indigo-400 font-extrabold text-sm md:text-base tracking-tight">{event.timeSlot}</span>
+                      </div>
+                    </td>
+                    <td className="p-4 font-black text-slate-900 dark:text-white uppercase tracking-tight text-sm">
+                      <div className="text-slate-900 dark:text-white font-extrabold">{event.title}</div>
+                      {event.description && <span className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold normal-case block mt-0.5">{event.description}</span>}
+                    </td>
+                    <td className="p-4">
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-[#3730a3] dark:text-indigo-400 font-extrabold text-[10px] uppercase border border-indigo-100 dark:border-indigo-900/30 tracking-wider">{event.responsible || '-'}</span>
+                    </td>
+                    {currentUserRole === 'ADMIN' && (
+                      <td className="p-4 pr-6 text-center">
+                        <div className="flex justify-center gap-1.5">
+                          <button onClick={() => openEditModal(event)} className="p-2 text-indigo-500 hover:text-indigo-700 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:text-indigo-300 dark:hover:bg-indigo-950/20 rounded-xl transition-all hover:scale-110 shadow-3xs cursor-pointer" title="Editar"><Pencil size={14} /></button>
+                          <button onClick={() => handleDeleteEvent(event.id)} className="p-2 text-rose-500 hover:text-rose-700 hover:bg-rose-50 dark:text-rose-400 dark:hover:text-rose-300 dark:hover:bg-rose-950/20 rounded-xl transition-all hover:scale-110 shadow-3xs cursor-pointer" title="Eliminar"><Trash2 size={14} /></button>
+                        </div>
+                      </td>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
 
-        <div className="overflow-x-auto text-xs font-bold scrollbar-none">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="bg-gradient-to-r from-slate-50/50 to-indigo-50/20 dark:from-slate-950/20 dark:to-indigo-950/5 border-b border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-500 text-[10px] uppercase font-black tracking-wider">
-                <th className="p-4 text-center w-12 pl-6">#</th>
-                <th className="p-4 w-32">Horario</th>
-                <th className="p-4">Punto del Programa</th>
-                <th className="p-4">Responsable</th>
-                {currentUserRole === 'ADMIN' && <th className="p-4 text-center w-24 pr-6">Acciones</th>}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-900/10 text-xs">
-              {events.map((event, index) => (
-                <tr key={event.id} className={`hover:bg-indigo-50/30 dark:hover:bg-indigo-950/10 transition-all ${!event.isActive ? 'opacity-40 line-through' : ''}`}>
-                  <td className="p-4 pl-6 text-center">
-                    <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white text-xs font-black shadow-lg shadow-indigo-500/30">{index + 1}</span>
-                  </td>
-                  <td className="p-4">
-                    <div className="inline-flex items-center gap-2.5 bg-white dark:bg-slate-900 border-2 border-indigo-100 dark:border-indigo-500/30 px-4 py-2 rounded-2xl shadow-md">
-                      <span className="w-3 h-3 rounded-full bg-gradient-to-r from-fuchsia-500 to-violet-500 animate-pulse shadow-sm" />
-                      <span className="font-mono text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-fuchsia-600 dark:from-indigo-400 dark:to-fuchsia-400 font-black text-xl md:text-2xl tracking-tighter">{event.timeSlot}</span>
-                    </div>
-                  </td>
-                  <td className="p-4 font-black text-slate-800 dark:text-slate-200 uppercase tracking-tight text-sm">
-                    <div className="text-transparent bg-clip-text bg-gradient-to-r from-slate-800 to-slate-600 dark:from-white dark:to-slate-300">{event.title}</div>
-                    {event.description && <span className="text-[11px] text-slate-400 dark:text-slate-500 font-bold normal-case block mt-1">{event.description}</span>}
-                  </td>
-                  <td className="p-4">
-                    <span className="inline-flex items-center px-3 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 font-bold text-xs uppercase border border-emerald-100 dark:border-emerald-500/20">{event.responsible || '-'}</span>
-                  </td>
+        {/* COLUMNA LATERAL (PROGRAMA GUÍA Y ASISTENTE) EN ANCHO 1/3 */}
+        <div className="space-y-6">
+          {/* TARJETA PROGRAMA GUÍA PDF */}
+          <div className="bg-white dark:bg-slate-900/50 rounded-3xl shadow-lg border border-slate-200/80 dark:border-slate-800/80 overflow-hidden relative p-5 space-y-4">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-500 via-orange-500 to-amber-500" />
+            <div className="flex justify-between items-center pb-2 border-b border-slate-100 dark:border-slate-800 gap-2">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="p-2 bg-red-50 dark:bg-red-500/10 text-red-650 dark:text-red-400 rounded-xl shrink-0"><FileText size={18} /></div>
+                <div className="min-w-0 flex-1">
+                  <h4 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">Programa Guía Oficial</h4>
+                  <p className="text-[10px] text-slate-505 dark:text-slate-400 font-bold">Guía en formato PDF</p>
+                </div>
+              </div>
+              {currentUserRole === 'ADMIN' && (
+                <button 
+                  onClick={downloadTemplatePDF}
+                  className="text-[9px] font-black uppercase bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 text-indigo-600 dark:text-indigo-400 py-1.5 px-3 rounded-lg shrink-0 transition duration-200 active:scale-95 flex items-center gap-1 shadow-3xs cursor-pointer"
+                  title="Descargar Plantilla de Formato PDF"
+                >
+                  <Download size={10} /> Plantilla
+                </button>
+              )}
+            </div>
+
+            {/* ESTADO CARGA DEL PDF */}
+            {guideUrl ? (
+              <div className="p-4 bg-slate-50 dark:bg-slate-950/40 rounded-2xl border border-slate-200/60 dark:border-slate-850 flex items-center justify-between gap-3 shadow-3xs">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="p-2.5 bg-red-100 dark:bg-red-955/40 text-red-650 dark:text-red-400 rounded-xl shrink-0">
+                    <FileText size={16} />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <h4 className="text-[11px] font-black text-slate-800 dark:text-slate-200 truncate uppercase tracking-tight">Itinerario_Guia_Sabatico.pdf</h4>
+                    <p className="text-[9px] text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wider mt-0.5 flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Documento Activo</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <a 
+                    href={guideUrl} 
+                    target="_blank" 
+                    rel="noreferrer" 
+                    className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 rounded-xl transition-all hover:scale-105 active:scale-95 border border-slate-200/60 dark:border-slate-800 flex items-center justify-center" 
+                    title="Ver / Descargar PDF"
+                  >
+                    <ExternalLink size={13} />
+                  </a>
                   {currentUserRole === 'ADMIN' && (
-                    <td className="p-4 pr-6 text-center">
-                      <div className="flex justify-center gap-1.5">
-                        <button onClick={() => openEditModal(event)} className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-500/20 rounded-xl transition-all hover:scale-105 hover:shadow-sm" title="Editar"><Pencil size={14} /></button>
-                        <button onClick={() => handleDeleteEvent(event.id)} className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/20 rounded-xl transition-all hover:scale-105 hover:shadow-sm" title="Eliminar"><Trash2 size={14} /></button>
-                      </div>
-                    </td>
+                    <button 
+                      onClick={handlePdfDelete}
+                      className="p-2 text-slate-450 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/30 rounded-xl transition-all hover:scale-105 active:scale-95 border border-slate-200/60 dark:border-slate-800 cursor-pointer"
+                      title="Eliminar PDF"
+                    >
+                      <Trash2 size={13} />
+                    </button>
                   )}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                </div>
+              </div>
+            ) : (
+              <div className="text-center py-2">
+                {currentUserRole === 'ADMIN' ? (
+                  <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-300 dark:border-slate-750 hover:border-indigo-500 dark:hover:border-indigo-500/50 rounded-2xl p-6 bg-slate-50/50 dark:bg-slate-950/20 cursor-pointer group transition-all duration-300 hover:bg-indigo-50/5">
+                    <input 
+                      type="file" 
+                      accept=".pdf" 
+                      className="hidden" 
+                      onChange={handlePdfUpload}
+                      disabled={uploading}
+                    />
+                    {uploading ? (
+                      <div className="flex flex-col items-center gap-2">
+                        <Loader2 size={24} className="text-indigo-600 animate-spin" />
+                        <span className="text-[10px] font-black text-indigo-600 uppercase tracking-wider animate-pulse">Subiendo archivo PDF...</span>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col items-center gap-2">
+                        <FileUp size={24} className="text-slate-400 dark:text-slate-500 group-hover:text-indigo-500 group-hover:scale-110 transition duration-300" />
+                        <span className="text-[10px] font-black text-slate-700 dark:text-slate-300 uppercase tracking-wider">Subir PDF Guía</span>
+                        <span className="text-[8px] font-bold text-slate-400 uppercase">Sólo formato PDF (Máx. 5MB)</span>
+                      </div>
+                    )}
+                  </label>
+                ) : (
+                  <div className="p-4 bg-slate-50 dark:bg-slate-950/20 border border-slate-200/60 dark:border-slate-800 rounded-2xl text-slate-400 dark:text-slate-500 italic text-[11px] font-bold uppercase tracking-wider">
+                    No hay programa guía cargado por la administración todavía.
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* ASISTENTE DE PLANIFICACIÓN INTELIGENTE */}
+          <div className="bg-white dark:bg-slate-900/50 rounded-3xl shadow-lg border border-slate-200/80 dark:border-slate-800/80 overflow-hidden relative p-5 space-y-4">
+            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-fuchsia-500" />
+            <div className="flex justify-between items-center pb-2 border-b border-slate-100 dark:border-slate-800 gap-2">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="p-2 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 rounded-xl shrink-0 animate-pulse"><Sparkles size={18} /></div>
+                <div className="min-w-0 flex-1">
+                  <h4 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider truncate">Asistente de Guía</h4>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold truncate">Inserción rápida basada en el PDF guía</p>
+                </div>
+              </div>
+              {guideUrl && events.length === 0 && (
+                <button 
+                  onClick={importAllSuggestedPoints}
+                  className="text-[9px] font-black uppercase bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white py-1.5 px-3 rounded-lg shrink-0 transition duration-200 active:scale-95 hover:scale-102 flex items-center gap-1 shadow-xs shadow-indigo-500/20 cursor-pointer"
+                >
+                  <Sparkles size={10} className="animate-spin" /> Auto-Rellenar
+                </button>
+              )}
+            </div>
+
+            <div className="space-y-2.5 max-h-[360px] overflow-y-auto pr-1 scrollbar-none">
+              {SUGGESTED_GUIDE_POINTS.map((point) => {
+                const isAdded = events.some(e => e.title.toUpperCase() === point.title.toUpperCase());
+                return (
+                  <div 
+                    key={point.title}
+                    className={`p-3 rounded-2xl border transition-all duration-300 flex items-center justify-between gap-3 ${
+                      isAdded 
+                        ? 'bg-emerald-50/40 dark:bg-emerald-950/10 border-emerald-100 dark:border-emerald-900/30' 
+                        : 'bg-slate-50/50 dark:bg-slate-950/10 border-slate-100 dark:border-slate-850 hover:bg-slate-50 dark:hover:bg-slate-900'
+                    }`}
+                  >
+                    <div className="min-w-0 flex-1 space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-[10px] font-black bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 px-1.5 py-0.5 rounded-md shrink-0">{point.timeSlot}</span>
+                        <h5 className="text-[11px] font-black text-slate-800 dark:text-slate-200 uppercase tracking-tight truncate">{point.title}</h5>
+                      </div>
+                      <p className="text-[9px] text-slate-500 dark:text-slate-400 font-semibold truncate">{point.description}</p>
+                      <p className="text-[8px] text-slate-450 dark:text-slate-500 font-bold uppercase tracking-wider">Por: {point.responsible}</p>
+                    </div>
+
+                    <div className="shrink-0">
+                      {isAdded ? (
+                        <span className="inline-flex items-center justify-center p-1.5 bg-emerald-100 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400 rounded-full font-black text-[9px] uppercase tracking-wider gap-0.5"><Check size={11} className="stroke-[3]" /></span>
+                      ) : (
+                         <button
+                           onClick={() => importSuggestedPoint(point)}
+                           disabled={!guideUrl}
+                           className={`p-1.5 rounded-xl border text-[9px] font-black transition-all ${
+                             guideUrl 
+                               ? 'border-indigo-100 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 text-indigo-600 cursor-pointer hover:scale-105 active:scale-95' 
+                               : 'border-slate-200 text-slate-300 cursor-not-allowed opacity-50'
+                           }`}
+                           title={guideUrl ? "Importar Punto" : "Requiere cargar el PDF guía primero"}
+                         >
+                           + Importar
+                         </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            {!guideUrl && (
+              <div className="p-3 bg-amber-50/50 dark:bg-amber-950/10 border border-amber-100/80 dark:border-amber-900/30 rounded-2xl text-[9px] text-amber-700 dark:text-amber-400 font-bold uppercase tracking-wider text-center flex items-center justify-center gap-1.5">
+                ⚠️ Sube el PDF guía para activar la importación rápida
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
@@ -445,15 +991,71 @@ export const ProgramaPage: React.FC = () => {
       )}
 
       {/* FEEDBACK POPUP */}
-      {alertConfig.isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs">
-          <div className="bg-white dark:bg-slate-900 w-full max-w-sm p-6 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-2xl text-center space-y-4 mx-4">
-            <div className="w-14 h-14 mx-auto rounded-full flex items-center justify-center bg-emerald-50 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400">✓</div>
-            <div className="space-y-1"><h4 className="text-sm font-black text-slate-800 dark:text-slate-200 uppercase">{alertConfig.title}</h4><p className="text-xs text-slate-500 font-semibold">{alertConfig.message}</p></div>
-            <button onClick={() => setAlertConfig({ ...alertConfig, isOpen: false })} className="w-full py-2.5 bg-[#3730a3] text-white font-black text-xs rounded-xl">Entendido</button>
+      {alertConfig.isOpen && (() => {
+        const isDeleteAction = 
+          alertConfig.title.toLowerCase().includes('vaciado') || 
+          alertConfig.title.toLowerCase().includes('eliminado') || 
+          alertConfig.title.toLowerCase().includes('removido');
+          
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
+            <div className="bg-white dark:bg-slate-900 w-full max-w-sm p-6 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-2xl text-center space-y-5 mx-4 relative overflow-hidden">
+              {/* Top decorative gradient bar */}
+              <div className={`absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r ${
+                isDeleteAction
+                  ? 'from-rose-400 to-red-500'
+                  : alertConfig.type === 'success' 
+                    ? 'from-emerald-400 to-teal-500' 
+                    : 'from-rose-400 to-red-500'
+              }`} />
+              
+              {/* Icon */}
+              <div className={`w-16 h-16 mx-auto rounded-full flex items-center justify-center shadow-lg transform transition-all hover:scale-105 duration-300 ${
+                isDeleteAction
+                  ? 'bg-gradient-to-br from-rose-500 to-red-600 shadow-rose-500/20 text-white animate-bounce'
+                  : alertConfig.type === 'success' 
+                    ? 'bg-gradient-to-br from-emerald-500 to-teal-600 shadow-emerald-500/20 text-white' 
+                    : 'bg-gradient-to-br from-rose-500 to-red-600 shadow-rose-500/20 text-white'
+              }`}>
+                {isDeleteAction ? (
+                  <Trash2 size={26} className="stroke-[1.5]" />
+                ) : alertConfig.type === 'success' ? (
+                  <Check size={28} className="stroke-[3]" />
+                ) : (
+                  <X size={28} className="stroke-[3]" />
+                )}
+              </div>
+
+              {/* Typography */}
+              <div className="space-y-2">
+                <h4 className="text-base font-black text-slate-850 dark:text-white uppercase tracking-tight">
+                  {alertConfig.title}
+                </h4>
+                <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold leading-relaxed">
+                  {alertConfig.message}
+                </p>
+              </div>
+
+              {/* Close Button */}
+              <div className="pt-2">
+                <button 
+                  type="button"
+                  onClick={() => setAlertConfig({ ...alertConfig, isOpen: false })} 
+                  className={`w-full py-3 text-white font-black text-xs rounded-xl shadow-md uppercase tracking-wider transition-all duration-200 active:scale-95 hover:scale-102 cursor-pointer ${
+                    isDeleteAction
+                      ? 'bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 shadow-rose-500/10 hover:shadow-rose-500/20'
+                      : alertConfig.type === 'success'
+                        ? 'bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 shadow-emerald-500/10 hover:shadow-emerald-500/20'
+                        : 'bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 shadow-rose-500/10 hover:shadow-rose-500/20'
+                  }`}
+                >
+                  Entendido
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* CONFIRM DELETE POPUP */}
       {deleteConfirmId !== null && (
@@ -471,6 +1073,28 @@ export const ProgramaPage: React.FC = () => {
             <div className="flex gap-3 pt-2">
               <button onClick={() => setDeleteConfirmId(null)} className="w-full py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-black text-xs rounded-xl transition-colors">Cancelar</button>
               <button onClick={confirmDeleteEvent} className="w-full py-2.5 bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 text-white font-black text-xs rounded-xl shadow-lg shadow-rose-500/30 transition-colors">Sí, Eliminar</button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* CONFIRM CLEAR ALL POPUP */}
+      {showClearConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-sm animate-fadeIn">
+          <div className="bg-white dark:bg-slate-900 w-full max-w-sm p-6 rounded-3xl border border-rose-200 dark:border-rose-900 shadow-2xl shadow-rose-500/20 text-center space-y-5 mx-4">
+            <div className="w-16 h-16 mx-auto rounded-full flex items-center justify-center bg-rose-50 dark:bg-rose-500/20 text-rose-500 animate-bounce">
+              <Trash2 size={32} className="stroke-[1.5]" />
+            </div>
+            <div className="space-y-2">
+              <h4 className="text-base font-black text-slate-800 dark:text-slate-200 uppercase">¿Vaciar Todo el Programa?</h4>
+              <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold leading-relaxed">
+                Estás a punto de borrar permanentemente todas las actividades registradas para este sábado. Esta acción NO se puede deshacer.
+              </p>
+            </div>
+            <div className="flex gap-3 pt-2">
+              <button type="button" onClick={() => setShowClearConfirm(false)} disabled={clearing} className="w-full py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-black text-xs rounded-xl transition-colors cursor-pointer">Cancelar</button>
+              <button type="button" onClick={confirmClearAllEvents} disabled={clearing} className="w-full py-2.5 bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 text-white font-black text-xs rounded-xl shadow-lg shadow-rose-500/30 transition-all flex items-center justify-center gap-1 cursor-pointer">
+                {clearing ? 'Limpiando...' : 'Sí, Vaciar Todo'}
+              </button>
             </div>
           </div>
         </div>

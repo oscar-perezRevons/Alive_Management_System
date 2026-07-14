@@ -109,6 +109,10 @@ export const programService = {
   createEvent: (data: any) => apiClient.post('/programa', data),
   updateEvent: (id: number, data: any) => apiClient.put(`/programa/${id}`, data),
   deleteEvent: (id: number) => apiClient.delete(`/programa/${id}`),
+  getGuideUrl: () => apiClient.get('/programa/guide-url'),
+  uploadGuidePdf: (formData: FormData) => 
+    apiClient.post('/programa/upload-guide', formData, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  deleteGuidePdf: () => apiClient.delete('/programa/guide'),
 };
 
 export const matinalesService = {
