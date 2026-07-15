@@ -55,7 +55,8 @@ async function verificarPermisosAdmin(req: any): Promise<boolean> {
 export class MatinalesController {
   async getMatinales(req: any, res: Response): Promise<Response> {
     try {
-      const matinales = matinalesService.getMatinalesData();
+      const date = req.query.date ? String(req.query.date) : undefined;
+      const matinales = matinalesService.getMatinalesData(date);
       return res.status(200).json({ success: true, matinales });
     } catch (error: any) {
       return res.status(500).json({ success: false, message: 'Error al obtener matinales', error: error.message });
@@ -68,10 +69,21 @@ export class MatinalesController {
         return res.status(403).json({ success: false, message: 'Acceso denegado. Se requiere rol de Administrador.' });
       }
       if (!req.file) {
-        return res.status(400).json({ success: false, message: 'No se ha seleccionado ningún archivo PDF.' });
+        return res.status(400).json({ success: false, message: 'No se ha seleccionado ningún archivo.' });
       }
-      const updated = matinalesService.updateMatinalPdf(parseInt(req.params.id), req.file.filename);
-      return res.status(200).json({ success: true, message: 'Folleto guardado correctamente.', data: updated });
+      
+      const date = req.query.date ? String(req.query.date) : req.body.date;
+      if (!date) {
+        return res.status(400).json({ success: false, message: 'Se requiere especificar la fecha del sábado.' });
+      }
+
+      const updated = matinalesService.updateMatinalPdf(
+        parseInt(req.params.id), 
+        req.file.filename, 
+        req.file.originalname, 
+        date
+      );
+      return res.status(200).json({ success: true, message: 'Material guardado correctamente.', data: updated });
     } catch (error: any) {
       return res.status(500).json({ success: false, message: 'Error en el servidor al procesar archivo.', error: error.message });
     }
@@ -83,7 +95,12 @@ export class MatinalesController {
         return res.status(403).json({ success: false, message: 'Acceso denegado. Operación exclusiva de administradores.' });
       }
       
-      const updated = matinalesService.updateMatinalInfo(parseInt(req.params.id), req.body);
+      const date = req.query.date ? String(req.query.date) : req.body.date;
+      if (!date) {
+        return res.status(400).json({ success: false, message: 'Se requiere especificar la fecha del sábado.' });
+      }
+
+      const updated = matinalesService.updateMatinalInfo(parseInt(req.params.id), req.body, date);
       return res.status(200).json({ success: true, message: 'Configuración actualizada con éxito.', data: updated });
     } catch (error: any) {
       return res.status(500).json({ success: false, message: 'Error al guardar los campos del formulario.', error: error.message });
@@ -95,8 +112,15 @@ export class MatinalesController {
       if (!(await verificarPermisosAdmin(req))) {
         return res.status(403).json({ success: false, message: 'Acceso denegado. Operación exclusiva de administradores.' });
       }
-      const updated = matinalesService.removeMatinalPdf(parseInt(req.params.id));
-      return res.status(200).json({ success: true, message: 'Archivo PDF removido de forma permanente.', data: updated });
+      
+      const date = req.query.date ? String(req.query.date) : req.body.date;
+      if (!date) {
+        return res.status(400).json({ success: false, message: 'Se requiere especificar la fecha del sábado.' });
+      }
+
+      const fileUrl = req.query.fileUrl || req.body.fileUrl;
+      const updated = matinalesService.removeMatinalPdf(parseInt(req.params.id), date, fileUrl ? String(fileUrl) : undefined);
+      return res.status(200).json({ success: true, message: 'Archivo removido de forma permanente.', data: updated });
     } catch (error: any) {
       return res.status(500).json({ success: false, message: 'Error al purgar el archivo.', error: error.message });
     }

@@ -1,52 +1,182 @@
+import fs from 'fs';
+import path from 'path';
+
 interface MatinalItem {
   id: number;
   category: string;
   range: string;
-  responsible: string;
   currentTheme: string;
-  nextDate: string;
   pdfUrl: string | null;
+  fileName?: string | null;
+  fileType?: 'pdf' | 'image' | null;
+  files?: SaturdayUpload[];
 }
 
-let matinalesRealData: MatinalItem[] = [
-  { id: 1, category: 'Niños', range: '6 a 10 años', responsible: 'Ana Flores', currentTheme: 'Historias del Antiguo Testamento', nextDate: '27/06/2026', pdfUrl: null },
-  { id: 2, category: 'Adolescentes', range: '11 a 16 años', responsible: 'Luis Ramos', currentTheme: 'Decisiones y Valores Cristianos', nextDate: '27/06/2026', pdfUrl: null },
-  { id: 3, category: 'Jóvenes', range: '17 a 30 años', responsible: 'Mario Pérez', currentTheme: 'Fidelidad en Tiempos Modernos', nextDate: '04/07/2026', pdfUrl: null },
-  { id: 4, category: 'Mujeres', range: '20 a 35 años', responsible: 'Sofía Hernández', currentTheme: 'Mujeres de Fe y Oración', nextDate: '27/06/2026', pdfUrl: null },
-  { id: 5, category: 'Adultos', range: '30 años en adelante', responsible: 'Pastor Central', currentTheme: 'Estudio de las Profecías', nextDate: '11/07/2026', pdfUrl: null }
+interface SaturdayUpload {
+  fileUrl: string;
+  fileName: string;
+  fileType: 'pdf' | 'image';
+  uploadedAt: string;
+}
+
+interface SaturdayRegistry {
+  [date: string]: {
+    [matinalId: string]: SaturdayUpload | SaturdayUpload[];
+  };
+}
+
+const dataDir = path.join(__dirname, '../../data');
+const registryPath = path.join(dataDir, 'matinales_saturdays.json');
+
+// Ensure directories exist
+if (!fs.existsSync(dataDir)) {
+  fs.mkdirSync(dataDir, { recursive: true });
+}
+
+let matinalesStaticData = [
+  { id: 1, category: 'Niños', range: '6 a 10 años', currentTheme: 'Historias del Antiguo Testamento' },
+  { id: 2, category: 'Adolescentes', range: '11 a 16 años', currentTheme: 'Decisiones y Valores Cristianos' },
+  { id: 3, category: 'Jóvenes', range: '17 a 30 años', currentTheme: 'Fidelidad en Tiempos Modernos' },
+  { id: 4, category: 'Mujeres', range: '20 a 35 años', currentTheme: 'Mujeres de Fe y Oración' },
+  { id: 5, category: 'Adultos', range: '30 años en adelante', currentTheme: 'Estudio de las Profecías' }
 ];
 
 export class MatinalesService {
-  getMatinalesData() {
-    return matinalesRealData;
+  private loadRegistry(): SaturdayRegistry {
+    try {
+      if (fs.existsSync(registryPath)) {
+        const raw = fs.readFileSync(registryPath, 'utf-8');
+        return JSON.parse(raw);
+      }
+    } catch (err) {
+      console.error('Error al leer registro de matinales:', err);
+    }
+    return {};
   }
 
-  updateMatinalPdf(id: number, filename: string) {
-    const matinal = matinalesRealData.find(m => m.id === id);
-    if (matinal) {
-      matinal.pdfUrl = `/uploads/matinales/${filename}`;
+  private saveRegistry(registry: SaturdayRegistry) {
+    try {
+      fs.writeFileSync(registryPath, JSON.stringify(registry, null, 2), 'utf-8');
+    } catch (err) {
+      console.error('Error al guardar registro de matinales:', err);
     }
-    return matinal;
   }
 
-  updateMatinalInfo(id: number, data: Partial<Omit<MatinalItem, 'id' | 'pdfUrl'>>) {
-    const matinal = matinalesRealData.find(m => m.id === id);
-    if (matinal) {
-      if (data.category) matinal.category = data.category;
-      if (data.range) matinal.range = data.range;
-      if (data.currentTheme !== undefined) matinal.currentTheme = data.currentTheme;
-      if (data.responsible) matinal.responsible = data.responsible;
-      if (data.nextDate) matinal.nextDate = data.nextDate;
-    }
-    return matinal;
+  getMatinalesData(date?: string): MatinalItem[] {
+    const registry = this.loadRegistry();
+    const targetDate = date || this.getUpcomingSaturdayStr();
+    const dateUploads = registry[targetDate] || {};
+
+    return matinalesStaticData.map(item => {
+      const uploadsRaw = dateUploads[String(item.id)] || [];
+      // Normalize single uploads to array
+      const files: SaturdayUpload[] = Array.isArray(uploadsRaw) ? uploadsRaw : [uploadsRaw].filter(Boolean);
+      
+      const primaryUpload = files[0] || null;
+      return {
+        ...item,
+        pdfUrl: primaryUpload ? primaryUpload.fileUrl : null,
+        fileName: primaryUpload ? primaryUpload.fileName : null,
+        fileType: primaryUpload ? primaryUpload.fileType : null,
+        files: files
+      };
+    });
   }
 
-  removeMatinalPdf(id: number) {
-    const matinal = matinalesRealData.find(m => m.id === id);
-    if (matinal) {
-      matinal.pdfUrl = null;
+  private getUpcomingSaturdayStr(): string {
+    const today = new Date();
+    const day = today.getDay();
+    const diff = 6 - day; 
+    const upcoming = new Date(today);
+    upcoming.setDate(today.getDate() + diff);
+    
+    const yyyy = upcoming.getFullYear();
+    const mm = String(upcoming.getMonth() + 1).padStart(2, '0');
+    const dd = String(upcoming.getDate()).padStart(2, '0');
+    return `${yyyy}-${mm}-${dd}`;
+  }
+
+  updateMatinalPdf(id: number, filename: string, originalName: string, date: string) {
+    const registry = this.loadRegistry();
+    if (!registry[date]) {
+      registry[date] = {};
     }
-    return matinal;
+
+    const fileType = filename.toLowerCase().endsWith('.pdf') ? 'pdf' : 'image';
+    
+    const currentUploadsRaw = registry[date][String(id)] || [];
+    const currentUploads: SaturdayUpload[] = Array.isArray(currentUploadsRaw) ? currentUploadsRaw : [currentUploadsRaw].filter(Boolean);
+
+    if (currentUploads.length >= 2) {
+      // Clean up uploaded file from disk because it exceeds limit
+      const tempPath = path.join(__dirname, '../../uploads/matinales', filename);
+      try {
+        if (fs.existsSync(tempPath)) fs.unlinkSync(tempPath);
+      } catch (err) {
+        console.error('Error clean up temp file:', err);
+      }
+      throw new Error('Límite alcanzado: máximo de 2 archivos por categoría.');
+    }
+
+    const newUpload: SaturdayUpload = {
+      fileUrl: `/uploads/matinales/${filename}`,
+      fileName: originalName,
+      fileType,
+      uploadedAt: new Date().toISOString()
+    };
+
+    registry[date][String(id)] = [...currentUploads, newUpload];
+
+    this.saveRegistry(registry);
+    return this.getMatinalesData(date).find(m => m.id === id);
+  }
+
+  updateMatinalInfo(id: number, data: Partial<Omit<MatinalItem, 'id' | 'pdfUrl'>>, date: string) {
+    const item = matinalesStaticData.find(m => m.id === id);
+    if (item) {
+      if (data.category) item.category = data.category;
+      if (data.range) item.range = data.range;
+      if (data.currentTheme !== undefined) item.currentTheme = data.currentTheme;
+    }
+    return this.getMatinalesData(date).find(m => m.id === id);
+  }
+
+  removeMatinalPdf(id: number, date: string, fileUrl?: string) {
+    const registry = this.loadRegistry();
+    if (registry[date] && registry[date][String(id)]) {
+      const uploadsRaw = registry[date][String(id)];
+      const uploads: SaturdayUpload[] = Array.isArray(uploadsRaw) ? uploadsRaw : [uploadsRaw].filter(Boolean);
+
+      const targetIndex = fileUrl
+        ? uploads.findIndex(u => u.fileUrl === fileUrl)
+        : 0;
+
+      if (targetIndex !== -1 && uploads[targetIndex]) {
+        const upload = uploads[targetIndex];
+        const filePath = path.join(__dirname, '../../', upload.fileUrl);
+        try {
+          if (fs.existsSync(filePath)) {
+            fs.unlinkSync(filePath);
+          }
+        } catch (err) {
+          console.error('Error al eliminar archivo físico:', err);
+        }
+        
+        uploads.splice(targetIndex, 1);
+      }
+
+      if (uploads.length > 0) {
+        registry[date][String(id)] = uploads;
+      } else {
+        delete registry[date][String(id)];
+      }
+
+      if (Object.keys(registry[date]).length === 0) {
+        delete registry[date];
+      }
+      this.saveRegistry(registry);
+    }
+    return this.getMatinalesData(date).find(m => m.id === id);
   }
 }
 

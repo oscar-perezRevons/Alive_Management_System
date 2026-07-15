@@ -116,20 +116,22 @@ export const programService = {
 };
 
 export const matinalesService = {
-  getAll: () => apiClient.get('/matinales'),
+  getAll: (date?: string) => apiClient.get('/matinales', { params: { date } }),
   
-  updateInfo: (id: number, data: { category: string; range: string; currentTheme: string; responsible: string; nextDate: string }) => {
+  updateInfo: (id: number, data: { category: string; range: string; currentTheme: string; responsible: string; nextDate: string }, date?: string) => {
     const token = localStorage.getItem('token');
     return apiClient.put(`/matinales/${id}`, data, {
+      params: { date },
       headers: {
         ...(token ? { 'Authorization': `Bearer ${token}` } : {})
       }
     });
   },
 
-  uploadPdf: (id: number, formData: FormData) => {
+  uploadPdf: (id: number, formData: FormData, date?: string) => {
     const token = localStorage.getItem('token');
     return apiClient.post(`/matinales/${id}/upload`, formData, {
+      params: { date },
       headers: { 
         'Content-Type': 'multipart/form-data',
         ...(token ? { 'Authorization': `Bearer ${token}` } : {})
@@ -137,9 +139,10 @@ export const matinalesService = {
     });
   },
 
-  deletePdf: (id: number) => {
+  deletePdf: (id: number, date?: string, fileUrl?: string) => {
     const token = localStorage.getItem('token');
     return apiClient.delete(`/matinales/${id}/pdf`, {
+      params: { date, fileUrl },
       headers: {
         ...(token ? { 'Authorization': `Bearer ${token}` } : {})
       }

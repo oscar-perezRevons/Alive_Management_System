@@ -1,0 +1,32 @@
+{
+  "2026-08-08": {
+    "1": {
+      "fileUrl": "/uploads/matinales/matinal-1-1784066938810-315167078.pdf",
+      "fileName": "guia_programa.pdf",
+      "fileType": "pdf",
+      "uploadedAt": "2026-07-14T22:08:58.950Z"
+    }
+  },
+  "2026-07-18": {
+    "1": [
+      {
+        "fileUrl": "/uploads/matinales/matinal-1-1784124660934-812912168.png",
+        "fileName": "logo.png",
+        "fileType": "image",
+        "uploadedAt": "2026-07-15T14:11:01.231Z"
+      },
+      {
+        "fileUrl": "/uploads/matinales/matinal-1-1784128898537-215174462.webp",
+        "fileName": "figura.webp",
+        "fileType": "image",
+        "uploadedAt": "2026-07-15T15:21:38.827Z"
+      }
+    ],
+    "2": {
+      "fileUrl": "/uploads/matinales/matinal-2-1784082784051-780772779.pdf",
+      "fileName": "guia_programa.pdf",
+      "fileType": "pdf",
+      "uploadedAt": "2026-07-15T02:33:04.193Z"
+    }
+  }
+}
