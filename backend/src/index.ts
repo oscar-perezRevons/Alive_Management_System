@@ -5,6 +5,33 @@ import dotenv from 'dotenv';
 
 dotenv.config(); 
 
+import prisma from './config/database';
+
+import fs from 'fs';
+
+async function runStartupMigrations() {
+  try {
+    console.log('Ejecutando migraciones de inicio...');
+    await (prisma as any).$executeRawUnsafe('ALTER TABLE "EventParticipation" ADD COLUMN IF NOT EXISTS "confirmedMembers" TEXT DEFAULT \'\';');
+    await (prisma as any).$executeRawUnsafe('ALTER TABLE "Event" ADD COLUMN IF NOT EXISTS "imageUrl" TEXT DEFAULT \'\';');
+    await (prisma as any).$executeRawUnsafe('ALTER TABLE "Event" ADD COLUMN IF NOT EXISTS "pdfUrl" TEXT DEFAULT \'\';');
+    console.log('Migración de inicio completada.');
+    
+    // Diagnóstico
+    try {
+      const testEvents = await (prisma as any).event.findMany();
+      fs.writeFileSync('test-output.txt', 'Success: ' + JSON.stringify(testEvents));
+    } catch (e: any) {
+      fs.writeFileSync('test-output.txt', 'Error querying events: ' + e.stack);
+    }
+  } catch (error: any) {
+    console.error('Error al ejecutar migración de inicio:', error);
+    fs.writeFileSync('test-output.txt', 'Error running startup migration: ' + error.stack);
+  }
+}
+runStartupMigrations();
+
+
 import authRoutes from './routes/auth.routes';
 import usersRoutes from './routes/users.routes';
 import groupsRoutes from './routes/groups.routes';

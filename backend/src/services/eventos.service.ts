@@ -46,7 +46,9 @@ export class EventosService {
         timeSlot: data.timeSlot,
         location: data.location,
         maxSpots: Number(data.maxSpots || 15),
-        status: data.status || 'Abierto'
+        status: data.status || 'Abierto',
+        imageUrl: data.imageUrl || '',
+        pdfUrl: data.pdfUrl || ''
       }
     });
   }
@@ -63,7 +65,9 @@ export class EventosService {
         timeSlot: data.timeSlot,
         location: data.location,
         maxSpots: Number(data.maxSpots),
-        status: data.status
+        status: data.status,
+        imageUrl: data.imageUrl || '',
+        pdfUrl: data.pdfUrl || ''
       }
     });
   }

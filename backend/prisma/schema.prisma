@@ -115,18 +115,21 @@ model Event {
   location       String
   maxSpots       Int                  @default(15)
   status         String               
+  imageUrl       String?              @default("")
+  pdfUrl         String?              @default("")
   createdAt      DateTime             @default(now())
   participations EventParticipation[]
 }
 
 model EventParticipation {
-  id         Int        @id @default(autoincrement())
-  eventId    Int
-  event      Event      @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  groupId    Int
-  groupSmall GroupSmall @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  enrolledAt DateTime   @default(now())
-  status     String     @default("Inscrito") 
+  id               Int        @id @default(autoincrement())
+  eventId          Int
+  event            Event      @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  groupId          Int
+  groupSmall       GroupSmall @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  enrolledAt       DateTime   @default(now())
+  status           String     @default("Inscrito") 
+  confirmedMembers String     @default("")
 
   @@unique([eventId, groupId])
 }

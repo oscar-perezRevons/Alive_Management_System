@@ -157,7 +157,19 @@ export const eventosService = {
   update: (id: number, data: any) => apiClient.put(`/eventos/${id}`, data),
   delete: (id: number) => apiClient.delete(`/eventos/${id}`),
   join: (id: number) => apiClient.post(`/eventos/${id}/participar`),
-  getMyParticipations: () => apiClient.get('/eventos/mis-participaciones')
+  leave: (id: number) => apiClient.delete(`/eventos/${id}/participar`),
+  getMyParticipations: () => apiClient.get('/eventos/mis-participaciones'),
+  getMyGroupMembers: () => apiClient.get('/eventos/mi-grupo-miembros'),
+  updateConfirmedMembers: (eventId: number, userIds: number[]) => apiClient.post(`/eventos/${eventId}/participantes`, { userIds }),
+  uploadFile: (formData: FormData) => {
+    const token = localStorage.getItem('token');
+    return apiClient.post('/eventos/upload', formData, {
+      headers: { 
+        'Content-Type': 'multipart/form-data',
+        'Authorization': `Bearer ${token}`
+      }
+    });
+  }
 };
 
 export const rankingService = {

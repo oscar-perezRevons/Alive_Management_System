@@ -82,6 +82,27 @@ export class EventosController {
         return res.status(401).json({ success: false, message: 'Usuario no autenticado o sesión inválida.' });
       }
 
+      const user = await prisma.user.findUnique({
+        where: { id: userId }
+      });
+
+      if (!user) {
+        return res.status(404).json({ success: false, message: 'Usuario no encontrado.' });
+      }
+
+      const normGroupRole = (user.groupRole || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toUpperCase()
+        .replace(/[_\s]+/g, '')
+        .trim();
+
+      const isAllowedToJoin = user.role === 'ADMIN' || ['LIDER', 'SUBLIDER', 'COLIDER', 'SECRETARIO', 'SECRETARIA', 'TESORERO', 'TESORERA'].includes(normGroupRole);
+
+      if (!isAllowedToJoin) {
+        return res.status(403).json({ success: false, message: 'No tienes permisos para registrar a tu grupo en este evento. Solo el Líder, Colíder, Secretario o Tesorero pueden confirmar la participación.' });
+      }
+
       const userGroup = await (prisma as any).groupSmall.findFirst({
         where: {
           OR: [
@@ -99,6 +120,165 @@ export class EventosController {
       return res.status(201).json({ success: true, data: registration });
     } catch (error: any) {
       return res.status(400).json({ success: false, message: 'Tu grupo ya se encuentra registrado en este evento.' });
+    }
+  };
+
+  getMyGroupMembers = async (req: any, res: Response) => {
+    try {
+      const userId = extraerUserIdDesdeToken(req);
+      if (!userId) {
+        return res.status(401).json({ success: false, message: 'Usuario no autenticado o sesión inválida.' });
+      }
+
+      const userGroup = await (prisma as any).groupSmall.findFirst({
+        where: {
+          OR: [
+            { administratorId: userId },
+            { members: { some: { id: userId } } }
+          ]
+        },
+        include: {
+          members: {
+            select: { id: true, name: true, groupRole: true }
+          }
+        }
+      });
+
+      if (!userGroup) {
+        return res.status(200).json({ success: true, members: [], groupName: '' });
+      }
+
+      return res.status(200).json({ success: true, members: userGroup.members, groupName: userGroup.name });
+    } catch (error: any) {
+      return res.status(500).json({ success: false, message: error.message });
+    }
+  };
+
+  updateConfirmedMembers = async (req: any, res: Response) => {
+    try {
+      const eventId = parseInt(req.params.id);
+      const userId = extraerUserIdDesdeToken(req);
+      const { userIds } = req.body;
+
+      if (!userId) {
+        return res.status(401).json({ success: false, message: 'Usuario no autenticado o sesión inválida.' });
+      }
+
+      const user = await prisma.user.findUnique({
+        where: { id: userId }
+      });
+
+      if (!user) {
+        return res.status(404).json({ success: false, message: 'Usuario no encontrado.' });
+      }
+
+      const normGroupRole = (user.groupRole || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toUpperCase()
+        .replace(/[_\s]+/g, '')
+        .trim();
+
+      const isAllowedToManage = user.role === 'ADMIN' || ['LIDER', 'SUBLIDER', 'COLIDER', 'SECRETARIO', 'SECRETARIA'].includes(normGroupRole);
+
+      if (!isAllowedToManage) {
+        return res.status(403).json({ success: false, message: 'No tienes permisos para modificar la lista de participantes. Solo el Líder, Colíder o Secretario pueden hacerlo.' });
+      }
+
+      const userGroup = await (prisma as any).groupSmall.findFirst({
+        where: {
+          OR: [
+            { administratorId: userId },
+            { members: { some: { id: userId } } }
+          ]
+        }
+      });
+
+      if (!userGroup) {
+        return res.status(400).json({ success: false, message: 'No perteneces a ningún Grupo Pequeño calificado.' });
+      }
+
+      const participation = await (prisma as any).eventParticipation.findUnique({
+        where: {
+          eventId_groupId: {
+            eventId,
+            groupId: userGroup.id
+          }
+        }
+      });
+
+      if (!participation) {
+        return res.status(404).json({ success: false, message: 'Tu grupo no está registrado en este evento.' });
+      }
+
+      const updated = await (prisma as any).eventParticipation.update({
+        where: { id: participation.id },
+        data: {
+          confirmedMembers: Array.isArray(userIds) ? userIds.map(Number).join(',') : ''
+        }
+      });
+
+      return res.status(200).json({ success: true, data: updated });
+    } catch (error: any) {
+      return res.status(500).json({ success: false, message: error.message });
+    }
+  };
+
+  leaveEvent = async (req: any, res: Response) => {
+    try {
+      const eventId = parseInt(req.params.id);
+      const userId = extraerUserIdDesdeToken(req);
+
+      if (!userId) {
+        return res.status(401).json({ success: false, message: 'Usuario no autenticado o sesión inválida.' });
+      }
+
+      const user = await prisma.user.findUnique({
+        where: { id: userId }
+      });
+
+      if (!user) {
+        return res.status(404).json({ success: false, message: 'Usuario no encontrado.' });
+      }
+
+      const normGroupRole = (user.groupRole || '')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .toUpperCase()
+        .replace(/[_\s]+/g, '')
+        .trim();
+
+      const isAllowedToCancel = user.role === 'ADMIN' || ['LIDER', 'SUBLIDER', 'COLIDER', 'SECRETARIO', 'SECRETARIA'].includes(normGroupRole);
+
+      if (!isAllowedToCancel) {
+        return res.status(403).json({ success: false, message: 'No tienes permisos para cancelar la inscripción de tu grupo. Solo el Líder, Colíder o Secretario pueden hacerlo.' });
+      }
+
+      const userGroup = await (prisma as any).groupSmall.findFirst({
+        where: {
+          OR: [
+            { administratorId: userId },
+            { members: { some: { id: userId } } }
+          ]
+        }
+      });
+
+      if (!userGroup) {
+        return res.status(400).json({ success: false, message: 'No perteneces a ningún Grupo Pequeño calificado.' });
+      }
+
+      await (prisma as any).eventParticipation.delete({
+        where: {
+          eventId_groupId: {
+            eventId,
+            groupId: userGroup.id
+          }
+        }
+      });
+
+      return res.status(200).json({ success: true, message: 'Inscripción cancelada con éxito.' });
+    } catch (error: any) {
+      return res.status(400).json({ success: false, message: 'No se pudo cancelar la participación o tu grupo no estaba inscrito.' });
     }
   };
 
@@ -120,3 +300,4 @@ export class EventosController {
 }
 
 export const eventosController = new EventosController();
+
