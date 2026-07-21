@@ -188,4 +188,18 @@ export const adminUserExtensions = {
   toggleStatus: (id: number, data: { isActive: boolean }) => apiClient.put(`/users/${id}/status`, data)
 };
 
+export const materialsService = {
+  getAll: () => apiClient.get('/materials'),
+  upload: (formData: FormData) => 
+    apiClient.post('/materials/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    }),
+  update: (id: number, data: { title: string; description: string; category: string }) => 
+    apiClient.put(`/materials/${id}`, data),
+  toggleVisibility: (id: number) => apiClient.put(`/materials/${id}/visibility`),
+  delete: (id: number) => apiClient.delete(`/materials/${id}`),
+  getCategories: () => apiClient.get('/materials/categories'),
+  createCategory: (name: string) => apiClient.post('/materials/categories', { name })
+};
+
 export default apiClient;

@@ -15,6 +15,43 @@ async function runStartupMigrations() {
     await (prisma as any).$executeRawUnsafe('ALTER TABLE "EventParticipation" ADD COLUMN IF NOT EXISTS "confirmedMembers" TEXT DEFAULT \'\';');
     await (prisma as any).$executeRawUnsafe('ALTER TABLE "Event" ADD COLUMN IF NOT EXISTS "imageUrl" TEXT DEFAULT \'\';');
     await (prisma as any).$executeRawUnsafe('ALTER TABLE "Event" ADD COLUMN IF NOT EXISTS "pdfUrl" TEXT DEFAULT \'\';');
+    
+    // Crear tabla de Materiales si no existe
+    await (prisma as any).$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS "Material" (
+        "id" SERIAL PRIMARY KEY,
+        "title" TEXT NOT NULL,
+        "description" TEXT,
+        "type" TEXT NOT NULL,
+        "size" TEXT NOT NULL,
+        "category" TEXT NOT NULL,
+        "fileUrl" TEXT NOT NULL,
+        "isVisible" BOOLEAN NOT NULL DEFAULT TRUE,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    // Crear tabla de Categorías de Materiales si no existe
+    await (prisma as any).$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS "MaterialCategory" (
+        "id" SERIAL PRIMARY KEY,
+        "name" TEXT UNIQUE NOT NULL,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    // Sembrar categorías iniciales
+    await (prisma as any).$executeRawUnsafe(`
+      INSERT INTO "MaterialCategory" ("name") VALUES ('Reglamentos') ON CONFLICT ("name") DO NOTHING;
+    `);
+    await (prisma as any).$executeRawUnsafe(`
+      INSERT INTO "MaterialCategory" ("name") VALUES ('Convocatorias') ON CONFLICT ("name") DO NOTHING;
+    `);
+    await (prisma as any).$executeRawUnsafe(`
+      INSERT INTO "MaterialCategory" ("name") VALUES ('Diseño') ON CONFLICT ("name") DO NOTHING;
+    `);
+
     console.log('Migración de inicio completada.');
     
     // Diagnóstico
@@ -44,6 +81,7 @@ import programRoutes from './routes/program.routes';
 import matinalesRoutes from './routes/matinales.routes'; 
 import eventosRoutes from './routes/eventos.routes';
 import rankingRoutes from './routes/ranking.routes';
+import materialsRoutes from './routes/materials.routes';
 
 const app = express();
 
@@ -68,6 +106,7 @@ app.use('/api/programa', programRoutes);
 app.use('/api/matinales', matinalesRoutes); 
 app.use('/api/eventos', eventosRoutes);
 app.use('/api/ranking', rankingRoutes);
+app.use('/api/materials', materialsRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'Backend running', timestamp: new Date().toISOString() });

@@ -133,3 +133,22 @@ model EventParticipation {
 
   @@unique([eventId, groupId])
 }
+
+model Material {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  type        String   // 'PDF' or 'IMAGE'
+  size        String   // e.g. "2.4 MB"
+  category    String   // e.g. "Reglamentos", "Capacitación"
+  fileUrl     String   // Path/URL to the uploaded file
+  isVisible   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model MaterialCategory {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  createdAt DateTime @default(now())
+}
