@@ -15,6 +15,30 @@ body {
   background-color: #f8fafc; 
 }
 
+/* Color scheme for native date picker */
+input[type="date"] {
+  color-scheme: light;
+}
+
+.dark input[type="date"] {
+  color-scheme: dark;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 2px;
+  transition: transform 0.2s ease;
+}
+
+.dark input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.85) sepia(1) saturate(5) hue-rotate(220deg);
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  transform: scale(1.15);
+}
+
 /* Clases base sobreescritas con paleta premium */
 .bg-sidebar-alive {
   background: linear-gradient(180deg, #090d1f 0%, #151d3b 100%);
