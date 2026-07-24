@@ -4,7 +4,7 @@ import { useAuthStore } from '../stores/authStore';
 import { 
   Calendar, Clock, Pencil, Trash2,
   X, FileText, Download, ListCollapse, 
-  Plus, Eye, Upload, FileUp, Sparkles, 
+  Plus, Eye, FileUp, Sparkles, 
   Check, ExternalLink, Loader2
 } from 'lucide-react';
 import { jsPDF } from 'jspdf';
@@ -486,10 +486,10 @@ export const ProgramaPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 font-sans text-slate-800 bg-[#f0f2fc] p-4 min-h-screen transition-colors duration-300">
+    <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100 bg-[#f0f2fc] dark:bg-slate-950 p-4 min-h-screen transition-colors duration-300 w-full">
       
       {/* ═══════ HEADER CON GRADIENTE ANIMADO ═══════ */}
-      <div className="relative flex flex-col sm:flex-row justify-between items-center gap-4 bg-white p-5 rounded-3xl border border-slate-200/80 shadow-lg transition-all duration-300 z-20 overflow-hidden">
+      <div className="relative flex flex-col sm:flex-row justify-between items-center gap-4 bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-lg transition-all duration-300 z-20 overflow-hidden">
         {/* Barra de gradiente animada superior */}
         <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-500 via-indigo-500 via-violet-500 via-fuchsia-500 to-orange-400" style={{backgroundSize: '200% 100%', animation: 'shimmer 4s linear infinite'}} />
         <style>{`@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }`}</style>
@@ -499,21 +499,21 @@ export const ProgramaPage: React.FC = () => {
             <div className="bg-gradient-to-br from-indigo-600 to-violet-600 p-3 rounded-2xl shadow-lg shadow-indigo-500/30">
               <Calendar size={26} className="stroke-[2.5] text-white" />
             </div>
-            <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-emerald-400 rounded-full border-2 border-white animate-pulse" />
+            <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-emerald-400 rounded-full border-2 border-white dark:border-slate-900 animate-pulse" />
           </div>
           <div>
-            <h1 className="text-2xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 to-violet-700">📅 Programa General</h1>
-            <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-0.5">Sistema Oficial de Programación</p>
+            <h1 className="text-2xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 dark:from-indigo-400 to-violet-700 dark:to-violet-400">📅 Programa General</h1>
+            <p className="text-xs text-slate-400 dark:text-slate-400 font-bold uppercase tracking-widest mt-0.5">Sistema Oficial de Programación</p>
           </div>
         </div>
-        <div className="flex items-center gap-2 bg-indigo-50 px-4 py-2 rounded-xl border border-indigo-100 text-[11px] font-black uppercase tracking-wider text-indigo-600">
+        <div className="flex items-center gap-2 bg-indigo-50 dark:bg-indigo-950/60 px-4 py-2 rounded-xl border border-indigo-100 dark:border-indigo-800/60 text-[11px] font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-300">
           <Calendar size={13} className="animate-pulse" />
           Programa Sabático
         </div>
       </div>
 
       {/* SECCIÓN ACCIONES RÁPIDAS */}
-      <div className="bg-white p-5 rounded-3xl border-l-4 border-l-indigo-500 border border-slate-200/60 shadow-md hover:shadow-xl hover:-translate-y-0.5 flex flex-col sm:flex-row items-center justify-between gap-4 relative overflow-hidden group transition-all duration-300">
+      <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border-l-4 border-l-indigo-500 border border-slate-200/60 dark:border-slate-800 shadow-md hover:shadow-xl hover:-translate-y-0.5 flex flex-col sm:flex-row items-center justify-between gap-4 relative overflow-hidden group transition-all duration-300">
         <div className="absolute right-0 top-0 opacity-5 rotate-12 pointer-events-none transition-transform group-hover:scale-110">
           <Calendar size={120} className="text-indigo-500" />
         </div>
@@ -526,7 +526,7 @@ export const ProgramaPage: React.FC = () => {
         </div>
         <button 
           onClick={() => setIsPreviewModalOpen(true)}
-          className="w-full sm:w-auto bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white text-[11px] font-black py-3 px-6 rounded-xl transition-all shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 uppercase tracking-wider flex items-center justify-center gap-1.5 relative z-10 active:scale-95"
+          className="w-full sm:w-auto bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white text-[11px] font-black py-3 px-6 rounded-xl transition-all shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 uppercase tracking-wider flex items-center justify-center gap-1.5 relative z-10 active:scale-95 cursor-pointer"
         >
           <Eye size={14} className="stroke-[3]" /> Ver Programa Oficial (Vista Previa) →
         </button>
@@ -592,7 +592,7 @@ export const ProgramaPage: React.FC = () => {
                   <th className="p-3 text-center w-16 pr-4">Borrar</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-150 dark:divide-slate-850 bg-white dark:bg-slate-900/10 text-xs font-bold text-slate-700">
+              <tbody className="divide-y divide-slate-150 dark:divide-slate-800 bg-white dark:bg-slate-900 text-xs font-bold text-slate-700">
                 {pdfPreviewEvents.map((event, index) => (
                   <tr key={index} className="hover:bg-slate-50/50 dark:hover:bg-slate-950/20 transition-all">
                     <td className="p-3 text-center pl-4 text-slate-400 font-mono text-sm">{index + 1}</td>
@@ -653,9 +653,9 @@ export const ProgramaPage: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
         
         {/* PANEL TABLA GENERAL EN ANCHO 2/3 */}
-        <div className="lg:col-span-2 bg-white dark:bg-slate-900/50 rounded-3xl shadow-lg border border-slate-200/80 dark:border-slate-800/80 overflow-hidden relative">
+        <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-3xl shadow-lg border border-slate-200/80 dark:border-slate-800 overflow-hidden relative">
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-500" />
-          <div className="p-4 bg-gradient-to-r from-slate-50 to-indigo-50/30 dark:from-slate-950/50 dark:to-indigo-950/10 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 px-5">
+          <div className="p-4 bg-slate-50 dark:bg-slate-800/80 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 px-5">
             <div className="flex items-center gap-3">
               <div className="p-1.5 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg text-white shadow-md shadow-indigo-500/20"><FileText size={14} /></div>
               <div>
@@ -677,7 +677,7 @@ export const ProgramaPage: React.FC = () => {
           <div className="overflow-x-auto text-xs font-bold scrollbar-none">
             <table className="w-full text-left border-collapse">
               <thead>
-                <tr className="bg-gradient-to-r from-slate-50/50 to-indigo-50/20 dark:from-slate-950/20 dark:to-indigo-950/5 border-b border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-500 text-[10px] uppercase font-black tracking-wider">
+                <tr className="bg-slate-100/80 dark:bg-slate-800/80 border-b border-slate-100 dark:border-slate-800 text-slate-500 dark:text-slate-300 text-[10px] uppercase font-black tracking-wider">
                   <th className="p-4 text-center w-12 pl-6">#</th>
                   <th className="p-4 w-32">Horario</th>
                   <th className="p-4">Punto del Programa</th>
@@ -685,16 +685,16 @@ export const ProgramaPage: React.FC = () => {
                   {currentUserRole === 'ADMIN' && <th className="p-4 text-center w-24 pr-6">Acciones</th>}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800 text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-900/10 text-xs">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-900 text-xs">
                 {events.map((event, index) => (
-                  <tr key={event.id} className={`hover:bg-indigo-50/30 dark:hover:bg-indigo-950/10 transition-all ${!event.isActive ? 'opacity-40 line-through' : ''}`}>
+                  <tr key={event.id} className={`hover:bg-indigo-50/30 dark:hover:bg-indigo-950/30 transition-all ${!event.isActive ? 'opacity-40 line-through' : ''}`}>
                     <td className="p-4 pl-6 text-center">
                       <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white text-xs font-black shadow-lg shadow-indigo-500/30">{index + 1}</span>
                     </td>
                     <td className="p-4">
-                      <div className="inline-flex items-center gap-2 bg-indigo-50/50 dark:bg-slate-900 border border-indigo-100 dark:border-indigo-500/20 px-3 py-1.5 rounded-xl shadow-xs">
+                      <div className="inline-flex items-center gap-2 bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-100 dark:border-indigo-800/60 px-3 py-1.5 rounded-xl shadow-xs">
                         <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse shrink-0" />
-                        <span className="font-mono text-indigo-700 dark:text-indigo-400 font-extrabold text-sm md:text-base tracking-tight">{event.timeSlot}</span>
+                        <span className="font-mono text-indigo-700 dark:text-indigo-300 font-extrabold text-sm md:text-base tracking-tight">{event.timeSlot}</span>
                       </div>
                     </td>
                     <td className="p-4 font-black text-slate-900 dark:text-white uppercase tracking-tight text-sm">
@@ -702,13 +702,13 @@ export const ProgramaPage: React.FC = () => {
                       {event.description && <span className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold normal-case block mt-0.5">{event.description}</span>}
                     </td>
                     <td className="p-4">
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/40 text-[#3730a3] dark:text-indigo-400 font-extrabold text-[10px] uppercase border border-indigo-100 dark:border-indigo-900/30 tracking-wider">{event.responsible || '-'}</span>
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 font-extrabold text-[10px] uppercase border border-indigo-100 dark:border-indigo-800/60 tracking-wider">{event.responsible || '-'}</span>
                     </td>
                     {currentUserRole === 'ADMIN' && (
                       <td className="p-4 pr-6 text-center">
                         <div className="flex justify-center gap-1.5">
-                          <button onClick={() => openEditModal(event)} className="p-2 text-indigo-500 hover:text-indigo-700 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:text-indigo-300 dark:hover:bg-indigo-950/20 rounded-xl transition-all hover:scale-110 shadow-3xs cursor-pointer" title="Editar"><Pencil size={14} /></button>
-                          <button onClick={() => handleDeleteEvent(event.id)} className="p-2 text-rose-500 hover:text-rose-700 hover:bg-rose-50 dark:text-rose-400 dark:hover:text-rose-300 dark:hover:bg-rose-950/20 rounded-xl transition-all hover:scale-110 shadow-3xs cursor-pointer" title="Eliminar"><Trash2 size={14} /></button>
+                          <button onClick={() => openEditModal(event)} className="p-2 text-indigo-500 hover:text-indigo-700 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:text-indigo-300 dark:hover:bg-indigo-950/40 rounded-xl transition-all hover:scale-110 shadow-3xs cursor-pointer" title="Editar"><Pencil size={14} /></button>
+                          <button onClick={() => handleDeleteEvent(event.id)} className="p-2 text-rose-500 hover:text-rose-700 hover:bg-rose-50 dark:text-rose-400 dark:hover:text-rose-300 dark:hover:bg-rose-950/40 rounded-xl transition-all hover:scale-110 shadow-3xs cursor-pointer" title="Eliminar"><Trash2 size={14} /></button>
                         </div>
                       </td>
                     )}
@@ -722,14 +722,14 @@ export const ProgramaPage: React.FC = () => {
         {/* COLUMNA LATERAL (PROGRAMA GUÍA Y ASISTENTE) EN ANCHO 1/3 */}
         <div className="space-y-6">
           {/* TARJETA PROGRAMA GUÍA PDF */}
-          <div className="bg-white dark:bg-slate-900/50 rounded-3xl shadow-lg border border-slate-200/80 dark:border-slate-800/80 overflow-hidden relative p-5 space-y-4">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-lg border border-slate-200/80 dark:border-slate-800 overflow-hidden relative p-5 space-y-4">
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-red-500 via-orange-500 to-amber-500" />
             <div className="flex justify-between items-center pb-2 border-b border-slate-100 dark:border-slate-800 gap-2">
               <div className="flex items-center gap-3 min-w-0">
                 <div className="p-2 bg-red-50 dark:bg-red-500/10 text-red-650 dark:text-red-400 rounded-xl shrink-0"><FileText size={18} /></div>
                 <div className="min-w-0 flex-1">
                   <h4 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">Programa Guía Oficial</h4>
-                  <p className="text-[10px] text-slate-505 dark:text-slate-400 font-bold">Guía en formato PDF</p>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold">Guía en formato PDF</p>
                 </div>
               </div>
               {currentUserRole === 'ADMIN' && (
@@ -745,9 +745,9 @@ export const ProgramaPage: React.FC = () => {
 
             {/* ESTADO CARGA DEL PDF */}
             {guideUrl ? (
-              <div className="p-4 bg-slate-50 dark:bg-slate-950/40 rounded-2xl border border-slate-200/60 dark:border-slate-850 flex items-center justify-between gap-3 shadow-3xs">
+              <div className="p-4 bg-slate-50 dark:bg-slate-800/60 rounded-2xl border border-slate-200/60 dark:border-slate-700 flex items-center justify-between gap-3 shadow-3xs">
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className="p-2.5 bg-red-100 dark:bg-red-955/40 text-red-650 dark:text-red-400 rounded-xl shrink-0">
+                  <div className="p-2.5 bg-red-100 dark:bg-red-950/60 text-red-650 dark:text-red-400 rounded-xl shrink-0">
                     <FileText size={16} />
                   </div>
                   <div className="min-w-0 flex-1">
@@ -779,7 +779,7 @@ export const ProgramaPage: React.FC = () => {
             ) : (
               <div className="text-center py-2">
                 {currentUserRole === 'ADMIN' ? (
-                  <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-300 dark:border-slate-750 hover:border-indigo-500 dark:hover:border-indigo-500/50 rounded-2xl p-6 bg-slate-50/50 dark:bg-slate-950/20 cursor-pointer group transition-all duration-300 hover:bg-indigo-50/5">
+                  <label className="flex flex-col items-center justify-center border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-500/50 rounded-2xl p-6 bg-slate-50/50 dark:bg-slate-950/20 cursor-pointer group transition-all duration-300 hover:bg-indigo-50/5">
                     <input 
                       type="file" 
                       accept=".pdf" 
@@ -810,7 +810,7 @@ export const ProgramaPage: React.FC = () => {
           </div>
 
           {/* ASISTENTE DE PLANIFICACIÓN INTELIGENTE */}
-          <div className="bg-white dark:bg-slate-900/50 rounded-3xl shadow-lg border border-slate-200/80 dark:border-slate-800/80 overflow-hidden relative p-5 space-y-4">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl shadow-lg border border-slate-200/80 dark:border-slate-800 overflow-hidden relative p-5 space-y-4">
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-fuchsia-500" />
             <div className="flex justify-between items-center pb-2 border-b border-slate-100 dark:border-slate-800 gap-2">
               <div className="flex items-center gap-2.5 min-w-0">
@@ -838,17 +838,17 @@ export const ProgramaPage: React.FC = () => {
                     key={point.title}
                     className={`p-3 rounded-2xl border transition-all duration-300 flex items-center justify-between gap-3 ${
                       isAdded 
-                        ? 'bg-emerald-50/40 dark:bg-emerald-950/10 border-emerald-100 dark:border-emerald-900/30' 
-                        : 'bg-slate-50/50 dark:bg-slate-950/10 border-slate-100 dark:border-slate-850 hover:bg-slate-50 dark:hover:bg-slate-900'
+                        ? 'bg-emerald-50/40 dark:bg-emerald-950/20 border-emerald-100 dark:border-emerald-900/40' 
+                        : 'bg-slate-50 dark:bg-slate-800/60 border-slate-100 dark:border-slate-700/60 hover:bg-slate-100 dark:hover:bg-slate-800'
                     }`}
                   >
                     <div className="min-w-0 flex-1 space-y-1">
                       <div className="flex items-center gap-2">
-                        <span className="font-mono text-[10px] font-black bg-indigo-50 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 px-1.5 py-0.5 rounded-md shrink-0">{point.timeSlot}</span>
-                        <h5 className="text-[11px] font-black text-slate-800 dark:text-slate-200 uppercase tracking-tight truncate">{point.title}</h5>
+                        <span className="font-mono text-[10px] font-black bg-indigo-50 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-300 px-1.5 py-0.5 rounded-md shrink-0">{point.timeSlot}</span>
+                        <h5 className="text-[11px] font-black text-slate-800 dark:text-slate-100 uppercase tracking-tight truncate">{point.title}</h5>
                       </div>
                       <p className="text-[9px] text-slate-500 dark:text-slate-400 font-semibold truncate">{point.description}</p>
-                      <p className="text-[8px] text-slate-450 dark:text-slate-500 font-bold uppercase tracking-wider">Por: {point.responsible}</p>
+                      <p className="text-[8px] text-slate-400 dark:text-slate-400 font-bold uppercase tracking-wider">Por: {point.responsible}</p>
                     </div>
 
                     <div className="shrink-0">
@@ -860,8 +860,8 @@ export const ProgramaPage: React.FC = () => {
                            disabled={!guideUrl}
                            className={`p-1.5 rounded-xl border text-[9px] font-black transition-all ${
                              guideUrl 
-                               ? 'border-indigo-100 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 text-indigo-600 cursor-pointer hover:scale-105 active:scale-95' 
-                               : 'border-slate-200 text-slate-300 cursor-not-allowed opacity-50'
+                               ? 'border-indigo-100 dark:border-indigo-800 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 text-indigo-600 dark:text-indigo-400 cursor-pointer hover:scale-105 active:scale-95' 
+                               : 'border-slate-200 dark:border-slate-700 text-slate-300 dark:text-slate-600 cursor-not-allowed opacity-50'
                            }`}
                            title={guideUrl ? "Importar Punto" : "Requiere cargar el PDF guía primero"}
                          >
@@ -874,7 +874,7 @@ export const ProgramaPage: React.FC = () => {
               })}
             </div>
             {!guideUrl && (
-              <div className="p-3 bg-amber-50/50 dark:bg-amber-950/10 border border-amber-100/80 dark:border-amber-900/30 rounded-2xl text-[9px] text-amber-700 dark:text-amber-400 font-bold uppercase tracking-wider text-center flex items-center justify-center gap-1.5">
+              <div className="p-3 bg-amber-50/50 dark:bg-amber-950/20 border border-amber-100/80 dark:border-amber-900/40 rounded-2xl text-[9px] text-amber-700 dark:text-amber-300 font-bold uppercase tracking-wider text-center flex items-center justify-center gap-1.5">
                 ⚠️ Sube el PDF guía para activar la importación rápida
               </div>
             )}
