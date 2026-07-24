@@ -77,21 +77,50 @@ export class RankingService {
       };
     });
 
-    const historialRaw = await (prisma as any).score.findMany({
+    const scoresRaw = await (prisma as any).score.findMany({
       where: { groupId },
       include: {
         activity: { include: { pointCategory: true } }
       },
-      orderBy: { date: 'desc' },
-      take: 5
+      orderBy: { date: 'desc' }
     });
 
-    const historialReciente = historialRaw.map((h: any) => ({
-      id: h.id,
+    const penaltiesRaw = await (prisma as any).penalty.findMany({
+      where: { groupSmallId: groupId },
+      orderBy: { date: 'desc' }
+    });
+
+    const formattedScores = scoresRaw.map((h: any) => ({
+      id: `score-${h.id}`,
       actividad: h.activity?.name || 'Puntuación Directa',
       area: h.activity?.pointCategory?.name || 'General',
       puntos: h.points,
+      type: 'SCORE',
+      fechaRaw: h.date,
       fecha: h.date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })
+    }));
+
+    const formattedPenalties = penaltiesRaw.map((p: any) => ({
+      id: `penalty-${p.id}`,
+      actividad: p.reason || 'Penalización aplicada',
+      area: 'Penalización',
+      puntos: p.points,
+      type: 'PENALTY',
+      fechaRaw: p.date,
+      fecha: p.date.toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' })
+    }));
+
+    const historialMerged = [...formattedScores, ...formattedPenalties].sort(
+      (a: any, b: any) => b.fechaRaw.getTime() - a.fechaRaw.getTime()
+    );
+
+    const historialReciente = historialMerged.map(item => ({
+      id: item.id,
+      actividad: item.actividad,
+      area: item.area,
+      puntos: item.puntos,
+      type: item.type,
+      fecha: item.fecha
     }));
 
     const rankingGeneral = await this.getRankingGeneral();

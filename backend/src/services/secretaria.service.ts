@@ -113,6 +113,22 @@ export class SecretariaService {
   }
 
   async linkMemberToGroup(groupId: number, userId: number, groupRole: string) {
+    const norm = (groupRole || '').toUpperCase().trim();
+    if (norm === 'LÍDER' || norm === 'LIDER') {
+      const existingLeader = await prisma.user.findFirst({
+        where: {
+          groupSmallId: groupId,
+          id: { not: userId },
+          groupRole: { in: ['Líder', 'LIDER', 'lider', 'Lider'] }
+        },
+        select: { id: true, name: true }
+      });
+
+      if (existingLeader) {
+        throw new Error(`El grupo ya cuenta con un Líder asignado (${existingLeader.name}). Solo se permite 1 Líder por Grupo Pequeño.`);
+      }
+    }
+
     return await prisma.$transaction([
       prisma.groupSmall.update({
         where: { id: groupId },

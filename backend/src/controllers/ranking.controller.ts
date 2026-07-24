@@ -1,4 +1,5 @@
 import { Response } from 'express';
+import fs from 'fs';
 import { rankingService } from '../services/ranking.service';
 import prisma from '../config/database';
 import jwt from 'jsonwebtoken';
@@ -94,6 +95,47 @@ export class RankingController {
 
       const datosProgreso = await rankingService.getProgresoGrupo(groupId);
       return res.status(200).json({ success: true, data: datosProgreso });
+    } catch (error: any) {
+      return res.status(500).json({ success: false, message: error.message });
+    }
+  };
+
+  getCalendar = async (req: any, res: Response) => {
+    try {
+      const filePath = './uploads/calendar-config.json';
+      let data = { fechaPublicacion: '15 de junio de 2026' };
+      if (fs.existsSync(filePath)) {
+        const fileContent = fs.readFileSync(filePath, 'utf8');
+        data = JSON.parse(fileContent);
+      }
+      return res.status(200).json({ success: true, ...data });
+    } catch (error: any) {
+      return res.status(500).json({ success: false, message: error.message });
+    }
+  };
+
+  saveCalendar = async (req: any, res: Response) => {
+    try {
+      const userRole = req.userRole || req.user?.role;
+      const isAdmin = String(userRole || '').toUpperCase() === 'ADMIN';
+      if (!isAdmin) {
+        return res.status(403).json({ success: false, message: 'Acceso denegado.' });
+      }
+
+      const { fechaPublicacion } = req.body;
+      if (!fechaPublicacion) {
+        return res.status(400).json({ success: false, message: 'Fecha de publicación requerida.' });
+      }
+
+      const dir = './uploads';
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+
+      const filePath = './uploads/calendar-config.json';
+      fs.writeFileSync(filePath, JSON.stringify({ fechaPublicacion }, null, 2), 'utf8');
+
+      return res.status(200).json({ success: true, message: 'Calendario actualizado.', fechaPublicacion });
     } catch (error: any) {
       return res.status(500).json({ success: false, message: error.message });
     }

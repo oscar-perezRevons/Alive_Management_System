@@ -174,7 +174,9 @@ export const eventosService = {
 
 export const rankingService = {
   getGeneral: () => apiClient.get('/ranking/general'),
-  getProgreso: (groupId: number) => apiClient.get(`/ranking/progreso/${groupId}`)
+  getProgreso: (groupId: number) => apiClient.get(`/ranking/progreso/${groupId}`),
+  getCalendar: () => apiClient.get('/ranking/calendar'),
+  saveCalendar: (fechaPublicacion: string) => apiClient.post('/ranking/calendar', { fechaPublicacion })
 };
 
 export const authExtensions = {
@@ -185,7 +187,10 @@ export const adminUserExtensions = {
   getAll: () => apiClient.get('/users'),
   updateRole: (id: number, data: { accessProfile?: 'ADMIN' | 'LIDER_GP' | 'USUARIO'; role?: string; groupRole?: string }) =>
     apiClient.put(`/users/${id}/role`, data),
-  toggleStatus: (id: number, data: { isActive: boolean }) => apiClient.put(`/users/${id}/status`, data)
+  toggleStatus: (id: number, data: { isActive: boolean }) => apiClient.put(`/users/${id}/status`, data),
+  resetPassword: (id: number, newPassword: string) => apiClient.put(`/users/${id}/password`, { newPassword }),
+  updateGroupRole: (id: number, data: { role?: string; groupRole?: string }) =>
+    apiClient.put(`/users/${id}/role`, data)
 };
 
 export const materialsService = {

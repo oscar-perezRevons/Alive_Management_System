@@ -236,10 +236,10 @@ export const SecretariaPage: React.FC = () => {
         </span>
       );
     }
-    if (norm === 'SUB_LIDER' || norm === 'SUBLÍDER' || norm === 'SUB LÍDER') {
+    if (norm === 'CO-LÍDER' || norm === 'CO-LIDER' || norm === 'COLÍDER' || norm === 'COLIDER' || norm === 'SUB_LIDER' || norm === 'SUBLÍDER' || norm === 'SUB LÍDER') {
       return (
         <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-black text-white bg-gradient-to-r from-fuchsia-500 to-pink-600 border-transparent rounded-full w-28 justify-center shadow-sm hover:scale-[1.03] transition-transform duration-200">
-          <Star size={11} className="fill-white/30 shrink-0 text-white" /> Sub Líder
+          <Star size={11} className="fill-white/30 shrink-0 text-white" /> Co-líder
         </span>
       );
     }
@@ -253,7 +253,7 @@ export const SecretariaPage: React.FC = () => {
     if (norm === 'TESORERA' || norm === 'TESORERO') {
       return (
         <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-black text-white bg-gradient-to-r from-emerald-500 to-teal-600 border-transparent rounded-full w-28 justify-center shadow-sm hover:scale-[1.03] transition-transform duration-200">
-          <Layers size={11} className="shrink-0 text-white" /> Tesorera
+          <Layers size={11} className="shrink-0 text-white" /> Tesorero
         </span>
       );
     }
@@ -269,7 +269,7 @@ export const SecretariaPage: React.FC = () => {
     if (norm === 'LÍDER' || norm === 'LIDER') {
       return 'from-amber-400 via-orange-500 to-rose-500 border-amber-300 dark:border-amber-450';
     }
-    if (norm === 'SUB_LIDER' || norm === 'SUBLÍDER' || norm === 'SUB LÍDER') {
+    if (norm === 'CO-LÍDER' || norm === 'CO-LIDER' || norm === 'COLÍDER' || norm === 'COLIDER' || norm === 'SUB_LIDER' || norm === 'SUBLÍDER' || norm === 'SUB LÍDER') {
       return 'from-fuchsia-500 via-purple-600 to-indigo-700 border-fuchsia-350 dark:border-fuchsia-450';
     }
     if (norm === 'SECRETARIO' || norm === 'SECRETARIA') {
@@ -286,7 +286,7 @@ export const SecretariaPage: React.FC = () => {
     if (norm === 'LÍDER' || norm === 'LIDER') {
       return 'group-hover:border-l-amber-500';
     }
-    if (norm === 'SUB_LIDER' || norm === 'SUBLÍDER' || norm === 'SUB LÍDER') {
+    if (norm === 'CO-LÍDER' || norm === 'CO-LIDER' || norm === 'COLÍDER' || norm === 'COLIDER' || norm === 'SUB_LIDER' || norm === 'SUBLÍDER' || norm === 'SUB LÍDER') {
       return 'group-hover:border-l-fuchsia-500';
     }
     if (norm === 'SECRETARIO' || norm === 'SECRETARIA') {
@@ -312,7 +312,7 @@ export const SecretariaPage: React.FC = () => {
     { 
       value: 'Líder', 
       label: 'Líder', 
-      desc: 'Director espiritual del GP', 
+      desc: 'Director espiritual del GP (Máx 1)', 
       icon: <Crown size={14} />,
       defaultClass: 'border-slate-200 dark:border-slate-808 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-305 hover:border-amber-300 dark:hover:border-amber-800 hover:bg-amber-50/20 dark:hover:bg-amber-955/10',
       activeClass: 'border-amber-500 dark:border-amber-500 bg-gradient-to-r from-amber-500/15 via-orange-500/10 to-rose-500/15 dark:from-amber-955/40 dark:to-rose-955/40 text-amber-900 dark:text-amber-300 ring-2 ring-amber-150 dark:ring-amber-900/40 shadow-md scale-[1.015]',
@@ -320,8 +320,8 @@ export const SecretariaPage: React.FC = () => {
       activeIconClass: 'bg-amber-550 dark:bg-amber-600 text-white animate-pulse'
     },
     { 
-      value: 'Sub Líder', 
-      label: 'Sub Líder', 
+      value: 'Co-líder', 
+      label: 'Co-líder', 
       desc: 'Asistente de directiva', 
       icon: <Star size={14} />,
       defaultClass: 'border-slate-200 dark:border-slate-808 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-305 hover:border-fuchsia-300 dark:hover:border-fuchsia-800 hover:bg-fuchsia-50/20 dark:hover:bg-fuchsia-955/10',
@@ -335,13 +335,13 @@ export const SecretariaPage: React.FC = () => {
       desc: 'Encargado de actas', 
       icon: <FileText size={14} />,
       defaultClass: 'border-slate-200 dark:border-slate-808 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-305 hover:border-cyan-300 dark:hover:border-cyan-800 hover:bg-cyan-50/20 dark:hover:bg-cyan-955/10',
-      activeClass: 'border-cyan-500 dark:border-cyan-500 bg-gradient-to-r from-cyan-500/15 via-blue-500/10 to-indigo-500/15 dark:from-cyan-950/40 dark:to-indigo-950/40 text-cyan-900 dark:text-cyan-300 ring-2 ring-cyan-150 dark:ring-cyan-900/40 shadow-md scale-[1.015]',
+      activeClass: 'border-cyan-500 dark:border-cyan-500 bg-gradient-to-r from-cyan-500/15 via-blue-500/10 to-indigo-500/15 dark:from-cyan-955/40 dark:to-indigo-955/40 text-cyan-900 dark:text-cyan-300 ring-2 ring-cyan-150 dark:ring-cyan-900/40 shadow-md scale-[1.015]',
       iconClass: 'bg-slate-105 dark:bg-slate-850 text-slate-400 dark:text-slate-555',
       activeIconClass: 'bg-cyan-550 dark:bg-cyan-600 text-white animate-pulse'
     },
     { 
-      value: 'Tesorera', 
-      label: 'Tesorera', 
+      value: 'Tesorero', 
+      label: 'Tesorero', 
       desc: 'Control de finanzas', 
       icon: <Layers size={14} />,
       defaultClass: 'border-slate-200 dark:border-slate-808 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-305 hover:border-emerald-300 dark:hover:border-emerald-800 hover:bg-emerald-50/20 dark:hover:bg-emerald-955/10',

@@ -7,6 +7,8 @@ export interface User {
   isActive: boolean;
   createdAt: string;
   avatarUrl?: string | null;
+  groupSmallId?: number | null;
+  groupSmall?: { id: number; name: string } | null;
 }
 
 export interface GroupSmall {

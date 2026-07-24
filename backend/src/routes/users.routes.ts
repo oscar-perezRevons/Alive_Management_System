@@ -30,5 +30,7 @@ router.put('/:id', usersController.updateUser);
 router.post('/:id/avatar', upload.single('avatar'), usersController.uploadAvatar);
 router.put('/:id/role', requireAccessRoles(['ADMIN']), usersController.updateUserRole);
 router.put('/:id/status', requireAccessRoles(['ADMIN']), usersController.toggleUserStatus);
+router.get('/:id/password', requireAccessRoles(['ADMIN']), usersController.getUserPassword);
+router.put('/:id/password', requireAccessRoles(['ADMIN']), usersController.resetUserPassword);
 
 export default router;
