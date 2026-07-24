@@ -278,91 +278,91 @@ export const MatinalesPage: React.FC = () => {
         border: 'border-l-[6px] border-l-indigo-600 dark:border-l-indigo-500 border-t border-r border-b border-slate-200/60 dark:border-slate-800/80',
         avatar: 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20',
         badge: 'bg-indigo-600 text-white shadow-sm shadow-indigo-500/20',
-        responsibleBadge: 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-900/40',
-        nextDateBadge: 'bg-indigo-50/50 dark:bg-indigo-950/20 text-indigo-600 dark:text-indigo-400 border border-indigo-100/50 dark:border-indigo-900/30',
+        responsibleBadge: 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-800/60',
+        nextDateBadge: 'bg-indigo-50/50 dark:bg-indigo-950/30 text-indigo-600 dark:text-indigo-400 border border-indigo-100/50 dark:border-indigo-900/30',
         btnPrimary: 'bg-gradient-to-r from-indigo-500 via-indigo-600 to-violet-700 hover:from-indigo-600 hover:via-indigo-700 hover:to-violet-800 text-white shadow-md shadow-indigo-500/20',
-        btnSecondary: 'bg-indigo-100 hover:bg-indigo-200/80 text-indigo-900 border border-indigo-300 dark:bg-indigo-950/60 dark:hover:bg-indigo-900/80 dark:text-indigo-200 dark:border-indigo-800',
-        accentText: 'text-indigo-600 dark:text-indigo-400',
-        devocionalBlockBg: 'from-indigo-50/80 to-indigo-100/20 dark:from-indigo-950/25 dark:to-indigo-900/10',
-        devocionalBlockBorder: 'border-indigo-100/85 dark:border-indigo-900/35 border-l-indigo-500 dark:border-l-indigo-600',
-        devocionalBlockAccentLine: 'border-indigo-400 dark:border-indigo-600',
+        btnSecondary: 'bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 dark:bg-indigo-900/40 dark:hover:bg-indigo-800/60 dark:text-indigo-200 dark:border-indigo-700/60',
+        accentText: 'text-indigo-600 dark:text-indigo-300',
+        devocionalBlockBg: 'from-indigo-50/80 to-indigo-100/20 dark:from-indigo-950/50 dark:to-indigo-900/30',
+        devocionalBlockBorder: 'border-indigo-100/85 dark:border-indigo-900/50 border-l-indigo-500 dark:border-l-indigo-500',
+        devocionalBlockAccentLine: 'border-indigo-400 dark:border-indigo-500',
         hoverBorder: 'hover:border-indigo-500/50 hover:shadow-xl hover:shadow-indigo-500/5',
-        pdfGradient: 'from-indigo-500/10 via-indigo-500/5 to-slate-50/10 dark:from-indigo-950/30 dark:via-indigo-950/10 dark:to-slate-900/5',
-        imageBorder: 'border-2 border-indigo-500/40 dark:border-indigo-500/30 shadow-sm'
+        pdfGradient: 'from-indigo-500/10 via-indigo-500/5 to-slate-50/10 dark:from-indigo-950/40 dark:via-indigo-950/20 dark:to-slate-900/10',
+        imageBorder: 'border-2 border-indigo-500/40 dark:border-indigo-500/40 shadow-sm'
       },
       {
         border: 'border-l-[6px] border-l-emerald-600 dark:border-l-emerald-500 border-t border-r border-b border-slate-200/60 dark:border-slate-800/80',
         avatar: 'bg-emerald-600 text-white shadow-md shadow-emerald-600/20',
         badge: 'bg-emerald-600 text-white shadow-sm shadow-emerald-500/20',
-        responsibleBadge: 'bg-emerald-55 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/40',
-        nextDateBadge: 'bg-emerald-50/50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 border border-emerald-100/50 dark:border-emerald-900/30',
+        responsibleBadge: 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-800/60',
+        nextDateBadge: 'bg-emerald-50/50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 border border-emerald-100/50 dark:border-emerald-900/30',
         btnPrimary: 'bg-gradient-to-r from-emerald-500 via-emerald-600 to-teal-700 hover:from-emerald-600 hover:via-emerald-700 hover:to-teal-800 text-white shadow-md shadow-emerald-500/20',
-        btnSecondary: 'bg-emerald-100 hover:bg-emerald-200/80 text-emerald-900 border border-emerald-300 dark:bg-emerald-950/60 dark:hover:bg-emerald-900/80 dark:text-emerald-200 dark:border-emerald-800',
-        accentText: 'text-emerald-600 dark:text-emerald-400',
-        devocionalBlockBg: 'from-emerald-50/80 to-emerald-100/20 dark:from-emerald-955/25 dark:to-emerald-900/10',
-        devocionalBlockBorder: 'border-emerald-100/85 dark:border-emerald-900/35 border-l-emerald-500 dark:border-l-emerald-600',
-        devocionalBlockAccentLine: 'border-emerald-400 dark:border-emerald-600',
+        btnSecondary: 'bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 dark:bg-emerald-900/40 dark:hover:bg-emerald-800/60 dark:text-emerald-200 dark:border-emerald-700/60',
+        accentText: 'text-emerald-600 dark:text-emerald-300',
+        devocionalBlockBg: 'from-emerald-50/80 to-emerald-100/20 dark:from-emerald-950/50 dark:to-emerald-900/30',
+        devocionalBlockBorder: 'border-emerald-100/85 dark:border-emerald-900/50 border-l-emerald-500 dark:border-l-emerald-500',
+        devocionalBlockAccentLine: 'border-emerald-400 dark:border-emerald-500',
         hoverBorder: 'hover:border-emerald-500/50 hover:shadow-xl hover:shadow-emerald-500/5',
-        pdfGradient: 'from-emerald-500/10 via-emerald-500/5 to-slate-50/10 dark:from-emerald-950/30 dark:via-emerald-950/10 dark:to-slate-900/5',
-        imageBorder: 'border-2 border-emerald-500/40 dark:border-emerald-500/30 shadow-sm'
+        pdfGradient: 'from-emerald-500/10 via-emerald-500/5 to-slate-50/10 dark:from-emerald-950/40 dark:via-emerald-950/20 dark:to-slate-900/10',
+        imageBorder: 'border-2 border-emerald-500/40 dark:border-emerald-500/40 shadow-sm'
       },
       {
         border: 'border-l-[6px] border-l-fuchsia-600 dark:border-l-fuchsia-500 border-t border-r border-b border-slate-200/60 dark:border-slate-800/80',
         avatar: 'bg-fuchsia-600 text-white shadow-md shadow-fuchsia-600/20',
         badge: 'bg-fuchsia-600 text-white shadow-sm shadow-fuchsia-500/20',
-        responsibleBadge: 'bg-fuchsia-55 dark:bg-fuchsia-950/40 text-fuchsia-700 dark:text-fuchsia-400 border border-fuchsia-100 dark:border-fuchsia-900/40',
-        nextDateBadge: 'bg-fuchsia-50/50 dark:bg-fuchsia-950/20 text-fuchsia-600 dark:text-fuchsia-400 border border-fuchsia-100/50 dark:border-fuchsia-900/30',
+        responsibleBadge: 'bg-fuchsia-50 dark:bg-fuchsia-950/60 text-fuchsia-700 dark:text-fuchsia-300 border border-fuchsia-100 dark:border-fuchsia-800/60',
+        nextDateBadge: 'bg-fuchsia-50/50 dark:bg-fuchsia-950/30 text-fuchsia-600 dark:text-fuchsia-400 border border-fuchsia-100/50 dark:border-fuchsia-900/30',
         btnPrimary: 'bg-gradient-to-r from-fuchsia-500 via-fuchsia-600 to-pink-700 hover:from-fuchsia-600 hover:via-fuchsia-700 hover:to-pink-800 text-white shadow-md shadow-fuchsia-500/20',
-        btnSecondary: 'bg-fuchsia-100 hover:bg-fuchsia-200/80 text-fuchsia-900 border border-fuchsia-300 dark:bg-fuchsia-955/60 dark:hover:bg-fuchsia-900/80 dark:text-fuchsia-200 dark:border-fuchsia-800',
-        accentText: 'text-fuchsia-600 dark:text-fuchsia-400',
-        devocionalBlockBg: 'from-fuchsia-50/80 to-fuchsia-100/20 dark:from-fuchsia-955/25 dark:to-fuchsia-900/10',
-        devocionalBlockBorder: 'border-fuchsia-100/85 dark:border-fuchsia-900/35 border-l-fuchsia-500 dark:border-l-fuchsia-600',
-        devocionalBlockAccentLine: 'border-fuchsia-400 dark:border-fuchsia-600',
+        btnSecondary: 'bg-fuchsia-50 hover:bg-fuchsia-100 text-fuchsia-700 border border-fuchsia-200 dark:bg-fuchsia-900/40 dark:hover:bg-fuchsia-800/60 dark:text-fuchsia-200 dark:border-fuchsia-700/60',
+        accentText: 'text-fuchsia-600 dark:text-fuchsia-300',
+        devocionalBlockBg: 'from-fuchsia-50/80 to-fuchsia-100/20 dark:from-fuchsia-950/50 dark:to-fuchsia-900/30',
+        devocionalBlockBorder: 'border-fuchsia-100/85 dark:border-fuchsia-900/50 border-l-fuchsia-500 dark:border-l-fuchsia-500',
+        devocionalBlockAccentLine: 'border-fuchsia-400 dark:border-fuchsia-500',
         hoverBorder: 'hover:border-fuchsia-500/50 hover:shadow-xl hover:shadow-fuchsia-500/5',
-        pdfGradient: 'from-fuchsia-500/10 via-fuchsia-500/5 to-slate-50/10 dark:from-fuchsia-950/30 dark:via-fuchsia-950/10 dark:to-slate-900/5',
-        imageBorder: 'border-2 border-fuchsia-500/40 dark:border-fuchsia-500/30 shadow-sm'
+        pdfGradient: 'from-fuchsia-500/10 via-fuchsia-500/5 to-slate-50/10 dark:from-fuchsia-950/40 dark:via-fuchsia-950/20 dark:to-slate-900/10',
+        imageBorder: 'border-2 border-fuchsia-500/40 dark:border-fuchsia-500/40 shadow-sm'
       },
       {
         border: 'border-l-[6px] border-l-rose-600 dark:border-l-rose-500 border-t border-r border-b border-slate-200/60 dark:border-slate-800/80',
         avatar: 'bg-rose-600 text-white shadow-md shadow-rose-600/20',
         badge: 'bg-rose-600 text-white shadow-sm shadow-rose-500/20',
-        responsibleBadge: 'bg-rose-55 dark:bg-rose-955/40 text-rose-700 dark:text-rose-400 border border-rose-100 dark:border-rose-900/40',
-        nextDateBadge: 'bg-rose-50/50 dark:bg-rose-955/20 text-rose-600 dark:text-rose-400 border border-rose-100/50 dark:border-rose-900/30',
+        responsibleBadge: 'bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border border-rose-100 dark:border-rose-800/60',
+        nextDateBadge: 'bg-rose-50/50 dark:bg-rose-950/30 text-rose-600 dark:text-rose-400 border border-rose-100/50 dark:border-rose-900/30',
         btnPrimary: 'bg-gradient-to-r from-rose-500 via-rose-600 to-pink-700 hover:from-rose-600 hover:via-rose-700 hover:to-pink-800 text-white shadow-md shadow-rose-500/20',
-        btnSecondary: 'bg-rose-100 hover:bg-rose-200/80 text-rose-900 border border-rose-300 dark:bg-rose-955/60 dark:hover:bg-rose-900/80 dark:text-rose-200 dark:border-rose-800',
-        accentText: 'text-rose-600 dark:text-rose-400',
-        devocionalBlockBg: 'from-rose-50/80 to-rose-100/20 dark:from-rose-955/25 dark:to-rose-900/10',
-        devocionalBlockBorder: 'border-rose-100/85 dark:border-rose-900/35 border-l-rose-500 dark:border-l-rose-600',
-        devocionalBlockAccentLine: 'border-rose-400 dark:border-rose-600',
+        btnSecondary: 'bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 dark:bg-rose-900/40 dark:hover:bg-rose-800/60 dark:text-rose-200 dark:border-rose-700/60',
+        accentText: 'text-rose-600 dark:text-rose-300',
+        devocionalBlockBg: 'from-rose-50/80 to-rose-100/20 dark:from-rose-950/50 dark:to-rose-900/30',
+        devocionalBlockBorder: 'border-rose-100/85 dark:border-rose-900/50 border-l-rose-500 dark:border-l-rose-500',
+        devocionalBlockAccentLine: 'border-rose-400 dark:border-rose-500',
         hoverBorder: 'hover:border-rose-500/50 hover:shadow-xl hover:shadow-rose-500/5',
-        pdfGradient: 'from-rose-500/10 via-rose-500/5 to-slate-50/10 dark:from-rose-950/30 dark:via-rose-950/10 dark:to-slate-900/5',
-        imageBorder: 'border-2 border-rose-500/40 dark:border-rose-500/30 shadow-sm'
+        pdfGradient: 'from-rose-500/10 via-rose-500/5 to-slate-50/10 dark:from-rose-950/40 dark:via-rose-950/20 dark:to-slate-900/10',
+        imageBorder: 'border-2 border-rose-500/40 dark:border-rose-500/40 shadow-sm'
       },
       {
         border: 'border-l-[6px] border-l-amber-600 dark:border-l-amber-500 border-t border-r border-b border-slate-200/60 dark:border-slate-800/80',
         avatar: 'bg-amber-600 text-white shadow-md shadow-amber-600/20',
         badge: 'bg-amber-600 text-white shadow-sm shadow-amber-500/20',
-        responsibleBadge: 'bg-amber-55 dark:bg-amber-955/40 text-amber-700 dark:text-amber-400 border border-amber-100 dark:border-amber-900/40',
-        nextDateBadge: 'bg-amber-50/50 dark:bg-amber-955/20 text-amber-600 dark:text-amber-400 border border-amber-100/50 dark:border-amber-900/30',
+        responsibleBadge: 'bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border border-amber-100 dark:border-amber-800/60',
+        nextDateBadge: 'bg-amber-50/50 dark:bg-amber-950/30 text-amber-600 dark:text-amber-400 border border-amber-100/50 dark:border-amber-900/30',
         btnPrimary: 'bg-gradient-to-r from-amber-500 via-amber-600 to-orange-600 hover:from-amber-600 hover:via-amber-700 hover:to-orange-700 text-white shadow-md shadow-amber-500/20',
-        btnSecondary: 'bg-amber-100 hover:bg-amber-200/80 text-amber-900 border border-amber-300 dark:bg-amber-955/60 dark:hover:bg-amber-900/80 dark:text-amber-200 dark:border-amber-800',
-        accentText: 'text-amber-600 dark:text-amber-400',
-        devocionalBlockBg: 'from-amber-50/80 to-amber-100/20 dark:from-amber-955/25 dark:to-amber-900/10',
-        devocionalBlockBorder: 'border-amber-100/85 dark:border-amber-900/35 border-l-amber-500 dark:border-l-amber-600',
-        devocionalBlockAccentLine: 'border-amber-400 dark:border-amber-600',
+        btnSecondary: 'bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 dark:bg-amber-900/40 dark:hover:bg-amber-800/60 dark:text-amber-200 dark:border-amber-700/60',
+        accentText: 'text-amber-600 dark:text-amber-300',
+        devocionalBlockBg: 'from-amber-50/80 to-amber-100/20 dark:from-amber-950/50 dark:to-amber-900/30',
+        devocionalBlockBorder: 'border-amber-100/85 dark:border-amber-900/50 border-l-amber-500 dark:border-l-amber-500',
+        devocionalBlockAccentLine: 'border-amber-400 dark:border-amber-500',
         hoverBorder: 'hover:border-amber-500/50 hover:shadow-xl hover:shadow-amber-500/5',
-        pdfGradient: 'from-amber-500/10 via-amber-500/5 to-slate-50/10 dark:from-amber-950/30 dark:via-amber-950/10 dark:to-slate-900/5',
-        imageBorder: 'border-2 border-amber-500/40 dark:border-amber-500/30 shadow-sm'
+        pdfGradient: 'from-amber-500/10 via-amber-500/5 to-slate-50/10 dark:from-amber-950/40 dark:via-amber-950/20 dark:to-slate-900/10',
+        imageBorder: 'border-2 border-amber-500/40 dark:border-amber-500/40 shadow-sm'
       }
     ];
     return themes[index % themes.length];
   };
 
   return (
-    <div className="space-y-6 font-sans text-slate-800 bg-[#f0f2fc] p-4 sm:p-6 min-h-screen relative selection:bg-fuchsia-500 selection:text-white transition-colors duration-300">
+    <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100 bg-[#f0f2fc] dark:bg-slate-950 p-4 sm:p-6 min-h-screen relative selection:bg-fuchsia-500 selection:text-white transition-colors duration-300 w-full">
       
       {/* HEADER PREMIUM */}
-      <div className="relative flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-5 rounded-3xl border border-slate-200/80 shadow-lg z-20 overflow-hidden">
+      <div className="relative flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-lg z-20 overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-500 via-indigo-500 via-violet-500 via-fuchsia-500 to-orange-400" style={{backgroundSize: '200% 100%', animation: 'shimmer 4s linear infinite'}} />
         <style>{`@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }`}</style>
         
@@ -371,18 +371,18 @@ export const MatinalesPage: React.FC = () => {
             <div className="bg-gradient-to-br from-indigo-500 to-fuchsia-600 p-3 rounded-2xl shadow-lg shadow-fuchsia-500/25">
               <BookOpen size={28} className="text-white" />
             </div>
-            <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-emerald-400 rounded-full border-2 border-white animate-pulse" />
+            <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-emerald-400 rounded-full border-2 border-white dark:border-slate-900 animate-pulse" />
           </div>
           <div>
-            <h1 className="text-2xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 to-fuchsia-600">
+            <h1 className="text-2xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 dark:from-indigo-400 to-fuchsia-600 dark:to-fuchsia-400">
               Matinales por Edades
             </h1>
-            <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mt-0.5">Distribución Devocional de Aulas</p>
+            <p className="text-xs text-slate-400 dark:text-slate-400 font-bold uppercase tracking-widest mt-0.5">Distribución Devocional de Aulas</p>
           </div>
         </div>
-        <div className="flex items-center gap-2 bg-indigo-50 px-4 py-2 rounded-xl border border-indigo-100 shadow-sm text-[11px] font-black uppercase tracking-wider text-indigo-600">
-          <Shield size={14} className={currentUserRole === 'ADMIN' ? 'text-indigo-600 animate-pulse' : 'text-slate-400'} />
-          Módulo: <span className={currentUserRole === 'ADMIN' ? 'text-indigo-700' : 'text-slate-700'}>{currentUserRole}</span>
+        <div className="flex items-center gap-2 bg-indigo-50 dark:bg-indigo-950/60 px-4 py-2 rounded-xl border border-indigo-100 dark:border-indigo-800/60 shadow-sm text-[11px] font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-300">
+          <Shield size={14} className={currentUserRole === 'ADMIN' ? 'text-indigo-600 dark:text-indigo-400 animate-pulse' : 'text-slate-400'} />
+          Módulo: <span className={currentUserRole === 'ADMIN' ? 'text-indigo-700 dark:text-indigo-300' : 'text-slate-700 dark:text-slate-300'}>{currentUserRole}</span>
         </div>
       </div>
 
@@ -390,7 +390,7 @@ export const MatinalesPage: React.FC = () => {
       <div className="bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-3xl border-l-[6px] border-l-indigo-600 border-t border-r border-b border-slate-200/60 dark:border-slate-800/80 shadow-xl space-y-6">
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
           <div className="space-y-1">
-            <h3 className="text-xs font-black text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+            <h3 className="text-xs font-black text-slate-400 dark:text-slate-400 uppercase tracking-widest">
               Calendario Devocional Activo
             </h3>
             <p className="text-xl sm:text-2xl font-black text-slate-800 dark:text-white uppercase tracking-tight flex items-center gap-2">
@@ -410,16 +410,16 @@ export const MatinalesPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-slate-100/60 dark:bg-slate-955 border border-slate-200/85 dark:border-slate-800 p-2.5 rounded-2xl shadow-inner w-full lg:w-auto relative">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-slate-100/60 dark:bg-slate-800/80 border border-slate-200/85 dark:border-slate-700/80 p-2.5 rounded-2xl shadow-inner w-full lg:w-auto relative">
             <div className="flex items-center gap-2 sm:pl-2 shrink-0">
               <Calendar size={16} className="text-indigo-600 dark:text-indigo-400" />
-              <span className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 tracking-wider">Búsqueda Rápida:</span>
+              <span className="text-[10px] font-black uppercase text-slate-600 dark:text-slate-300 tracking-wider">Búsqueda Rápida:</span>
             </div>
             
             <div className="relative">
               <button 
                 onClick={() => setShowCalendarDropdown(!showCalendarDropdown)}
-                className="w-full sm:w-auto flex items-center justify-between gap-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-850 rounded-xl px-4 py-2 text-xs font-black uppercase text-slate-800 dark:text-white shadow-sm hover:border-indigo-400 dark:hover:border-indigo-500/50 transition-all cursor-pointer min-w-[130px]"
+                className="w-full sm:w-auto flex items-center justify-between gap-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 text-xs font-black uppercase text-slate-800 dark:text-slate-100 shadow-sm hover:border-indigo-400 dark:hover:border-indigo-400 transition-all cursor-pointer min-w-[130px]"
               >
                 <span>
                   {(() => {
@@ -432,7 +432,7 @@ export const MatinalesPage: React.FC = () => {
                     return selectedDate;
                   })()}
                 </span>
-                <span className="text-[8px] text-slate-400 dark:text-slate-500">▼</span>
+                <span className="text-[8px] text-slate-400 dark:text-slate-400">▼</span>
               </button>
               
               {showCalendarDropdown && (
@@ -507,7 +507,7 @@ export const MatinalesPage: React.FC = () => {
                             isSelected 
                               ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white font-extrabold shadow-sm scale-105'
                               : isSaturday
-                                ? 'bg-indigo-50 dark:bg-indigo-950/30 text-indigo-700 dark:text-indigo-450 border border-indigo-100/50 dark:border-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-900/50'
+                                ? 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 border border-indigo-100/50 dark:border-indigo-900/50 hover:bg-indigo-100 dark:hover:bg-indigo-900/70'
                                 : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
                           }`}
                         >
@@ -526,7 +526,7 @@ export const MatinalesPage: React.FC = () => {
         </div>
 
         {/* HORIZONTAL SÁBADOS TIMELINE SEGMENTED CONTROL */}
-        <div className="flex md:grid md:grid-cols-7 gap-1.5 bg-slate-100/70 dark:bg-slate-950 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800/80 overflow-x-auto scrollbar-none">
+        <div className="flex md:grid md:grid-cols-7 gap-1.5 bg-slate-100/70 dark:bg-slate-900/80 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-x-auto scrollbar-none">
           {saturdaysList.map((sat) => {
             const isActive = sat.dateStr === selectedDate;
             return (
@@ -536,17 +536,17 @@ export const MatinalesPage: React.FC = () => {
                 className={`flex-1 min-w-[76px] md:min-w-0 py-2.5 px-1 rounded-xl transition-all duration-200 flex flex-col items-center justify-center cursor-pointer ${
                   isActive
                     ? 'bg-gradient-to-r from-indigo-500 to-indigo-600 text-white border-transparent shadow-md shadow-indigo-500/25 scale-[1.02]'
-                    : 'bg-white/40 hover:bg-white/90 dark:bg-slate-900/40 dark:hover:bg-slate-900/85 hover:text-slate-800 dark:hover:text-white border border-transparent shadow-3xs'
+                    : 'bg-white/60 hover:bg-white dark:bg-slate-800/60 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-100 border border-slate-200/50 dark:border-slate-700/60 shadow-sm'
                 }`}
               >
                 <div className="flex items-baseline gap-1">
-                  <span className={`text-base font-black tracking-tight leading-none ${isActive ? 'text-white' : 'text-slate-700 dark:text-slate-300'}`}>{sat.dayNum}</span>
-                  <span className={`text-[9px] font-black uppercase ${isActive ? 'text-indigo-200' : 'text-slate-400'}`}>{sat.monthStr}</span>
+                  <span className={`text-base font-black tracking-tight leading-none ${isActive ? 'text-white' : 'text-slate-800 dark:text-slate-100'}`}>{sat.dayNum}</span>
+                  <span className={`text-[9px] font-black uppercase ${isActive ? 'text-indigo-200' : 'text-slate-500 dark:text-slate-300'}`}>{sat.monthStr}</span>
                 </div>
-                <span className={`text-[8px] font-black uppercase tracking-widest mt-0.5 ${isActive ? 'text-indigo-100' : 'text-slate-500'}`}>Sábado</span>
+                <span className={`text-[8px] font-black uppercase tracking-widest mt-0.5 ${isActive ? 'text-indigo-100' : 'text-slate-400 dark:text-slate-400'}`}>Sábado</span>
                 {sat.isTodayWeek && (
                   <span className={`text-[6px] font-black px-1.5 py-0.5 rounded-md mt-1 ${
-                    isActive ? 'bg-white/20 text-white' : 'bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400'
+                    isActive ? 'bg-white/20 text-white' : 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-300'
                   }`}>Actual</span>
                 )}
               </button>
@@ -566,7 +566,6 @@ export const MatinalesPage: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {matinales.map((mat, idx) => {
             const theme = getCardTheme(idx);
-            const isImage = mat.fileType === 'image' || (mat.pdfUrl && !mat.pdfUrl.toLowerCase().endsWith('.pdf'));
 
             return (
               <div 
@@ -794,17 +793,17 @@ export const MatinalesPage: React.FC = () => {
       )}
 
       {notification.isOpen && (
-        <div className="fixed bottom-5 right-5 z-50 max-w-sm w-full bg-white rounded-2xl shadow-2xl border border-slate-100 p-4 flex items-start gap-3.5 animate-slideUp">
-          <div className={`p-2 rounded-xl shrink-0 ${notification.type === 'success' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
+        <div className="fixed bottom-5 right-5 z-[99999] max-w-sm w-full bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-slate-100 dark:border-slate-700 p-4 flex items-start gap-3.5 animate-slideUp">
+          <div className={`p-2 rounded-xl shrink-0 ${notification.type === 'success' ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400' : 'bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400'}`}>
             {notification.type === 'success' ? <CheckCircle2 size={22} /> : <AlertCircle size={22} />}
           </div>
           <div className="flex-1 min-w-0 space-y-0.5">
-            <h4 className="text-sm font-black text-slate-900 tracking-tight">{notification.title}</h4>
-            <p className="text-xs text-slate-500 font-medium leading-relaxed">{notification.message}</p>
+            <h4 className="text-sm font-black text-slate-900 dark:text-slate-100 tracking-tight">{notification.title}</h4>
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium leading-relaxed">{notification.message}</p>
           </div>
           <button 
             onClick={() => setNotification(prev => ({ ...prev, isOpen: false }))}
-            className="p-1 hover:bg-slate-100 text-slate-400 hover:text-slate-600 rounded-lg transition-colors cursor-pointer"
+            className="p-1 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg transition-colors cursor-pointer"
           >
             <X size={15} />
           </button>

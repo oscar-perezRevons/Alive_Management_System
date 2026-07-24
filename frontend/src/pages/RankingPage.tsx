@@ -9,16 +9,6 @@ import {
   Maximize2, Minimize2, Eye, EyeOff
 } from 'lucide-react';
 
-// ─── Skeleton ────────────────────────────────────────────────────────────────
-const SkeletonLine = ({ w = 'w-full', h = 'h-3' }: { w?: string; h?: string }) => (
-  <div className={`${w} ${h} rounded-full`} style={{ background: 'linear-gradient(90deg,#e2e8f0 25%,#f1f5f9 50%,#e2e8f0 75%)', backgroundSize: '200% 100%', animation: 'shimmer 1.5s linear infinite' }} />
-);
-const SkeletonCard = ({ lines = 3 }: { lines?: number }) => (
-  <div className="bg-white rounded-2xl border border-slate-200/60 p-4 space-y-3">
-    {Array.from({ length: lines }).map((_, i) => <SkeletonLine key={i} w={i % 2 === 0 ? 'w-full' : 'w-2/3'} />)}
-  </div>
-);
-
 // ─── Custom Loader animation matching reference image ───────────────────────
 const CustomLoader = () => (
   <div className="flex flex-col items-center justify-center py-20 space-y-6 select-none animate-[fadeInUp_0.4s_ease_both]">
@@ -51,7 +41,7 @@ const CustomLoader = () => (
 // ─── Animated border wrapper ─────────────────────────────────────────────────
 const FlowBorder = ({ children, gradient, className = '' }: { children: React.ReactNode; gradient: string; className?: string }) => (
   <div className={`p-[2.5px] rounded-3xl ${className}`} style={{ background: gradient, backgroundSize: '400% 400%', animation: 'borderFlow 5s ease infinite' }}>
-    <div className="bg-white rounded-[22px] overflow-hidden h-full">{children}</div>
+    <div className="bg-white dark:bg-slate-900 rounded-[22px] overflow-hidden h-full text-slate-800 dark:text-slate-100 transition-colors duration-300">{children}</div>
   </div>
 );
 
@@ -59,7 +49,7 @@ const FlowBorder = ({ children, gradient, className = '' }: { children: React.Re
 const ModalWrap = ({ children, gradient, maxW = 'max-w-md' }: { children: React.ReactNode; gradient: string; maxW?: string }) => (
   <div className="fixed inset-0 bg-slate-900/70 backdrop-blur-sm flex items-center justify-center z-50 p-4" style={{ animation: 'fadeInUp 0.25s ease both' }}>
     <div className={`p-[2.5px] rounded-3xl ${maxW} w-full`} style={{ background: gradient, backgroundSize: '400% 400%', animation: 'borderFlow 5s ease infinite' }}>
-      <div className="bg-white rounded-[22px] overflow-hidden shadow-2xl">{children}</div>
+      <div className="bg-white dark:bg-slate-900 rounded-[22px] overflow-hidden shadow-2xl text-slate-800 dark:text-slate-100 transition-colors duration-300">{children}</div>
     </div>
   </div>
 );
@@ -295,28 +285,28 @@ export const RankingPage: React.FC = () => {
     if (pos===1) return 'bg-gradient-to-br from-amber-400 to-yellow-500 text-white shadow-lg shadow-amber-400/50 ring-2 ring-amber-300';
     if (pos===2) return 'bg-gradient-to-br from-slate-400 to-slate-500 text-white shadow-md ring-2 ring-slate-300';
     if (pos===3) return 'bg-gradient-to-br from-amber-700 to-orange-800 text-white shadow-md ring-2 ring-amber-600/50';
-    return 'bg-slate-100 text-slate-600 font-bold';
+    return 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-bold';
   };
   const getPodiumRow = (pos: number) => {
-    if (pos===1) return 'bg-gradient-to-r from-amber-50 via-yellow-50/60 to-transparent';
-    if (pos===2) return 'bg-gradient-to-r from-slate-50 to-transparent';
-    if (pos===3) return 'bg-gradient-to-r from-orange-50 to-transparent';
+    if (pos===1) return 'bg-gradient-to-r from-amber-50 via-yellow-50/60 to-transparent dark:from-amber-950/30 dark:via-amber-900/10 dark:to-transparent';
+    if (pos===2) return 'bg-gradient-to-r from-slate-50 to-transparent dark:from-slate-800/40 dark:to-transparent';
+    if (pos===3) return 'bg-gradient-to-r from-orange-50 to-transparent dark:from-orange-950/30 dark:to-transparent';
     return '';
   };
 
   const areaColors = [
-    { dot:'bg-indigo-500',   bar:'from-indigo-500 via-violet-500 to-purple-600', bg:'bg-indigo-50',   text:'text-indigo-700',   border:'border-indigo-200' },
-    { dot:'bg-fuchsia-500',  bar:'from-fuchsia-500 via-pink-500 to-rose-600',    bg:'bg-fuchsia-50',  text:'text-fuchsia-700',  border:'border-fuchsia-200' },
-    { dot:'bg-violet-500',   bar:'from-violet-500 via-purple-500 to-indigo-600', bg:'bg-violet-50',   text:'text-violet-700',   border:'border-violet-200' },
-    { dot:'bg-rose-500',     bar:'from-rose-500 via-pink-500 to-fuchsia-600',    bg:'bg-rose-50',     text:'text-rose-700',     border:'border-rose-200' },
-    { dot:'bg-amber-500',    bar:'from-amber-500 via-orange-500 to-amber-600',   bg:'bg-amber-50',    text:'text-amber-700',    border:'border-amber-200' },
+    { dot:'bg-indigo-500',   bar:'from-indigo-500 via-violet-500 to-purple-600', bg:'bg-indigo-50 dark:bg-indigo-950/60',   text:'text-indigo-700 dark:text-indigo-300',   border:'border-indigo-200 dark:border-indigo-800/60' },
+    { dot:'bg-fuchsia-500',  bar:'from-fuchsia-500 via-pink-500 to-rose-600',    bg:'bg-fuchsia-50 dark:bg-fuchsia-950/60',  text:'text-fuchsia-700 dark:text-fuchsia-300',  border:'border-fuchsia-200 dark:border-fuchsia-800/60' },
+    { dot:'bg-violet-500',   bar:'from-violet-500 via-purple-500 to-indigo-600', bg:'bg-violet-50 dark:bg-violet-950/60',   text:'text-violet-700 dark:text-violet-300',   border:'border-violet-200 dark:border-violet-800/60' },
+    { dot:'bg-rose-500',     bar:'from-rose-500 via-pink-500 to-fuchsia-600',    bg:'bg-rose-50 dark:bg-rose-950/60',     text:'text-rose-700 dark:text-rose-300',     border:'border-rose-200 dark:border-rose-800/60' },
+    { dot:'bg-amber-500',    bar:'from-amber-500 via-orange-500 to-amber-600',   bg:'bg-amber-50 dark:bg-amber-950/60',    text:'text-amber-700 dark:text-amber-300',    border:'border-amber-200 dark:border-amber-800/60' },
   ];
 
   const totalGanancias = grupoProgreso.historialReciente.filter((h:any)=>h.puntos>=0).reduce((a:number,h:any)=>a+h.puntos,0);
   const totalPenalizaciones = grupoProgreso.historialReciente.filter((h:any)=>h.puntos<0).reduce((a:number,h:any)=>a+h.puntos,0);
 
   return (
-    <div className="space-y-5 bg-[#f0f2fc] min-h-screen text-slate-800 p-4 sm:p-6 antialiased select-none relative">
+    <div className="w-full space-y-5 min-h-screen text-slate-800 dark:text-slate-100 p-2 sm:p-4 lg:p-6 antialiased select-none relative transition-colors duration-300">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
         * { font-family: 'Inter', system-ui, sans-serif; }
@@ -346,19 +336,19 @@ export const RankingPage: React.FC = () => {
                 <div className="bg-gradient-to-br from-amber-400 via-orange-500 to-rose-500 p-3.5 rounded-2xl shadow-xl shadow-amber-500/30">
                   <Trophy size={28} className="text-white fill-white" />
                 </div>
-                <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-violet-400 rounded-full border-2 border-white" style={{ animation:'pulseRing 2s ease infinite' }} />
+                <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-violet-400 rounded-full border-2 border-white dark:border-slate-900" style={{ animation:'pulseRing 2s ease infinite' }} />
               </div>
               <div>
-                <h1 className="text-3xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-violet-600 to-fuchsia-600">Ranking</h1>
-                <p className="text-[10px] text-slate-400 font-semibold uppercase tracking-widest mt-0.5">Sistema Oficial · Clasificación de Grupos Pequeños</p>
+                <h1 className="text-3xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 via-violet-600 to-fuchsia-600 dark:from-indigo-400 dark:via-violet-400 dark:to-fuchsia-400">Ranking</h1>
+                <p className="text-[10px] text-slate-400 dark:text-slate-400 font-semibold uppercase tracking-widest mt-0.5">Sistema Oficial · Clasificación de Grupos Pequeños</p>
               </div>
             </div>
             <div 
               onClick={isAdmin ? openDateConfigModal : undefined}
-              className={`flex items-center gap-3.5 bg-white border p-3 px-4 rounded-2xl transition-all duration-300 ${
+              className={`flex items-center gap-3.5 border p-3 px-4 rounded-2xl transition-all duration-300 ${
                 isAdmin 
-                  ? 'cursor-pointer hover:scale-[1.02] hover:shadow-md hover:border-violet-300 border-violet-100 bg-gradient-to-br from-violet-50/50 to-indigo-50/50' 
-                  : 'border-slate-200/80 shadow-xs'
+                  ? 'cursor-pointer hover:scale-[1.02] hover:shadow-md hover:border-violet-300 dark:hover:border-violet-600 border-violet-100 dark:border-violet-900/60 bg-gradient-to-br from-violet-50/50 to-indigo-50/50 dark:from-violet-950/40 dark:to-indigo-950/40' 
+                  : 'bg-white dark:bg-slate-800/80 border-slate-200/80 dark:border-slate-700 shadow-xs'
               }`}
               title={isAdmin ? "Haga clic para configurar la próxima fecha de emisión" : undefined}
             >
@@ -367,16 +357,16 @@ export const RankingPage: React.FC = () => {
                   <Calendar size={18} className="fill-current animate-[pulseRing_3s_ease_infinite]" />
                 </div>
                 {isAdmin && (
-                  <div className="absolute -top-1 -right-1 bg-violet-600 text-white p-0.5 rounded-full border border-white" title="Configurar calendario">
+                  <div className="absolute -top-1 -right-1 bg-violet-600 text-white p-0.5 rounded-full border border-white dark:border-slate-900" title="Configurar calendario">
                     <Settings2 size={9} className="animate-[spin_4s_linear_infinite]" />
                   </div>
                 )}
               </div>
               <div className="min-w-0">
-                <p className="text-[9px] text-indigo-700 font-black uppercase tracking-wider">Próxima publicación</p>
-                <h4 className="text-sm font-black text-slate-900 leading-none capitalize mt-1 flex items-center gap-1.5">
+                <p className="text-[9px] text-indigo-700 dark:text-indigo-300 font-black uppercase tracking-wider">Próxima publicación</p>
+                <h4 className="text-sm font-black text-slate-900 dark:text-slate-100 leading-none capitalize mt-1 flex items-center gap-1.5">
                   {fechaPublicacion}
-                  {isAdmin && <span className="text-[9px] text-violet-500 font-extrabold animate-pulse">(Editar)</span>}
+                  {isAdmin && <span className="text-[9px] text-violet-500 dark:text-violet-400 font-extrabold animate-pulse">(Editar)</span>}
                 </h4>
               </div>
             </div>
@@ -393,7 +383,7 @@ export const RankingPage: React.FC = () => {
 
       {/* ── MAIN CONTENT ─────────────────────────────────── */}
       {initialLoad ? (
-        <div className="anim-up bg-white rounded-3xl border border-slate-200/60 p-12 shadow-sm flex items-center justify-center min-h-[55vh]">
+        <div className="anim-up bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/60 dark:border-slate-800 p-12 shadow-sm flex items-center justify-center min-h-[55vh] transition-colors duration-300">
           <CustomLoader />
         </div>
       ) : isAdmin ? (
@@ -415,7 +405,7 @@ export const RankingPage: React.FC = () => {
                   {grupos.length > 0 && (
                     <select value={selectedGroupId} onChange={(e) => setSelectedGroupId(Number(e.target.value))}
                       className="text-[11px] bg-white/10 hover:bg-white/20 border border-white/25 text-white font-black rounded-xl px-3 py-1.5 focus:outline-none cursor-pointer tracking-wider uppercase backdrop-blur-sm transition-all duration-200 active:scale-95">
-                      {grupos.map((g:any) => <option key={g.id} value={g.id} className="text-slate-900 bg-white font-bold">GP: {g.name.toUpperCase()}</option>)}
+                      {grupos.map((g:any) => <option key={g.id} value={g.id} className="text-slate-900 bg-white dark:bg-slate-800 dark:text-slate-100 font-bold">GP: {g.name.toUpperCase()}</option>)}
                     </select>
                   )}
                 </div>
@@ -450,7 +440,7 @@ export const RankingPage: React.FC = () => {
                   </div>
                   {/* Desglose */}
                   <div className="space-y-3">
-                    <div className="flex items-center gap-2"><TrendingUp size={13} className="text-violet-500" /><h4 className="text-[11px] font-black text-slate-700 uppercase tracking-widest">Desglose por Área</h4></div>
+                    <div className="flex items-center gap-2"><TrendingUp size={13} className="text-violet-500 dark:text-violet-400" /><h4 className="text-[11px] font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest">Desglose por Área</h4></div>
                     {grupoProgreso.desgloseAreas.length === 0 ? (
                       <p className="text-xs text-slate-400 font-semibold text-center py-4">Sin datos disponibles.</p>
                     ) : grupoProgreso.desgloseAreas.map((area:any,i:number) => {
@@ -459,10 +449,10 @@ export const RankingPage: React.FC = () => {
                       return (
                         <div key={area.id} className="space-y-1.5 group">
                           <div className="flex justify-between items-center">
-                            <div className="flex items-center gap-2"><div className={`w-2.5 h-2.5 rounded-full ${c.dot} shrink-0`} /><span className="text-[12px] font-bold text-slate-700 uppercase tracking-wide group-hover:text-indigo-700 transition-colors">{area.name}</span></div>
+                            <div className="flex items-center gap-2"><div className={`w-2.5 h-2.5 rounded-full ${c.dot} shrink-0`} /><span className="text-[12px] font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wide group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{area.name}</span></div>
                             <span className={`text-[11px] font-black font-mono ${c.text} ${c.bg} border ${c.border} px-2.5 py-0.5 rounded-lg`}>{area.puntos.toLocaleString()} PTS</span>
                           </div>
-                          <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden shadow-inner">
+                          <div className="h-2.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden shadow-inner">
                             <div className={`h-full bg-gradient-to-r ${c.bar} rounded-full transition-all duration-700 ease-out`} style={{ width:`${pct}%` }} />
                           </div>
                         </div>
@@ -470,30 +460,30 @@ export const RankingPage: React.FC = () => {
                     })}
                   </div>
                   {/* Historial reciente */}
-                  <div className="space-y-3 pt-1 border-t border-slate-100">
+                  <div className="space-y-3 pt-1 border-t border-slate-100 dark:border-slate-800">
                     <div className="flex justify-between items-center">
-                      <div className="flex items-center gap-2"><Clock size={13} className="text-slate-400" /><h4 className="text-[11px] font-black text-slate-600 uppercase tracking-widest">Historial Reciente</h4></div>
+                      <div className="flex items-center gap-2"><Clock size={13} className="text-slate-400" /><h4 className="text-[11px] font-black text-slate-600 dark:text-slate-300 uppercase tracking-widest">Historial Reciente</h4></div>
                       <button 
                         onClick={() => setIsHistoryModalOpen(true)} 
-                        className="text-[10px] font-black text-indigo-700 uppercase tracking-wider bg-indigo-50 hover:bg-indigo-100 hover:text-indigo-800 transition duration-200 cursor-pointer px-3.5 py-2 rounded-xl border border-indigo-200/60 shadow-sm active:scale-95"
+                        className="text-[10px] font-black text-indigo-700 dark:text-indigo-300 uppercase tracking-wider bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900 transition duration-200 cursor-pointer px-3.5 py-2 rounded-xl border border-indigo-200/60 dark:border-indigo-800/60 shadow-sm active:scale-95"
                       >
                         Ver todo
                       </button>
                     </div>
                     {grupoProgreso.historialReciente.length === 0 ? (
-                      <div className="text-center py-6"><Clock size={32} className="mx-auto mb-2 text-slate-200" /><p className="text-xs font-semibold text-slate-400">Sin historial disponible</p></div>
+                      <div className="text-center py-6"><Clock size={32} className="mx-auto mb-2 text-slate-200 dark:text-slate-700" /><p className="text-xs font-semibold text-slate-400">Sin historial disponible</p></div>
                     ) : (
-                      <div className="rounded-2xl overflow-hidden border border-slate-100 divide-y divide-slate-50">
+                      <div className="rounded-2xl overflow-hidden border border-slate-100 dark:border-slate-800 divide-y divide-slate-50 dark:divide-slate-800/60">
                         {grupoProgreso.historialReciente.slice(0,4).map((h:any) => (
-                          <div key={h.id} className="px-4 py-3 flex justify-between items-center bg-white hover:bg-slate-50 transition group cursor-default">
+                          <div key={h.id} className="px-4 py-3 flex justify-between items-center bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/80 transition group cursor-default">
                             <div className="flex items-center gap-3 min-w-0">
                               <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${h.puntos<0?'bg-rose-500 animate-pulse':'bg-violet-500'}`} />
                               <div className="truncate">
-                                <p className="text-[12px] font-bold text-slate-800 truncate group-hover:text-indigo-700 transition-colors">{h.actividad}</p>
-                                <p className="text-[9px] text-slate-400 font-semibold uppercase tracking-wider mt-0.5">{h.area} · {h.fecha}</p>
+                                <p className="text-[12px] font-bold text-slate-800 dark:text-slate-200 truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{h.actividad}</p>
+                                <p className="text-[9px] text-slate-400 dark:text-slate-400 font-semibold uppercase tracking-wider mt-0.5">{h.area} · {h.fecha}</p>
                               </div>
                             </div>
-                            <span className={`font-mono font-black text-xs shrink-0 ml-3 px-2.5 py-1.5 rounded-xl border-2 ${h.puntos<0?'text-rose-600 bg-rose-50 border-rose-200':'text-violet-700 bg-violet-50 border-violet-200'}`}>
+                            <span className={`font-mono font-black text-xs shrink-0 ml-3 px-2.5 py-1.5 rounded-xl border-2 ${h.puntos<0?'text-rose-600 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/60 border-rose-200 dark:border-rose-800/60':'text-violet-700 dark:text-violet-300 bg-violet-50 dark:bg-violet-950/60 border-violet-200 dark:border-violet-800/60'}`}>
                               {h.puntos>=0?`+${h.puntos}`:h.puntos} pts
                             </span>
                           </div>
@@ -529,7 +519,7 @@ export const RankingPage: React.FC = () => {
                     </button>
                     <button
                       onClick={() => setIsExportModalOpen(true)}
-                      className="inline-flex items-center justify-center gap-2 h-10 px-4 bg-white text-indigo-700 text-[11px] font-black rounded-xl hover:bg-indigo-50 hover:text-indigo-850 border border-transparent transition-all duration-200 active:scale-95 shadow-sm cursor-pointer tracking-wider uppercase"
+                      className="inline-flex items-center justify-center gap-2 h-10 px-4 bg-white dark:bg-slate-800 text-indigo-700 dark:text-indigo-300 text-[11px] font-black rounded-xl hover:bg-indigo-50 dark:hover:bg-slate-700 hover:text-indigo-850 dark:hover:text-indigo-200 border border-transparent dark:border-slate-700 transition-all duration-200 active:scale-95 shadow-sm cursor-pointer tracking-wider uppercase"
                     >
                       <Download size={13} className="shrink-0" />
                       <span>Exportar</span>
@@ -538,40 +528,40 @@ export const RankingPage: React.FC = () => {
                 </div>
                 <div className="p-5 flex-1 flex flex-col space-y-4">
                   <div className="flex justify-between items-center">
-                    <h3 className="font-black text-lg text-slate-900 tracking-tight">Ranking General de GP</h3>
-                    <span className="text-[10px] font-black text-indigo-600 bg-indigo-50 border border-indigo-200 px-2.5 py-1 rounded-xl uppercase tracking-wide">{tablaRanking.length} equipos</span>
+                    <h3 className="font-black text-lg text-slate-900 dark:text-slate-100 tracking-tight">Ranking General de GP</h3>
+                    <span className="text-[10px] font-black text-indigo-600 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800/60 px-2.5 py-1 rounded-xl uppercase tracking-wide">{tablaRanking.length} equipos</span>
                   </div>
-                  <div className="flex-1 overflow-x-auto rounded-2xl border-2 border-slate-100">
+                  <div className="flex-1 overflow-x-auto rounded-2xl border-2 border-slate-100 dark:border-slate-800">
                     <table className="w-full text-left border-collapse">
                       <thead>
-                        <tr className="bg-slate-50 border-b-2 border-slate-100 text-slate-400 font-black uppercase tracking-widest text-[9px]">
+                        <tr className="bg-slate-50 dark:bg-slate-800/60 border-b-2 border-slate-100 dark:border-slate-800 text-slate-400 dark:text-slate-400 font-black uppercase tracking-widest text-[9px]">
                           <th className="p-4 text-center w-16">Pos.</th>
                           <th className="p-4">Grupo Pequeño</th>
                           <th className="p-4 text-right pr-6">Puntos</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-slate-50 bg-white">
+                      <tbody className="divide-y divide-slate-50 dark:divide-slate-800/60 bg-white dark:bg-slate-900">
                         {tablaRanking.length===0 ? (
-                          <tr><td colSpan={3} className="text-center py-14 text-slate-300"><Trophy size={40} className="mx-auto mb-3" /><p className="text-sm font-semibold text-slate-400">Sin datos disponibles</p></td></tr>
+                          <tr><td colSpan={3} className="text-center py-14 text-slate-300 dark:text-slate-600"><Trophy size={40} className="mx-auto mb-3" /><p className="text-sm font-semibold text-slate-400">Sin datos disponibles</p></td></tr>
                         ) : tablaRanking.map(item => (
-                          <tr key={item.id} className={`transition-all hover:bg-indigo-50/40 ${getPodiumRow(item.posicion)}`}>
+                          <tr key={item.id} className={`transition-all hover:bg-indigo-50/40 dark:hover:bg-indigo-950/30 ${getPodiumRow(item.posicion)}`}>
                             <td className="p-4 text-center"><span className={`w-9 h-9 rounded-full inline-flex items-center justify-center font-black text-sm ${getPodiumBadge(item.posicion)}`}>{item.posicion===1?'🥇':item.posicion===2?'🥈':item.posicion===3?'🥉':item.posicion}</span></td>
                             <td className="p-4">
                               <div className="flex items-center gap-2.5">
                                 <Shield size={16} className={`fill-current shrink-0 ${item.shieldColor||'text-slate-400'}`} />
-                                <div><p className="font-black text-slate-900 text-[13px] uppercase tracking-wide">{item.name}</p><p className="text-[9px] text-slate-400 font-semibold uppercase tracking-wider">Grupo Pequeño</p></div>
+                                <div><p className="font-black text-slate-900 dark:text-slate-100 text-[13px] uppercase tracking-wide">{item.name}</p><p className="text-[9px] text-slate-400 dark:text-slate-400 font-semibold uppercase tracking-wider">Grupo Pequeño</p></div>
                               </div>
                             </td>
-                            <td className="p-4 text-right pr-6"><span className="font-mono font-black text-slate-900 text-base">{item.totalPoints.toLocaleString()}</span><span className="text-slate-400 text-[11px] font-semibold ml-1">pts</span></td>
+                            <td className="p-4 text-right pr-6"><span className="font-mono font-black text-slate-900 dark:text-slate-100 text-base">{item.totalPoints.toLocaleString()}</span><span className="text-slate-400 dark:text-slate-400 text-[11px] font-semibold ml-1">pts</span></td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
                   </div>
-                  <div className="flex justify-between items-center text-[10px] text-slate-400 font-semibold uppercase tracking-wider">
+                  <div className="flex justify-between items-center text-[10px] text-slate-400 dark:text-slate-400 font-semibold uppercase tracking-wider">
                     <div className="flex items-center gap-1.5"><div className="w-1.5 h-1.5 rounded-full bg-violet-400 animate-pulse" /><span>En vivo</span></div>
                     <div className="flex items-center gap-2 font-mono"><span>Act: {lastUpdated}</span>
-                      <button onClick={() => { cargarRankingGlobal(); triggerToast('Clasificaciones sincronizadas.'); }} className="p-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-xl border border-indigo-100/60 transition-all cursor-pointer active:scale-95" title="Sincronizar">
+                      <button onClick={() => { cargarRankingGlobal(); triggerToast('Clasificaciones sincronizadas.'); }} className="p-2 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900 text-indigo-600 dark:text-indigo-300 rounded-xl border border-indigo-100/60 dark:border-indigo-800/60 transition-all cursor-pointer active:scale-95" title="Sincronizar">
                         <RefreshCw size={13} className={loading?'animate-spin':''} />
                       </button>
                     </div>
@@ -648,8 +638,8 @@ export const RankingPage: React.FC = () => {
                     </div>
 
                     {/* Desglose */}
-                    <div className="bg-slate-50 rounded-2xl border-2 border-slate-100 p-5 space-y-4">
-                      <div className="flex items-center gap-2 mb-1"><TrendingUp size={14} className="text-violet-500" /><h4 className="text-[11px] font-black text-slate-700 uppercase tracking-widest">Desglose por Área</h4></div>
+                    <div className="bg-slate-50 dark:bg-slate-800/40 rounded-2xl border-2 border-slate-100 dark:border-slate-800 p-5 space-y-4">
+                      <div className="flex items-center gap-2 mb-1"><TrendingUp size={14} className="text-violet-500 dark:text-violet-400" /><h4 className="text-[11px] font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest">Desglose por Área</h4></div>
                       {grupoProgreso.desgloseAreas.length===0 ? (
                         <p className="text-xs text-slate-400 font-semibold text-center py-4">Sin datos disponibles.</p>
                       ) : grupoProgreso.desgloseAreas.map((area:any,i:number) => {
@@ -658,10 +648,10 @@ export const RankingPage: React.FC = () => {
                         return (
                           <div key={area.id} className="space-y-2 group">
                             <div className="flex justify-between items-center">
-                              <div className="flex items-center gap-2"><div className={`w-2.5 h-2.5 rounded-full ${c.dot} shrink-0`} /><span className="text-[12px] font-bold text-slate-700 uppercase tracking-wide group-hover:text-indigo-700 transition-colors">{area.name}</span></div>
+                              <div className="flex items-center gap-2"><div className={`w-2.5 h-2.5 rounded-full ${c.dot} shrink-0`} /><span className="text-[12px] font-bold text-slate-700 dark:text-slate-200 uppercase tracking-wide group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{area.name}</span></div>
                               <span className={`text-[11px] font-black font-mono ${c.text} ${c.bg} border ${c.border} px-2.5 py-0.5 rounded-lg`}>{area.puntos.toLocaleString()} PTS</span>
                             </div>
-                            <div className="h-3 bg-slate-200 rounded-full overflow-hidden shadow-inner">
+                            <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden shadow-inner">
                               <div className={`h-full bg-gradient-to-r ${c.bar} rounded-full transition-all duration-700 ease-out`} style={{ width:`${pct}%` }} />
                             </div>
                           </div>
@@ -673,29 +663,29 @@ export const RankingPage: React.FC = () => {
                   {/* RIGHT: Historial reciente completo */}
                   <div className="space-y-4">
                     <div className="flex justify-between items-center">
-                      <div className="flex items-center gap-2"><Clock size={14} className="text-violet-500" /><h4 className="text-[12px] font-black text-slate-700 uppercase tracking-widest">Historial Reciente</h4></div>
-                      <span className="text-[10px] font-black text-violet-600 bg-violet-50 border border-violet-200 px-2.5 py-1 rounded-lg uppercase tracking-wide">{grupoProgreso.historialReciente.length} registros</span>
+                      <div className="flex items-center gap-2"><Clock size={14} className="text-violet-500 dark:text-violet-400" /><h4 className="text-[12px] font-black text-slate-700 dark:text-slate-300 uppercase tracking-widest">Historial Reciente</h4></div>
+                      <span className="text-[10px] font-black text-violet-600 dark:text-violet-300 bg-violet-50 dark:bg-violet-950/60 border border-violet-200 dark:border-violet-800/60 px-2.5 py-1 rounded-lg uppercase tracking-wide">{grupoProgreso.historialReciente.length} registros</span>
                     </div>
 
                     {grupoProgreso.historialReciente.length === 0 ? (
-                      <div className="flex flex-col items-center justify-center py-16 text-slate-300">
+                      <div className="flex flex-col items-center justify-center py-16 text-slate-300 dark:text-slate-600">
                         <Clock size={48} className="mb-3" />
                         <p className="text-sm font-semibold text-slate-400">Sin historial disponible</p>
                       </div>
                     ) : (
                       <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
                         {grupoProgreso.historialReciente.map((h:any) => (
-                          <div key={h.id} className="px-4 py-3.5 bg-white border-2 border-slate-100 rounded-2xl flex justify-between items-center hover:shadow-md hover:border-violet-200 transition-all group cursor-default">
+                          <div key={h.id} className="px-4 py-3.5 bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 rounded-2xl flex justify-between items-center hover:shadow-md hover:border-violet-200 dark:hover:border-violet-700 transition-all group cursor-default">
                             <div className="flex items-center gap-3 min-w-0">
-                              <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${h.puntos<0?'bg-rose-100 text-rose-600':'bg-violet-100 text-violet-700'}`}>
+                              <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${h.puntos<0?'bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400':'bg-violet-100 dark:bg-violet-950/60 text-violet-700 dark:text-violet-300'}`}>
                                 {h.puntos<0?<ArrowDown size={15} />:<ArrowUp size={15} />}
                               </div>
                               <div className="truncate">
-                                <p className="text-[13px] font-bold text-slate-800 truncate group-hover:text-indigo-700 transition-colors">{h.actividad}</p>
-                                <p className="text-[9px] text-slate-400 mt-0.5 font-semibold uppercase tracking-wider">{h.area} · {h.fecha}</p>
+                                <p className="text-[13px] font-bold text-slate-800 dark:text-slate-200 truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{h.actividad}</p>
+                                <p className="text-[9px] text-slate-400 dark:text-slate-400 mt-0.5 font-semibold uppercase tracking-wider">{h.area} · {h.fecha}</p>
                               </div>
                             </div>
-                            <span className={`font-mono font-black text-sm shrink-0 ml-3 px-3 py-1.5 rounded-xl border-2 ${h.puntos<0?'text-rose-600 bg-rose-50 border-rose-200':'text-violet-700 bg-violet-50 border-violet-200'}`}>
+                            <span className={`font-mono font-black text-sm shrink-0 ml-3 px-3 py-1.5 rounded-xl border-2 ${h.puntos<0?'text-rose-600 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/60 border-rose-200 dark:border-rose-800/60':'text-violet-700 dark:text-violet-300 bg-violet-50 dark:bg-violet-950/60 border-violet-200 dark:border-violet-800/60'}`}>
                               {h.puntos>=0?`+${h.puntos}`:h.puntos} pts
                             </span>
                           </div>
@@ -712,13 +702,13 @@ export const RankingPage: React.FC = () => {
 
       {/* ── TOAST ─────────────────────────────────────────── */}
       {notification.isOpen && (
-        <div className="fixed bottom-5 right-5 z-50 max-w-sm w-full bg-white rounded-2xl shadow-2xl border border-violet-100 p-4 flex items-center justify-between gap-3.5 overflow-hidden" style={{ animation:'fadeInUp 0.3s ease both' }}>
+        <div className="fixed bottom-5 right-5 z-[99999] max-w-sm w-full bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-violet-100 dark:border-violet-900/60 p-4 flex items-center justify-between gap-3.5 overflow-hidden" style={{ animation:'fadeInUp 0.3s ease both' }}>
           <div className="absolute top-0 left-0 right-0 h-[3px]" style={{ background:'linear-gradient(90deg,#6366f1,#8b5cf6,#d946ef)' }} />
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-md"><Zap size={16} /></div>
-            <p className="text-xs font-black text-slate-800">{notification.message}</p>
+            <p className="text-xs font-black text-slate-800 dark:text-slate-100">{notification.message}</p>
           </div>
-          <button onClick={() => setNotification({ isOpen:false, message:'' })} className="text-slate-400 hover:text-slate-600 p-1 hover:bg-slate-100 rounded-lg transition"><X size={14} /></button>
+          <button onClick={() => setNotification({ isOpen:false, message:'' })} className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition"><X size={14} /></button>
         </div>
       )}
 
@@ -733,17 +723,17 @@ export const RankingPage: React.FC = () => {
             <button onClick={() => setIsExportModalOpen(false)} className="text-white/70 hover:text-white p-2 hover:bg-white/10 rounded-xl transition duration-200 active:scale-95"><X size={18} /></button>
           </div>
           <div className="p-6 space-y-3">
-            <button onClick={exportarRankingPDF} className="w-full group flex items-center gap-4 p-5 rounded-2xl border-2 border-indigo-200 bg-indigo-50 hover:bg-indigo-100 hover:border-indigo-400 transition-all duration-200 cursor-pointer active:scale-[0.98] text-left">
+            <button onClick={exportarRankingPDF} className="w-full group flex items-center gap-4 p-5 rounded-2xl border-2 border-indigo-200 dark:border-indigo-900/50 bg-indigo-50 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 hover:border-indigo-400 dark:hover:border-indigo-700 transition-all duration-200 cursor-pointer active:scale-[0.98] text-left">
               <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-2xl flex items-center justify-center shrink-0 shadow-lg shadow-indigo-500/30 group-hover:scale-105 transition-transform"><BarChart3 size={22} className="text-white" /></div>
-              <div><p className="font-black text-sm text-indigo-900 uppercase tracking-wide">Ranking General</p><p className="text-[11px] text-indigo-600 font-semibold mt-0.5">Tabla completa de clasificación · PDF a color</p></div>
+              <div><p className="font-black text-sm text-indigo-900 dark:text-indigo-200 uppercase tracking-wide">Ranking General</p><p className="text-[11px] text-indigo-600 dark:text-indigo-400 font-semibold mt-0.5">Tabla completa de clasificación · PDF a color</p></div>
               <Download size={16} className="text-indigo-400 ml-auto shrink-0 transition-transform group-hover:translate-y-0.5" />
             </button>
-            <button onClick={exportarHistorialPDF} className="w-full group flex items-center gap-4 p-5 rounded-2xl border-2 border-fuchsia-200 bg-fuchsia-50 hover:bg-fuchsia-100 hover:border-fuchsia-400 transition-all duration-200 cursor-pointer active:scale-[0.98] text-left">
+            <button onClick={exportarHistorialPDF} className="w-full group flex items-center gap-4 p-5 rounded-2xl border-2 border-fuchsia-200 dark:border-fuchsia-900/50 bg-fuchsia-50 dark:bg-fuchsia-950/40 hover:bg-fuchsia-100 dark:hover:bg-fuchsia-900/50 hover:border-fuchsia-400 dark:hover:border-fuchsia-700 transition-all duration-200 cursor-pointer active:scale-[0.98] text-left">
               <div className="w-12 h-12 bg-gradient-to-br from-fuchsia-500 to-violet-600 rounded-2xl flex items-center justify-center shrink-0 shadow-lg shadow-fuchsia-500/30 group-hover:scale-105 transition-transform"><FileText size={22} className="text-white" /></div>
-              <div className="flex-1 min-w-0"><p className="font-black text-sm text-fuchsia-900 uppercase tracking-wide">Historial del Grupo</p><p className="text-[11px] text-fuchsia-700 font-semibold mt-0.5 truncate">{grupos.find((g:any)=>g.id===selectedGroupId)?.name?.toUpperCase()||'Grupo seleccionado'} · Puntos y penalizaciones</p></div>
+              <div className="flex-1 min-w-0"><p className="font-black text-sm text-fuchsia-900 dark:text-fuchsia-200 uppercase tracking-wide">Historial del Grupo</p><p className="text-[11px] text-fuchsia-700 dark:text-fuchsia-400 font-semibold mt-0.5 truncate">{grupos.find((g:any)=>g.id===selectedGroupId)?.name?.toUpperCase()||'Grupo seleccionado'} · Puntos y penalizaciones</p></div>
               <Download size={16} className="text-fuchsia-400 ml-2 shrink-0 transition-transform group-hover:translate-y-0.5" />
             </button>
-            <button onClick={() => setIsExportModalOpen(false)} className="w-full py-3.5 bg-slate-100 hover:bg-slate-200 text-slate-500 font-black uppercase text-xs rounded-2xl cursor-pointer transition-all duration-200 active:scale-95 shadow-sm">Cancelar</button>
+            <button onClick={() => setIsExportModalOpen(false)} className="w-full py-3.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 font-black uppercase text-xs rounded-2xl cursor-pointer transition-all duration-200 active:scale-95 shadow-sm">Cancelar</button>
           </div>
         </ModalWrap>
       )}
@@ -763,18 +753,18 @@ export const RankingPage: React.FC = () => {
           </div>
           <form onSubmit={guardarConfiguracionFechas} className="p-6 space-y-6">
             <div className="space-y-2">
-              <label className="block text-[11px] font-black uppercase text-slate-400 tracking-widest">📅 Próxima Emisión General</label>
+              <label className="block text-[11px] font-black uppercase text-slate-400 dark:text-slate-400 tracking-widest">📅 Próxima Emisión General</label>
               <div className="relative">
                 <input 
                   type="date" 
                   required 
                   value={tempFechaPublicacion} 
                   onChange={(e) => setTempFechaPublicacion(e.target.value)} 
-                  className="w-full border-2 border-slate-200 focus:border-violet-500 focus:ring-4 focus:ring-violet-500/20 rounded-2xl px-4 py-3.5 font-bold text-sm text-slate-800 focus:outline-none bg-slate-50 hover:bg-white transition cursor-pointer" 
+                  className="w-full border-2 border-slate-200 dark:border-slate-700 focus:border-violet-500 dark:focus:border-violet-400 focus:ring-4 focus:ring-violet-500/20 rounded-2xl px-4 py-3.5 font-bold text-sm text-slate-800 dark:text-slate-100 focus:outline-none bg-slate-50 dark:bg-slate-800 hover:bg-white dark:hover:bg-slate-800 transition cursor-pointer" 
                 />
               </div>
               {tempFechaPublicacion && (
-                <p className="text-[11px] text-violet-600 font-black capitalize px-1 flex items-center gap-1.5 animate-pulse mt-2">
+                <p className="text-[11px] text-violet-600 dark:text-violet-400 font-black capitalize px-1 flex items-center gap-1.5 animate-pulse mt-2">
                   <span>→</span> {formatDateToSpanish(tempFechaPublicacion)}
                 </p>
               )}
@@ -783,7 +773,7 @@ export const RankingPage: React.FC = () => {
               <button 
                 type="button" 
                 onClick={() => setIsDateConfigOpen(false)} 
-                className="flex-1 py-3.5 bg-slate-100 hover:bg-slate-250 text-slate-550 rounded-2xl font-black uppercase text-xs cursor-pointer transition-all duration-200 active:scale-95 border border-slate-200 shadow-2xs"
+                className="flex-1 py-3.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-2xl font-black uppercase text-xs cursor-pointer transition-all duration-200 active:scale-95 border border-slate-200 dark:border-slate-700 shadow-2xs"
               >
                 Cancelar
               </button>
@@ -813,25 +803,25 @@ export const RankingPage: React.FC = () => {
           </div>
 
           {/* Summary Cards */}
-          <div className="grid grid-cols-3 gap-3 p-4 bg-slate-50 border-b-2 border-slate-100 shrink-0">
-            <div className="p-3 bg-gradient-to-br from-indigo-50/50 to-violet-50/50 border-2 border-indigo-150/70 rounded-2xl text-center shadow-xs">
-              <p className="text-[10px] text-indigo-700 font-extrabold uppercase tracking-wider">Puntos Total</p>
-              <p className="text-base font-black text-slate-900 font-mono mt-1.5">{(grupoProgreso.grupoInfo?.totalPoints??0).toLocaleString()}</p>
+          <div className="grid grid-cols-3 gap-3 p-4 bg-slate-50 dark:bg-slate-900 border-b-2 border-slate-100 dark:border-slate-800 shrink-0">
+            <div className="p-3 bg-gradient-to-br from-indigo-50/50 to-violet-50/50 dark:from-indigo-950/40 dark:to-violet-950/40 border-2 border-indigo-150/70 dark:border-indigo-900/50 rounded-2xl text-center shadow-xs">
+              <p className="text-[10px] text-indigo-700 dark:text-indigo-300 font-extrabold uppercase tracking-wider">Puntos Total</p>
+              <p className="text-base font-black text-slate-900 dark:text-slate-100 font-mono mt-1.5">{(grupoProgreso.grupoInfo?.totalPoints??0).toLocaleString()}</p>
             </div>
-            <div className="p-3 bg-gradient-to-br from-emerald-50/60 to-teal-50/60 border-2 border-emerald-150/60 rounded-2xl text-center shadow-xs">
-              <p className="text-[10px] text-emerald-700 font-extrabold uppercase tracking-wider">Ganancias</p>
-              <p className="text-base font-black text-emerald-750 font-mono mt-1.5">+{totalGanancias.toLocaleString()}</p>
+            <div className="p-3 bg-gradient-to-br from-emerald-50/60 to-teal-50/60 dark:from-emerald-950/40 dark:to-teal-950/40 border-2 border-emerald-150/60 dark:border-emerald-900/50 rounded-2xl text-center shadow-xs">
+              <p className="text-[10px] text-emerald-700 dark:text-emerald-300 font-extrabold uppercase tracking-wider">Ganancias</p>
+              <p className="text-base font-black text-emerald-600 dark:text-emerald-400 font-mono mt-1.5">+{totalGanancias.toLocaleString()}</p>
             </div>
-            <div className="p-3 bg-gradient-to-br from-rose-50/60 to-orange-50/60 border-2 border-rose-150/60 rounded-2xl text-center shadow-xs">
-              <p className="text-[10px] text-rose-700 font-extrabold uppercase tracking-wider">Penalizaciones</p>
-              <p className="text-base font-black text-rose-750 font-mono mt-1.5">{totalPenalizaciones.toLocaleString()}</p>
+            <div className="p-3 bg-gradient-to-br from-rose-50/60 to-orange-50/60 dark:from-rose-950/40 dark:to-orange-950/40 border-2 border-rose-150/60 dark:border-rose-900/50 rounded-2xl text-center shadow-xs">
+              <p className="text-[10px] text-rose-700 dark:text-rose-300 font-extrabold uppercase tracking-wider">Penalizaciones</p>
+              <p className="text-base font-black text-rose-600 dark:text-rose-400 font-mono mt-1.5">{totalPenalizaciones.toLocaleString()}</p>
             </div>
           </div>
 
-          <div className="overflow-y-auto p-5 space-y-3 max-h-[50vh] bg-slate-50/30">
+          <div className="overflow-y-auto p-5 space-y-3 max-h-[50vh] bg-slate-50/30 dark:bg-slate-900/50">
             {grupoProgreso.historialReciente.length===0 ? (
-              <div className="text-center py-16 text-slate-350 bg-white border-2 border-dashed border-slate-200 rounded-2xl">
-                <Clock size={44} className="mx-auto mb-3 text-slate-300 animate-pulse" />
+              <div className="text-center py-16 text-slate-350 bg-white dark:bg-slate-900 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl">
+                <Clock size={44} className="mx-auto mb-3 text-slate-300 dark:text-slate-600 animate-pulse" />
                 <p className="text-sm font-black text-slate-400 uppercase tracking-wider">Sin historial disponible</p>
               </div>
             ) : grupoProgreso.historialReciente.map((h:any) => {
@@ -839,10 +829,10 @@ export const RankingPage: React.FC = () => {
               return (
                 <div 
                   key={h.id} 
-                  className={`px-5 py-4 bg-white border-2 rounded-2xl flex justify-between items-center transition-all duration-300 hover:scale-[1.01] hover:shadow-md cursor-default group ${
+                  className={`px-5 py-4 bg-white dark:bg-slate-800/80 border-2 rounded-2xl flex justify-between items-center transition-all duration-300 hover:scale-[1.01] hover:shadow-md cursor-default group ${
                     isNeg 
-                      ? 'border-rose-100 hover:border-rose-350 hover:bg-rose-50/10' 
-                      : 'border-indigo-100 hover:border-indigo-350 hover:bg-indigo-50/10'
+                      ? 'border-rose-100 dark:border-rose-900/50 hover:border-rose-350 dark:hover:border-rose-700 hover:bg-rose-50/10 dark:hover:bg-rose-950/30' 
+                      : 'border-indigo-100 dark:border-indigo-900/50 hover:border-indigo-350 dark:hover:border-indigo-700 hover:bg-indigo-50/10 dark:hover:bg-indigo-950/30'
                   }`}
                 >
                   <div className="flex items-center gap-3.5 min-w-0">
@@ -854,9 +844,9 @@ export const RankingPage: React.FC = () => {
                       {isNeg ? <ArrowDown size={17} /> : <ArrowUp size={17} />}
                     </div>
                     <div className="truncate">
-                      <p className="text-[14px] font-extrabold text-slate-800 truncate group-hover:text-indigo-850 transition-colors uppercase tracking-wide leading-snug">{h.actividad}</p>
-                      <p className="text-[10px] text-slate-400 mt-1 font-bold uppercase tracking-wider flex items-center gap-1.5">
-                        <span className={`px-1.5 py-0.5 rounded-md ${isNeg ? 'bg-rose-50 text-rose-600' : 'bg-indigo-50 text-indigo-600'}`}>{h.area}</span>
+                      <p className="text-[14px] font-extrabold text-slate-800 dark:text-slate-100 truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors uppercase tracking-wide leading-snug">{h.actividad}</p>
+                      <p className="text-[10px] text-slate-400 dark:text-slate-400 mt-1 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                        <span className={`px-1.5 py-0.5 rounded-md ${isNeg ? 'bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-300' : 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-300'}`}>{h.area}</span>
                         <span>·</span>
                         <span>{h.fecha}</span>
                       </p>
@@ -864,8 +854,8 @@ export const RankingPage: React.FC = () => {
                   </div>
                   <span className={`font-mono font-black text-xs shrink-0 ml-4 px-3.5 py-2 rounded-xl border shadow-xs transition-colors ${
                     isNeg 
-                      ? 'text-rose-600 bg-rose-50/70 border-rose-200 group-hover:bg-rose-100' 
-                      : 'text-violet-700 bg-violet-50/70 border-violet-200 group-hover:bg-violet-100'
+                      ? 'text-rose-600 dark:text-rose-300 bg-rose-50/70 dark:bg-rose-950/60 border-rose-200 dark:border-rose-800/60 group-hover:bg-rose-100 dark:group-hover:bg-rose-900/60' 
+                      : 'text-violet-700 dark:text-violet-300 bg-violet-50/70 dark:bg-violet-950/60 border-violet-200 dark:border-violet-800/60 group-hover:bg-violet-100 dark:group-hover:bg-violet-900/60'
                   }`}>
                     {h.puntos>=0?`+${h.puntos}`:h.puntos} pts
                   </span>
@@ -874,10 +864,10 @@ export const RankingPage: React.FC = () => {
             })}
           </div>
 
-          <div className="p-5 border-t-2 border-slate-100 bg-white shrink-0 flex gap-3.5">
+          <div className="p-5 border-t-2 border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 shrink-0 flex gap-3.5">
             <button 
               onClick={() => setIsHistoryModalOpen(false)} 
-              className="flex-1 py-4 bg-slate-100 hover:bg-slate-200 text-slate-700 font-black uppercase text-xs tracking-wider rounded-2xl cursor-pointer transition-all duration-200 active:scale-95 border border-slate-200/85 shadow-2xs"
+              className="flex-1 py-4 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-black uppercase text-xs tracking-wider rounded-2xl cursor-pointer transition-all duration-200 active:scale-95 border border-slate-200/85 dark:border-slate-700 shadow-2xs"
             >
               Cerrar
             </button>
@@ -997,7 +987,7 @@ export const RankingPage: React.FC = () => {
                     <Trophy size={64} className="mx-auto mb-4" />
                     <p className="text-lg font-semibold">Sin datos de ranking disponibles</p>
                   </div>
-                ) : [...tablaRanking].sort((a, b) => b.posicion - a.posicion).map((item, idx) => {
+                ) : [...tablaRanking].sort((a, b) => a.posicion - b.posicion).map((item, idx) => {
                   const isPodium1 = item.posicion === 1;
                   const isPodium2 = item.posicion === 2;
                   const isPodium3 = item.posicion === 3;
