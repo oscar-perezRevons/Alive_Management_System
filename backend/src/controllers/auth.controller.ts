@@ -42,7 +42,11 @@ export class AuthController {
           role: true,
           groupRole: true,
           birthDate: true,
-          isActive: true
+          isActive: true,
+          groupSmallId: true,
+          groupSmall: {
+            select: { id: true, name: true }
+          }
         }
       });
 

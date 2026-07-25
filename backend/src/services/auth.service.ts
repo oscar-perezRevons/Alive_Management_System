@@ -4,7 +4,14 @@ import jwt from 'jsonwebtoken';
 
 export class AuthService {
   async loginUser(email: string, password: string) {
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await prisma.user.findUnique({
+      where: { email },
+      include: {
+        groupSmall: {
+          select: { id: true, name: true }
+        }
+      }
+    });
     if (!user || !user.isActive) throw new Error('El usuario no existe o se encuentra inactivo.');
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -18,7 +25,15 @@ export class AuthService {
 
     return {
       token,
-      user: { id: user.id, name: user.name, email: user.email, role: user.role, groupRole: user.groupRole }
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        groupRole: user.groupRole,
+        groupSmallId: user.groupSmallId,
+        groupSmall: user.groupSmall ? { id: user.groupSmall.id, name: user.groupSmall.name } : null
+      }
     };
   }
 

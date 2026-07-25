@@ -8,6 +8,8 @@ interface User {
   role: string;
   groupRole?: string;
   avatarUrl?: string | null;
+  groupSmallId?: number | null;
+  groupSmall?: { id: number; name: string } | null;
 }
 
 interface AuthStore {

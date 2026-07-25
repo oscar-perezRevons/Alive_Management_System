@@ -6,7 +6,7 @@ import { resolveAccessRole } from '../utils/access';
 import { 
   Trophy, Shield, Star, RefreshCw,
   ArrowUp, ArrowDown, Calendar, Download, Settings2, X, Clock, Zap, TrendingUp, FileText, BarChart3, Sparkles,
-  Maximize2, Minimize2, Eye, EyeOff, Users
+  Maximize2, Minimize2, Eye, EyeOff, Users, ArrowUpRight, ArrowDownRight, AlertTriangle
 } from 'lucide-react';
 
 // ─── Custom Loader animation matching reference image ───────────────────────
@@ -448,13 +448,13 @@ export const RankingPage: React.FC = () => {
                         )}
                       </div>
                     </div>
-                    <div className="relative overflow-hidden bg-gradient-to-br from-fuchsia-600 via-pink-600 to-rose-600 p-5 rounded-2xl text-white text-center shadow-xl shadow-fuchsia-500/30 flex flex-col items-center justify-center">
+                    <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 p-5 rounded-2xl text-white text-center shadow-xl border border-indigo-500/20 flex flex-col items-center justify-center">
                       <div className="absolute -right-4 -top-4 opacity-10"><Star size={80} className="fill-current" /></div>
-                      <p className="text-[10px] font-black uppercase tracking-widest opacity-75 mb-3">Posición</p>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-indigo-300 mb-3">Posición</p>
                       <div className={`w-14 h-14 rounded-full flex items-center justify-center font-black text-xl ring-4 ring-white/20 shadow-lg ${Number(grupoProgreso.grupoInfo?.posicionActual)===1?'bg-amber-400 text-slate-900':Number(grupoProgreso.grupoInfo?.posicionActual)===2?'bg-slate-300 text-slate-700':Number(grupoProgreso.grupoInfo?.posicionActual)===3?'bg-amber-800 text-white':'bg-white/20 text-white'}`}>
                         {grupoProgreso.grupoInfo?.posicionActual}
                       </div>
-                      <p className="text-[10px] font-black uppercase tracking-widest opacity-60 mt-2.5">Puesto General</p>
+                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mt-2.5">Puesto General</p>
                     </div>
                   </div>
                   {/* Desglose */}
@@ -492,21 +492,37 @@ export const RankingPage: React.FC = () => {
                     {grupoProgreso.historialReciente.length === 0 ? (
                       <div className="text-center py-6"><Clock size={32} className="mx-auto mb-2 text-slate-200 dark:text-slate-700" /><p className="text-xs font-semibold text-slate-400">Sin historial disponible</p></div>
                     ) : (
-                      <div className="rounded-2xl overflow-hidden border border-slate-100 dark:border-slate-800 divide-y divide-slate-50 dark:divide-slate-800/60">
-                        {grupoProgreso.historialReciente.slice(0,4).map((h:any) => (
-                          <div key={h.id} className="px-4 py-3 flex justify-between items-center bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/80 transition group cursor-default">
-                            <div className="flex items-center gap-3 min-w-0">
-                              <div className={`w-2.5 h-2.5 rounded-full shrink-0 ${h.puntos<0?'bg-rose-500 animate-pulse':'bg-violet-500'}`} />
-                              <div className="truncate">
-                                <p className="text-[12px] font-bold text-slate-800 dark:text-slate-200 truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{h.actividad}</p>
-                                <p className="text-[9px] text-slate-400 dark:text-slate-400 font-semibold uppercase tracking-wider mt-0.5">{h.area} · {h.fecha}</p>
+                      <div className="space-y-2">
+                        {grupoProgreso.historialReciente.slice(0,4).map((h:any) => {
+                          const isNegative = h.puntos < 0;
+                          return (
+                            <div 
+                              key={h.id} 
+                              className={`p-3 rounded-xl flex justify-between items-center transition-all duration-200 group cursor-default shadow-xs ${
+                                isNegative 
+                                  ? 'bg-rose-50/60 dark:bg-rose-950/30 border border-rose-100 dark:border-rose-900/40' 
+                                  : 'bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40'
+                              }`}
+                            >
+                              <div className="flex items-center gap-2.5 min-w-0">
+                                <div className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 text-white ${
+                                  isNegative ? 'bg-gradient-to-br from-rose-500 to-pink-600' : 'bg-gradient-to-br from-indigo-500 to-violet-600'
+                                }`}>
+                                  {isNegative ? <ArrowDownRight size={13} /> : <ArrowUpRight size={13} />}
+                                </div>
+                                <div className="truncate">
+                                  <p className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-300 transition-colors">{h.actividad}</p>
+                                  <p className="text-[9px] text-slate-400 dark:text-slate-400 font-semibold uppercase tracking-wider">{h.area} · {h.fecha}</p>
+                                </div>
                               </div>
+                              <span className={`font-mono font-black text-xs shrink-0 ml-2 px-2.5 py-1 rounded-lg text-white ${
+                                isNegative ? 'bg-gradient-to-r from-rose-500 to-pink-600' : 'bg-gradient-to-r from-indigo-600 to-violet-600'
+                              }`}>
+                                {h.puntos>=0?`+${h.puntos}`:h.puntos} pts
+                              </span>
                             </div>
-                            <span className={`font-mono font-black text-xs shrink-0 ml-3 px-2.5 py-1.5 rounded-xl border-2 ${h.puntos<0?'text-rose-600 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/60 border-rose-200 dark:border-rose-800/60':'text-violet-700 dark:text-violet-300 bg-violet-50 dark:bg-violet-950/60 border-violet-200 dark:border-violet-800/60'}`}>
-                              {h.puntos>=0?`+${h.puntos}`:h.puntos} pts
-                            </span>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     )}
                   </div>
@@ -616,27 +632,29 @@ export const RankingPage: React.FC = () => {
       ) : (
         /* ─── USER LAYOUT: full width, 2 columns ────────── */
         <div className="anim-up">
-          <FlowBorder gradient={G.fuchsia} className="shadow-xl">
+          <FlowBorder gradient={G.violet} className="shadow-xl rounded-3xl">
             <div>
-              {/* Card header */}
-              <div className="bg-gradient-to-r from-indigo-600 via-violet-600 to-fuchsia-600 p-5 flex justify-between items-center">
+              {/* Card header (Fully coherent Light & Dark mode) */}
+              <div className="bg-gradient-to-r from-indigo-50/90 via-violet-50/80 to-slate-50 dark:from-slate-900 dark:via-indigo-950 dark:to-slate-900 border-b border-indigo-100 dark:border-indigo-500/20 p-5 flex justify-between items-center rounded-t-3xl shadow-xs transition-colors duration-300">
                 <div className="flex items-center gap-3">
-                  <div className="bg-white/20 p-2.5 rounded-xl backdrop-blur-sm"><Sparkles size={18} className="text-white" /></div>
+                  <div className="bg-indigo-600 dark:bg-indigo-500/20 text-white dark:text-indigo-300 border border-indigo-500/20 dark:border-indigo-400/30 p-2.5 rounded-xl shadow-xs backdrop-blur-md">
+                    <Sparkles size={18} />
+                  </div>
                   <div>
-                    <h2 className="font-black text-base text-white uppercase tracking-wider">Mi Progreso</h2>
-                    <p className="text-[9px] text-white/60 font-semibold uppercase tracking-widest">Estadísticas de tu grupo pequeño</p>
+                    <h2 className="font-black text-base text-slate-900 dark:text-white uppercase tracking-wider">Mi Progreso</h2>
+                    <p className="text-[10px] text-slate-500 dark:text-indigo-300/80 font-bold uppercase tracking-widest">Estadísticas de tu grupo pequeño</p>
                   </div>
                 </div>
                 <button 
                   onClick={() => setIsHistoryModalOpen(true)} 
-                  className="flex items-center gap-2.5 px-5 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white text-[11px] font-black rounded-xl transition duration-200 active:scale-95 cursor-pointer backdrop-blur-sm shadow-sm"
+                  className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500/20 dark:hover:bg-indigo-500/30 text-white dark:text-indigo-100 text-[11px] font-black rounded-xl border border-indigo-500/30 transition duration-200 active:scale-95 cursor-pointer shadow-sm"
                 >
                   <Clock size={13} /> VER HISTORIAL
                 </button>
               </div>
 
               {progressLoading ? (
-                <div className="p-12 flex items-center justify-center min-h-[50vh] w-full">
+                <div className="p-12 flex items-center justify-center min-h-[40vh] w-full">
                   <CustomLoader />
                 </div>
               ) : (
@@ -645,36 +663,58 @@ export const RankingPage: React.FC = () => {
 
                   {/* LEFT: Stats + Desglose */}
                   <div className="space-y-5">
-                    {/* Hero puntos */}
-                    <div className="relative overflow-hidden bg-gradient-to-br from-indigo-600 via-violet-600 to-fuchsia-700 p-12 pb-14 pt-14 rounded-3xl text-white text-center shadow-2xl shadow-indigo-500/30 flex flex-col justify-center min-h-[420px]">
-                      <div className="relative space-y-6">
-                        <p className="text-xs sm:text-sm font-black uppercase tracking-[0.2em] text-violet-200">Puntos Acumulados</p>
+                    {/* Hero puntos (Enlarged numbers, wide horizontal layout, coherent light/dark theme) */}
+                    <div className="relative overflow-hidden bg-gradient-to-br from-indigo-50/80 via-white to-violet-50/60 dark:from-slate-900 dark:via-slate-850 dark:to-indigo-950 border border-indigo-200/80 dark:border-indigo-500/20 p-6 sm:p-8 rounded-2xl text-slate-900 dark:text-white text-center shadow-lg transition-colors duration-300 flex flex-col justify-center items-center space-y-4">
+                      <div className="relative z-10 w-full space-y-3 flex flex-col items-center">
+                        <span className="px-4 py-1 text-[10px] font-black uppercase tracking-[0.2em] bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 rounded-full border border-indigo-200 dark:border-indigo-400/30 shadow-xs">
+                          PUNTOS ACUMULADOS
+                        </span>
                         
-                        <p className="text-6xl sm:text-7xl font-black leading-none tracking-tighter font-mono">
+                        <p className="text-5xl sm:text-6xl md:text-7xl font-black leading-none tracking-tight font-mono text-slate-900 dark:text-white drop-shadow-sm my-2">
                           {(grupoProgreso.grupoInfo?.totalPoints??0).toLocaleString()}
                         </p>
                         
-                        <p className="text-sm sm:text-base font-bold opacity-80 uppercase tracking-widest">puntos totales del grupo</p>
+                        <p className="text-xs font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-widest">Puntos Totales del Grupo</p>
                         
-                        <div className="flex justify-center gap-5 pt-3">
-                          <div className="bg-white/10 backdrop-blur-xs border border-white/20 hover:border-white/40 hover:bg-white/15 transition-all duration-300 rounded-2xl px-5 py-3 text-center min-w-[115px]">
-                            <p className="text-[10px] font-black uppercase tracking-wider opacity-60">Ganancias</p>
-                            <p className="text-lg sm:text-xl font-black font-mono text-yellow-300 mt-1">+{totalGanancias.toLocaleString()}</p>
+                        <div className="grid grid-cols-2 gap-3.5 w-full max-w-lg pt-2">
+                          {/* GANANCIAS CARD */}
+                          <div className="bg-gradient-to-br from-emerald-500/10 via-emerald-500/5 to-teal-500/15 dark:from-emerald-950/50 dark:to-teal-950/30 border border-emerald-300/80 dark:border-emerald-700/60 rounded-2xl p-4 flex flex-col justify-between shadow-sm transition-all hover:scale-[1.02] group">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[10px] font-black uppercase tracking-wider text-emerald-700 dark:text-emerald-400">Ganancias</span>
+                              <div className="p-1.5 bg-emerald-500/15 dark:bg-emerald-400/20 text-emerald-600 dark:text-emerald-300 rounded-lg group-hover:scale-110 transition-transform">
+                                <TrendingUp size={14} />
+                              </div>
+                            </div>
+                            <p className="text-2xl sm:text-3xl font-black font-mono text-emerald-600 dark:text-emerald-300 mt-2">
+                              +{totalGanancias.toLocaleString()}
+                            </p>
                           </div>
-                          <div className="bg-white/10 backdrop-blur-xs border border-white/20 hover:border-white/40 hover:bg-white/15 transition-all duration-300 rounded-2xl px-5 py-3 text-center min-w-[115px]">
-                            <p className="text-[10px] font-black uppercase tracking-wider opacity-60">Penalizaciones</p>
-                            <p className="text-lg sm:text-xl font-black font-mono text-rose-300 mt-1">{totalPenalizaciones.toLocaleString()}</p>
+
+                          {/* PENALIZACIONES CARD */}
+                          <div className="bg-gradient-to-br from-rose-500/10 via-rose-500/5 to-pink-500/15 dark:from-rose-950/50 dark:to-pink-950/30 border border-rose-300/80 dark:border-rose-700/60 rounded-2xl p-4 flex flex-col justify-between shadow-sm transition-all hover:scale-[1.02] group">
+                            <div className="flex items-center justify-between">
+                              <span className="text-[10px] font-black uppercase tracking-wider text-rose-700 dark:text-rose-400">Penalizaciones</span>
+                              <div className="p-1.5 bg-rose-500/15 dark:bg-rose-400/20 text-rose-600 dark:text-rose-300 rounded-lg group-hover:scale-110 transition-transform">
+                                <AlertTriangle size={14} />
+                              </div>
+                            </div>
+                            <p className="text-2xl sm:text-3xl font-black font-mono text-rose-600 dark:text-rose-300 mt-2">
+                              {totalPenalizaciones.toLocaleString()}
+                            </p>
                           </div>
                         </div>
 
+                        {/* MONTHLY VARIATION BADGE */}
                         {(grupoProgreso.grupoInfo?.variation??0)>=0 ? (
-                          <p className="text-sm sm:text-base font-black tracking-widest text-yellow-300 uppercase pt-2 animate-pulse">
-                            +{grupoProgreso.grupoInfo?.variation} este mes
-                          </p>
+                          <div className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500/10 dark:bg-emerald-500/20 border border-emerald-300 dark:border-emerald-700/60 text-emerald-700 dark:text-emerald-300 rounded-full text-xs font-black font-mono shadow-xs mt-1 transition-transform hover:scale-[1.03]">
+                            <TrendingUp size={15} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+                            <span className="tracking-wide">+{grupoProgreso.grupoInfo?.variation} este mes</span>
+                          </div>
                         ) : (
-                          <p className="text-sm sm:text-base font-black tracking-widest text-rose-350 uppercase pt-2 animate-pulse">
-                            {grupoProgreso.grupoInfo?.variation} este mes
-                          </p>
+                          <div className="inline-flex items-center gap-2 px-4 py-2 bg-rose-500/10 dark:bg-rose-500/20 border border-rose-300 dark:border-rose-700/60 text-rose-700 dark:text-rose-300 rounded-full text-xs font-black font-mono shadow-xs mt-1 transition-transform hover:scale-[1.03]">
+                            <ArrowDownRight size={15} className="text-rose-600 dark:text-rose-400 shrink-0" />
+                            <span className="tracking-wide">{grupoProgreso.grupoInfo?.variation} este mes</span>
+                          </div>
                         )}
                       </div>
                     </div>
@@ -711,27 +751,58 @@ export const RankingPage: React.FC = () => {
 
                     {grupoProgreso.historialReciente.length === 0 ? (
                       <div className="flex flex-col items-center justify-center py-16 text-slate-300 dark:text-slate-600">
-                        <Clock size={48} className="mb-3" />
+                        <Clock size={48} className="mb-3 opacity-40" />
                         <p className="text-sm font-semibold text-slate-400">Sin historial disponible</p>
                       </div>
                     ) : (
-                      <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1">
-                        {grupoProgreso.historialReciente.map((h:any) => (
-                          <div key={h.id} className="px-4 py-3.5 bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 rounded-2xl flex justify-between items-center hover:shadow-md hover:border-violet-200 dark:hover:border-violet-700 transition-all group cursor-default">
-                            <div className="flex items-center gap-3 min-w-0">
-                              <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${h.puntos<0?'bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400':'bg-violet-100 dark:bg-violet-950/60 text-violet-700 dark:text-violet-300'}`}>
-                                {h.puntos<0?<ArrowDown size={15} />:<ArrowUp size={15} />}
+                      <div className="space-y-2.5 max-h-[500px] overflow-y-auto pr-1 custom-scrollbar">
+                        {grupoProgreso.historialReciente.map((h:any) => {
+                          const isNegative = h.puntos < 0;
+                          return (
+                            <div 
+                              key={h.id} 
+                              className={`p-4 rounded-2xl flex justify-between items-center transition-all duration-300 group cursor-default shadow-sm hover:shadow-md ${
+                                isNegative 
+                                  ? 'bg-gradient-to-r from-rose-50/90 via-white to-pink-50/60 dark:from-slate-900 dark:to-rose-950/40 border border-rose-200/80 dark:border-rose-800/60 hover:border-rose-400 dark:hover:border-rose-600' 
+                                  : 'bg-gradient-to-r from-indigo-50/90 via-white to-violet-50/60 dark:from-slate-900 dark:to-indigo-950/40 border border-indigo-200/80 dark:border-indigo-800/60 hover:border-indigo-400 dark:hover:border-indigo-600'
+                              }`}
+                            >
+                              <div className="flex items-center gap-3.5 min-w-0">
+                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-md ${
+                                  isNegative
+                                    ? 'bg-gradient-to-br from-rose-500 to-pink-600 text-white shadow-rose-500/25'
+                                    : 'bg-gradient-to-br from-indigo-500 via-violet-600 to-purple-600 text-white shadow-indigo-500/25'
+                                } group-hover:scale-110 transition-transform duration-300`}>
+                                  {isNegative ? <ArrowDownRight size={18} /> : <ArrowUpRight size={18} />}
+                                </div>
+                                <div className="truncate">
+                                  <p className="text-sm font-extrabold text-slate-900 dark:text-white truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-300 transition-colors">
+                                    {h.actividad}
+                                  </p>
+                                  <div className="flex items-center gap-2 mt-0.5">
+                                    <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-md ${
+                                      isNegative 
+                                        ? 'bg-rose-100 dark:bg-rose-950/80 text-rose-700 dark:text-rose-300' 
+                                        : 'bg-indigo-100 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300'
+                                    }`}>
+                                      {h.area}
+                                    </span>
+                                    <span className="text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wider font-mono">
+                                      {h.fecha}
+                                    </span>
+                                  </div>
+                                </div>
                               </div>
-                              <div className="truncate">
-                                <p className="text-[13px] font-bold text-slate-800 dark:text-slate-200 truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{h.actividad}</p>
-                                <p className="text-[9px] text-slate-400 dark:text-slate-400 mt-0.5 font-semibold uppercase tracking-wider">{h.area} · {h.fecha}</p>
-                              </div>
+                              <span className={`font-mono font-black text-xs sm:text-sm shrink-0 ml-3 px-3.5 py-1.5 rounded-xl shadow-md ${
+                                isNegative
+                                  ? 'bg-gradient-to-r from-rose-500 to-pink-600 text-white shadow-rose-500/20'
+                                  : 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-indigo-500/20'
+                              }`}>
+                                {h.puntos >= 0 ? `+${h.puntos}` : h.puntos} pts
+                              </span>
                             </div>
-                            <span className={`font-mono font-black text-sm shrink-0 ml-3 px-3 py-1.5 rounded-xl border-2 ${h.puntos<0?'text-rose-600 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/60 border-rose-200 dark:border-rose-800/60':'text-violet-700 dark:text-violet-300 bg-violet-50 dark:bg-violet-950/60 border-violet-200 dark:border-violet-800/60'}`}>
-                              {h.puntos>=0?`+${h.puntos}`:h.puntos} pts
-                            </span>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     )}
                   </div>

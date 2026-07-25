@@ -15,7 +15,9 @@ import {
   BookOpen,
   User,
   Sun,
-  Moon
+  Moon,
+  ChevronRight,
+  Sparkles
 } from 'lucide-react';
 import logoImage from '../assets/logo.png';
 
@@ -64,112 +66,137 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
   };
 
   return (
-    <div className="flex h-screen bg-[#f8fafc] font-sans overflow-hidden antialiased text-slate-800">
+    <div className="flex h-screen bg-slate-100 dark:bg-slate-950 font-sans overflow-hidden antialiased text-slate-800 dark:text-slate-200 transition-colors duration-500">
       
+      {/* ═══════ SIDEBAR ═══════ */}
       <div
         className={`${
           sidebarOpen ? 'w-64' : 'w-20'
-        } bg-sidebar-alive text-white transition-all duration-300 flex flex-col shadow-premium z-20 shrink-0 select-none border-r border-white/5`}
+        } relative transition-all duration-300 flex flex-col z-20 shrink-0 select-none overflow-hidden`}
       >
-        <div className="p-5 flex flex-col items-center justify-center min-h-[220px] relative border-b border-white/5 bg-white/[0.02]">
+        {/* Sidebar Background — Gradient with animated orbs */}
+        <div className="absolute inset-0 bg-gradient-to-b from-indigo-950 via-slate-900 to-slate-950 dark:from-[#060818] dark:via-[#0a0e24] dark:to-[#050711]" />
+        <div className="absolute top-0 right-0 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl animate-float pointer-events-none" />
+        <div className="absolute bottom-20 left-0 w-32 h-32 bg-violet-500/10 rounded-full blur-3xl animate-float-delayed pointer-events-none" />
+        <div className="absolute inset-y-0 right-0 w-px bg-gradient-to-b from-indigo-500/20 via-violet-500/10 to-transparent" />
+
+        {/* Brand Section */}
+        <div className="relative p-5 flex flex-col items-center justify-center min-h-[210px] border-b border-white/5">
           {sidebarOpen ? (
             <div className="text-center space-y-3 animate-fadeIn">
-              <div className="w-28 h-28 mx-auto flex items-center justify-center transform transition hover:scale-105 duration-300 filter drop-shadow-[0_0_15px_rgba(99,102,241,0.4)]">
+              <div className="w-24 h-24 mx-auto flex items-center justify-center transform transition hover:scale-110 duration-500 relative">
+                <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/30 to-violet-500/30 rounded-2xl blur-xl animate-glow-pulse" />
                 <img 
                   src={logoImage} 
                   alt="Alive Shield" 
-                  className="w-full h-full object-contain filter drop-shadow-lg" 
+                  className="w-full h-full object-contain filter drop-shadow-[0_0_20px_rgba(99,102,241,0.4)] relative z-10" 
                 />
               </div>
               <div>
-                <h1 className="text-2xl font-black tracking-widest bg-gradient-to-r from-white via-indigo-100 to-white bg-clip-text text-transparent leading-none">
+                <h1 className="text-2xl font-black tracking-[0.25em] bg-gradient-to-r from-white via-indigo-200 to-white bg-clip-text text-transparent leading-none">
                   ALIVE
                 </h1>
-                <p className="text-[10px] font-black tracking-widest text-indigo-300 uppercase mt-1">
+                <p className="text-[9px] font-bold tracking-[0.3em] text-indigo-400/80 uppercase mt-1.5">
                   Maranata Adoración
                 </p>
               </div>
             </div>
           ) : (
-            <div className="w-14 h-14 flex items-center justify-center transition-all filter drop-shadow-[0_0_10px_rgba(99,102,241,0.35)] transform hover:scale-105">
-              <img src={logoImage} alt="Alive" className="w-full h-full object-contain" />
+            <div className="w-12 h-12 flex items-center justify-center transition-all transform hover:scale-110 duration-300 relative">
+              <div className="absolute inset-0 bg-indigo-500/20 rounded-xl blur-lg animate-glow-pulse" />
+              <img src={logoImage} alt="Alive" className="w-full h-full object-contain relative z-10" />
             </div>
           )}
           
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="absolute top-3 right-3 p-1.5 hover:bg-white/10 rounded-lg text-white/60 hover:text-white transition-all active:scale-95 cursor-pointer"
+            className="absolute top-3 right-3 p-1.5 hover:bg-white/10 rounded-lg text-white/40 hover:text-white transition-all active:scale-90 cursor-pointer"
             title={sidebarOpen ? "Contraer menú" : "Expandir menú"}
           >
             <Menu size={16} />
           </button>
         </div>
 
-        <nav className="mt-4 flex-1 space-y-1.5 px-3 overflow-y-auto custom-scrollbar">
-          <MenuLink to="/dashboard" icon={<Home size={20} />} label="Inicio" open={sidebarOpen} />
+        {/* Navigation */}
+        <nav className="relative mt-3 flex-1 space-y-1 px-3 overflow-y-auto custom-scrollbar">
+          <MenuLink to="/dashboard" icon={<Home size={19} />} label="Inicio" open={sidebarOpen} />
           {hasAnyAccessRole(user, ['ADMIN', 'LIDER_GP']) && (
-            <MenuLink to="/dashboard/secretaria" icon={<UserCheck size={20} />} label="Secretaría" open={sidebarOpen} />
+            <MenuLink to="/dashboard/secretaria" icon={<UserCheck size={19} />} label="Secretaría" open={sidebarOpen} />
           )}
           {hasAnyAccessRole(user, ['ADMIN']) && (
-            <MenuLink to="/dashboard/puntuaciones" icon={<Award size={20} />} label="Puntuaciones" open={sidebarOpen} />
+            <MenuLink to="/dashboard/puntuaciones" icon={<Award size={19} />} label="Puntuaciones" open={sidebarOpen} />
           )}
           {hasAnyAccessRole(user, ['ADMIN', 'LIDER_GP']) && (
-            <MenuLink to="/dashboard/programa" icon={<CalendarDays size={20} />} label="Programa General" open={sidebarOpen} />
+            <MenuLink to="/dashboard/programa" icon={<CalendarDays size={19} />} label="Programa General" open={sidebarOpen} />
           )}
-          <MenuLink to="/dashboard/matinales" icon={<BookOpen size={20} />} label="Matinales" open={sidebarOpen} />
-          <MenuLink to="/dashboard/eventos" icon={<Users size={20} />} label="Eventos" open={sidebarOpen} />
-          <MenuLink to="/dashboard/ranking" icon={<BarChart3 size={20} />} label="Ranking" open={sidebarOpen} />
-          <MenuLink to="/dashboard/materiales" icon={<Folder size={20} />} label="Materiales" open={sidebarOpen} />
-          <MenuLink to="/dashboard/profile" icon={<User size={20} />} label="Mi Perfil" open={sidebarOpen} />
+          <MenuLink to="/dashboard/matinales" icon={<BookOpen size={19} />} label="Matinales" open={sidebarOpen} />
+          <MenuLink to="/dashboard/eventos" icon={<Users size={19} />} label="Eventos" open={sidebarOpen} />
+          <MenuLink to="/dashboard/ranking" icon={<BarChart3 size={19} />} label="Ranking" open={sidebarOpen} />
+          <MenuLink to="/dashboard/materiales" icon={<Folder size={19} />} label="Materiales" open={sidebarOpen} />
+          <MenuLink to="/dashboard/profile" icon={<User size={19} />} label="Mi Perfil" open={sidebarOpen} />
 
           {user?.role === 'ADMIN' && (
-            <div className="pt-3 mt-3 border-t border-white/5 space-y-1.5">
-              <p className={`text-[10px] font-black tracking-widest text-indigo-300 uppercase px-4 ${sidebarOpen ? 'block' : 'hidden'}`}>Administración</p>
+            <div className="pt-3 mt-3 border-t border-white/5 space-y-1">
+              <p className={`text-[9px] font-bold tracking-[0.2em] text-indigo-400/60 uppercase px-4 mb-1 ${sidebarOpen ? 'block' : 'hidden'}`}>Administración</p>
               <MenuLink to="/dashboard/users" icon={<Users size={18} />} label="Control Usuarios" open={sidebarOpen} />
             </div>
           )}
         </nav>
 
+        {/* Footer */}
         {sidebarOpen && (
-          <div className="p-4 flex flex-col items-center justify-center space-y-1 animate-fadeIn border-t border-white/5 bg-black/10">
-            <div className="text-center opacity-40">
-              <p className="text-xs font-black tracking-widest text-white">ALIVE SYSTEM</p>
-              <p className="text-[8px] font-bold text-indigo-200 uppercase tracking-widest">v2.1 • 2026</p>
+          <div className="relative p-4 flex flex-col items-center justify-center space-y-1 animate-fadeIn border-t border-white/5">
+            <div className="text-center">
+              <div className="flex items-center gap-1.5 justify-center mb-1">
+                <Sparkles size={10} className="text-indigo-400/60" />
+                <p className="text-[10px] font-black tracking-[0.2em] text-white/30">ALIVE SYSTEM</p>
+                <Sparkles size={10} className="text-indigo-400/60" />
+              </div>
+              <p className="text-[8px] font-bold text-indigo-400/40 uppercase tracking-[0.3em]">v2.1 • 2026</p>
             </div>
           </div>
         )}
       </div>
 
+      {/* ═══════ MAIN CONTENT ═══════ */}
       <div className="flex-1 flex flex-col overflow-hidden">
-           <header className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200/60 dark:border-slate-800/80 h-16 px-6 flex justify-between items-center z-10 shadow-sm transition-colors duration-300">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 bg-indigo-600 dark:bg-indigo-400 rounded-full animate-pulse"></span>
-            <h2 className="text-xs font-bold text-slate-500 dark:text-slate-400 tracking-wider uppercase">
+        
+        {/* Header */}
+        <header className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-b border-slate-200/70 dark:border-slate-800/80 h-16 px-6 flex justify-between items-center z-10 shadow-sm transition-colors duration-300">
+          <div className="flex items-center gap-2.5">
+            <div className="flex items-center gap-1.5">
+              <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
+              <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }}></span>
+            </div>
+            <h2 className="text-[11px] font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase">
               Sistema de Gestión Colectiva
             </h2>
           </div>
           
-          <div className="flex items-center gap-4">
-            {/* TEMA OSCURO / CLARO TOGGLE */}
+          <div className="flex items-center gap-3">
+            {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
-              className="p-2 text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-800 rounded-xl transition-all duration-200 cursor-pointer active:scale-90"
+              className="p-2.5 text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 rounded-xl transition-all duration-300 cursor-pointer active:scale-90 hover:shadow-md"
               title={theme === 'light' ? "Activar Modo Oscuro" : "Activar Modo Claro"}
             >
-              {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+              {theme === 'light' ? <Moon size={17} /> : <Sun size={17} />}
             </button>
 
+            <div className="w-px h-6 bg-slate-200 dark:bg-slate-800"></div>
+
+            {/* User Profile Link */}
             <Link 
               to="/dashboard/profile" 
-              className="flex items-center gap-3 text-right group transition-all duration-200 p-1 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 border border-transparent"
+              className="flex items-center gap-3 text-right group transition-all duration-300 py-1.5 px-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 border border-transparent hover:border-slate-200 dark:hover:border-slate-700"
               title="Ir a mi configuración de perfil"
             >
               <div className="flex flex-col text-right hidden sm:flex">
-                <span className="text-xs font-bold text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors capitalize">{user?.name}</span>
+                <span className="text-xs font-bold text-slate-700 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors capitalize">{user?.name}</span>
                 <span className="text-[9px] text-slate-400 dark:text-slate-500 font-mono font-medium mt-0.5">{user?.email}</span>
               </div>
               
-              <div className={`w-9 h-9 ${user?.avatarUrl ? '' : avatarBg} rounded-xl flex items-center justify-center font-bold text-xs overflow-hidden shadow-sm border border-slate-200 dark:border-slate-850 shrink-0 transform transition-transform duration-200 group-hover:scale-105`}>
+              <div className={`w-9 h-9 ${user?.avatarUrl ? '' : avatarBg} rounded-xl flex items-center justify-center font-bold text-xs overflow-hidden shadow-md border-2 border-white dark:border-slate-700 shrink-0 transform transition-transform duration-200 group-hover:scale-110 ring-2 ring-indigo-500/20`}>
                 {user?.avatarUrl ? (
                   <img src={`http://localhost:5000${user.avatarUrl}`} alt="" className="w-full h-full object-cover" />
                 ) : (
@@ -178,25 +205,28 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
               </div>
             </Link>
             
-            <span className="px-2 py-0.5 text-[9px] font-extrabold rounded-md bg-indigo-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 border border-indigo-100/80 dark:border-indigo-900/40 uppercase tracking-wider">
+            <span className="px-2.5 py-1 text-[9px] font-extrabold rounded-lg bg-gradient-to-r from-indigo-50 to-violet-50 dark:from-indigo-950/60 dark:to-violet-950/40 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800/50 uppercase tracking-wider shadow-sm">
               {accessRole === 'LIDER_GP' ? 'LIDER GP' : user?.role}
             </span>
             
-            <div className="w-px h-6 bg-slate-200 dark:bg-slate-800 mx-0.5"></div>
- 
+            <div className="w-px h-6 bg-slate-200 dark:bg-slate-800"></div>
+
             <button
               onClick={handleLogout}
-              className="p-2 text-slate-400 dark:text-slate-500 hover:text-rose-600 dark:hover:text-rose-450 hover:bg-rose-50 dark:hover:bg-rose-950/20 rounded-xl transition-all duration-200 cursor-pointer active:scale-90"
+              className="p-2.5 text-slate-400 dark:text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-xl transition-all duration-300 cursor-pointer active:scale-90"
               title="Cerrar Sesión"
             >
-              <LogOut size={18} />
+              <LogOut size={17} />
             </button>
           </div>
         </header>
  
-        <main className="flex-1 overflow-auto p-6 bg-gradient-to-tr from-[#f3f4f6] via-[#f1f4fc] to-[#f7f5ff] dark:from-[#090d1a] dark:via-[#0e1124] dark:to-[#050711] relative z-0 transition-colors duration-300">
-          <div className="absolute right-0 top-0 w-[400px] h-[400px] rounded-full bg-indigo-500/10 dark:bg-indigo-500/5 blur-[120px] pointer-events-none -z-10 animate-pulse"></div>
-          <div className="absolute left-10 bottom-0 w-[400px] h-[400px] rounded-full bg-purple-500/10 dark:bg-purple-500/5 blur-[120px] pointer-events-none -z-10 animate-pulse"></div>
+        {/* Main Content Area */}
+        <main className="flex-1 overflow-auto p-6 relative z-0 transition-colors duration-500 bg-gradient-to-br from-slate-50 via-indigo-50/30 to-violet-50/20 dark:from-[#080c18] dark:via-[#0c1028] dark:to-[#0a0818]">
+          {/* Ambient background orbs */}
+          <div className="absolute right-0 top-0 w-[500px] h-[500px] rounded-full bg-indigo-400/8 dark:bg-indigo-500/5 blur-[150px] pointer-events-none -z-10 animate-float-slow"></div>
+          <div className="absolute left-10 bottom-0 w-[400px] h-[400px] rounded-full bg-violet-400/8 dark:bg-violet-500/5 blur-[130px] pointer-events-none -z-10 animate-float-delayed"></div>
+          <div className="absolute left-1/2 top-1/3 w-[300px] h-[300px] rounded-full bg-emerald-400/5 dark:bg-emerald-500/3 blur-[120px] pointer-events-none -z-10 animate-float"></div>
           {children}
         </main>
       </div>
@@ -218,20 +248,28 @@ const MenuLink: React.FC<MenuLinkProps> = ({ to, icon, label, open }) => {
   return (
     <Link
       to={to}
-      className={`flex items-center gap-3.5 px-4 py-3 rounded-xl transition-all duration-200 group font-medium text-sm select-none relative ${
+      className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 group text-sm select-none relative ${
         isActive 
-          ? 'bg-gradient-to-r from-indigo-500/15 to-purple-500/5 text-white font-semibold border border-indigo-500/15 shadow-glow-primary' 
-          : 'text-slate-400 hover:bg-white/[0.04] hover:text-white'
+          ? 'bg-gradient-to-r from-indigo-600/20 to-violet-600/10 text-white font-bold shadow-lg shadow-indigo-500/10 border border-indigo-400/20' 
+          : 'text-slate-400 hover:bg-white/5 hover:text-white'
       }`}
     >
+      {/* Active indicator bar */}
       {isActive && (
-        <div className="absolute left-0 top-3 bottom-3 w-1 bg-gradient-to-b from-amber-400 to-amber-500 rounded-r-md"></div>
+        <div className="absolute left-0 top-2 bottom-2 w-[3px] bg-gradient-to-b from-amber-400 via-amber-300 to-orange-400 rounded-r-full shadow-[0_0_8px_rgba(251,191,36,0.5)]"></div>
       )}
       
-      <div className={`${isActive ? 'scale-105 text-indigo-450 filter drop-shadow-xs' : 'text-slate-400 group-hover:text-white'} transition-transform duration-200`}>
+      <div className={`${isActive ? 'text-indigo-300 scale-110' : 'text-slate-500 group-hover:text-indigo-300'} transition-all duration-200 shrink-0`}>
         {icon}
       </div>
-      {open && <span className="truncate tracking-wider uppercase text-[10px] font-semibold">{label}</span>}
+      
+      {open && (
+        <span className={`truncate tracking-wider uppercase text-[10px] ${isActive ? 'font-extrabold' : 'font-semibold'}`}>{label}</span>
+      )}
+      
+      {open && isActive && (
+        <ChevronRight size={14} className="ml-auto text-indigo-400/60 shrink-0" />
+      )}
     </Link>
   );
 };

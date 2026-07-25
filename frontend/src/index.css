@@ -15,6 +15,10 @@ body {
   background-color: #f8fafc; 
 }
 
+.dark body {
+  background-color: #020617;
+}
+
 /* Color scheme for native date picker */
 input[type="date"] {
   color-scheme: light;
@@ -67,6 +71,50 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+/* ═══════ Animated Gradient Border ═══════ */
+.gradient-border {
+  position: relative;
+}
+
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899, #f59e0b, #6366f1);
+  background-size: 300% 300%;
+  animation: gradientShift 4s ease infinite;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.gradient-border:hover::before {
+  opacity: 1;
+}
+
+/* ═══════ Shimmer Text Effect ═══════ */
+.shimmer-text {
+  background: linear-gradient(
+    90deg,
+    #6366f1 0%,
+    #a78bfa 25%,
+    #ec4899 50%,
+    #a78bfa 75%,
+    #6366f1 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 3s linear infinite;
+}
+
 /* Animaciones fluidas */
 .animate-fadeIn {
   animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -74,6 +122,10 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 
 .animate-slideUp {
   animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slideInLeft {
+  animation: slideInLeft 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 @keyframes fadeIn {
@@ -86,7 +138,22 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Personalización de Scrollbars */
+@keyframes slideInLeft {
+  from { opacity: 0; transform: translateX(-20px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Personalización de Scrollbars — Light Mode */
 .custom-scrollbar::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -97,11 +164,20 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(148, 163, 184, 0.3);
   border-radius: 9999px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.5);
+}
+
+/* Scrollbar — Dark Mode */
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.25);
 }
 
@@ -109,6 +185,12 @@ input[type="date"]::-webkit-calendar-picker-indicator:hover {
 .transition-premium {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+/* ═══════ Stat Card Colored Top Bar ═══════ */
+.stat-card-indigo { border-top: 3px solid #6366f1; }
+.stat-card-amber { border-top: 3px solid #f59e0b; }
+.stat-card-purple { border-top: 3px solid #8b5cf6; }
+.stat-card-emerald { border-top: 3px solid #10b981; }
 
 /* ═══════ Custom Premium Select Styling ═══════ */
 .select-premium {

@@ -1,7 +1,7 @@
 import prisma from '../config/database';
 
 export class DashboardService {
-  async getHomeData() {
+  async getHomeData(userId?: number) {
     console.log('[DashboardService] Compilando métricas y agregaciones reales para el Inicio...');
     const activitiesAsAnnouncements = await prisma.activity.findMany({
       take: 3,
@@ -67,12 +67,24 @@ export class DashboardService {
       _sum: { totalPoints: true }
     });
 
+    let myGroupSmall = null;
+    if (userId) {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        include: { groupSmall: { select: { id: true, name: true } } }
+      });
+      if (user?.groupSmall) {
+        myGroupSmall = { id: user.groupSmall.id, name: user.groupSmall.name };
+      }
+    }
+
     return {
       announcements,
       activities,
       featuredGroup,
       totalGroupsCount,
-      totalPointsAccumulated: pointsSumAggregate._sum.totalPoints || 0
+      totalPointsAccumulated: pointsSumAggregate._sum.totalPoints || 0,
+      myGroupSmall
     };
   }
 }

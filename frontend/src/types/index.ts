@@ -149,6 +149,7 @@ export interface DashboardHomeData {
   featuredGroup: FeaturedGroup | null;
   totalGroupsCount: number;
   totalPointsAccumulated: number;
+  myGroupSmall?: { id: number; name: string } | null;
 }
 
 export interface GPMember {

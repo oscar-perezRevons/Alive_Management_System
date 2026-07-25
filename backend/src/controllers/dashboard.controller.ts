@@ -14,7 +14,7 @@ export class DashboardController {
         });
       }
 
-      const data = await dashboardService.getHomeData();
+      const data = await dashboardService.getHomeData(req.userId);
       return res.json(data);
     } catch (error: any) {
       console.error('Error en DashboardController:', error);
