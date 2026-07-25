@@ -53,8 +53,8 @@ export const DashboardPage: React.FC = () => {
     ? (rawGroupName.toUpperCase().startsWith('GP') ? rawGroupName : `GP ${rawGroupName}`) 
     : null;
 
-  // ═══════ HERO SLIDES (Tailored per role) ═══════
-  const slides = isAdminOrLeader ? [
+  // ═══════ HERO SLIDES (Tailored per role - Only ADMIN sees featured leading group name) ═══════
+  const slides = isAdmin ? [
     {
       id: 0,
       title: homeData?.featuredGroup?.name || "GP DESTACADO",
@@ -63,8 +63,11 @@ export const DashboardPage: React.FC = () => {
       points: `${homeData?.featuredGroup?.totalPoints || 0} PTS`,
       buttonText: "Ver Tabla de Posiciones",
       link: "/dashboard/ranking",
-      bgGradient: "linear-gradient(135deg, rgba(15, 23, 42, 0.97) 0%, rgba(49, 46, 129, 0.85) 50%, rgba(99, 102, 241, 0.7) 100%)",
-      icon: <Trophy size={44} className="text-amber-400 shrink-0" />,
+      bgGradient: "linear-gradient(135deg, rgba(30, 27, 75, 0.94) 0%, rgba(67, 56, 202, 0.88) 50%, rgba(147, 51, 234, 0.82) 100%)",
+      badgeBg: "bg-amber-400/20 text-amber-300 border-amber-400/40",
+      btnBg: "bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 text-slate-950 shadow-amber-500/30 hover:shadow-amber-500/50",
+      iconBg: "bg-gradient-to-br from-amber-400 to-orange-500 text-slate-950 shadow-amber-500/40",
+      icon: <Trophy size={36} className="shrink-0" />,
     },
     {
       id: 1,
@@ -74,8 +77,11 @@ export const DashboardPage: React.FC = () => {
       points: "SÁBADO • 09:00 AM",
       buttonText: "Explorar Programa",
       link: "/dashboard/programa",
-      bgGradient: "linear-gradient(135deg, rgba(15, 23, 42, 0.97) 0%, rgba(6, 78, 59, 0.85) 50%, rgba(16, 185, 129, 0.7) 100%)",
-      icon: <Calendar size={44} className="text-emerald-400 shrink-0" />,
+      bgGradient: "linear-gradient(135deg, rgba(6, 78, 59, 0.94) 0%, rgba(13, 148, 136, 0.88) 50%, rgba(16, 185, 129, 0.82) 100%)",
+      badgeBg: "bg-emerald-400/20 text-emerald-300 border-emerald-400/40",
+      btnBg: "bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 hover:from-emerald-300 hover:to-cyan-300 text-slate-950 shadow-emerald-500/30 hover:shadow-emerald-500/50",
+      iconBg: "bg-gradient-to-br from-emerald-400 to-teal-500 text-slate-950 shadow-emerald-500/40",
+      icon: <Calendar size={36} className="shrink-0" />,
     },
     {
       id: 2,
@@ -85,11 +91,14 @@ export const DashboardPage: React.FC = () => {
       points: "ALIVE SYSTEM",
       buttonText: "Ir a Secretaría",
       link: "/dashboard/secretaria",
-      bgGradient: "linear-gradient(135deg, rgba(15, 23, 42, 0.97) 0%, rgba(76, 29, 149, 0.85) 50%, rgba(139, 92, 246, 0.7) 100%)",
-      icon: <UserCheck size={44} className="text-violet-400 shrink-0" />,
+      bgGradient: "linear-gradient(135deg, rgba(88, 28, 135, 0.94) 0%, rgba(126, 34, 206, 0.88) 50%, rgba(217, 70, 239, 0.82) 100%)",
+      badgeBg: "bg-fuchsia-400/20 text-fuchsia-300 border-fuchsia-400/40",
+      btnBg: "bg-gradient-to-r from-fuchsia-400 via-pink-300 to-rose-400 hover:from-fuchsia-300 hover:to-rose-300 text-slate-950 shadow-fuchsia-500/30 hover:shadow-fuchsia-500/50",
+      iconBg: "bg-gradient-to-br from-fuchsia-400 to-pink-500 text-slate-950 shadow-fuchsia-500/40",
+      icon: <UserCheck size={36} className="shrink-0" />,
     }
   ] : [
-    // REGULAR USER SLIDES (Hides featured leading GP name)
+    // REGULAR USER & LEADER SLIDES (Hides featured leading GP name)
     {
       id: 0,
       title: "RANKING DE CLASIFICACIÓN",
@@ -98,8 +107,11 @@ export const DashboardPage: React.FC = () => {
       points: "PUNTUACIÓN",
       buttonText: "Ver Tabla de Posiciones",
       link: "/dashboard/ranking",
-      bgGradient: "linear-gradient(135deg, rgba(15, 23, 42, 0.97) 0%, rgba(49, 46, 129, 0.85) 50%, rgba(99, 102, 241, 0.7) 100%)",
-      icon: <Trophy size={44} className="text-amber-400 shrink-0" />,
+      bgGradient: "linear-gradient(135deg, rgba(30, 27, 75, 0.94) 0%, rgba(67, 56, 202, 0.88) 50%, rgba(147, 51, 234, 0.82) 100%)",
+      badgeBg: "bg-amber-400/20 text-amber-300 border-amber-400/40",
+      btnBg: "bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 text-slate-950 shadow-amber-500/30 hover:shadow-amber-500/50",
+      iconBg: "bg-gradient-to-br from-amber-400 to-orange-500 text-slate-950 shadow-amber-500/40",
+      icon: <Trophy size={36} className="shrink-0" />,
     },
     {
       id: 1,
@@ -109,8 +121,11 @@ export const DashboardPage: React.FC = () => {
       points: "ALIVE COMUNIDAD",
       buttonText: "Ver Calendario de Eventos",
       link: "/dashboard/eventos",
-      bgGradient: "linear-gradient(135deg, rgba(15, 23, 42, 0.97) 0%, rgba(6, 78, 59, 0.85) 50%, rgba(16, 185, 129, 0.7) 100%)",
-      icon: <Calendar size={44} className="text-emerald-400 shrink-0" />,
+      bgGradient: "linear-gradient(135deg, rgba(6, 78, 59, 0.94) 0%, rgba(13, 148, 136, 0.88) 50%, rgba(16, 185, 129, 0.82) 100%)",
+      badgeBg: "bg-emerald-400/20 text-emerald-300 border-emerald-400/40",
+      btnBg: "bg-gradient-to-r from-emerald-400 via-teal-300 to-cyan-400 hover:from-emerald-300 hover:to-cyan-300 text-slate-950 shadow-emerald-500/30 hover:shadow-emerald-500/50",
+      iconBg: "bg-gradient-to-br from-emerald-400 to-teal-500 text-slate-950 shadow-emerald-500/40",
+      icon: <Calendar size={36} className="shrink-0" />,
     },
     {
       id: 2,
@@ -120,8 +135,11 @@ export const DashboardPage: React.FC = () => {
       points: "LECTURA VITAL",
       buttonText: "Leer Matinales del Mes",
       link: "/dashboard/matinales",
-      bgGradient: "linear-gradient(135deg, rgba(15, 23, 42, 0.97) 0%, rgba(76, 29, 149, 0.85) 50%, rgba(139, 92, 246, 0.7) 100%)",
-      icon: <BookOpen size={44} className="text-indigo-400 shrink-0" />,
+      bgGradient: "linear-gradient(135deg, rgba(76, 29, 149, 0.94) 0%, rgba(124, 58, 237, 0.88) 50%, rgba(168, 85, 247, 0.82) 100%)",
+      badgeBg: "bg-purple-400/20 text-purple-300 border-purple-400/40",
+      btnBg: "bg-gradient-to-r from-purple-400 via-fuchsia-300 to-pink-400 hover:from-purple-300 hover:to-pink-300 text-slate-950 shadow-purple-500/30 hover:shadow-purple-500/50",
+      iconBg: "bg-gradient-to-br from-purple-400 to-fuchsia-500 text-slate-950 shadow-purple-500/40",
+      icon: <BookOpen size={36} className="shrink-0" />,
     }
   ];
 
@@ -141,8 +159,9 @@ export const DashboardPage: React.FC = () => {
     return <Loader text="Cargando Información..." />;
   }
 
-  // ═══════ KPI STAT CARDS (Tailored per role) ═══════
-  const statCards = isAdminOrLeader ? [
+  // ═══════ KPI STAT CARDS (Strict Role Privacy: Only ADMIN sees top leading group) ═══════
+  const statCards = isAdmin ? [
+    // ADMIN ONLY STAT CARDS
     {
       icon: <Users size={22} className="stroke-[2.5]" />,
       label: 'GP Registrados',
@@ -172,8 +191,32 @@ export const DashboardPage: React.FC = () => {
       bgIcon: 'bg-gradient-to-br from-emerald-500 via-teal-600 to-cyan-600 text-white shadow-md shadow-emerald-500/30 border-none',
       topBorder: 'stat-card-emerald',
     },
+  ] : isAdminOrLeader ? [
+    // LIDER_GP (Líder, Colíder, Secretario, Tesorero): Hides featured leading group name
+    {
+      icon: <HeartHandshake size={22} className="stroke-[2.5]" />,
+      label: 'Mi Grupo Pequeño',
+      value: userGroupName || 'Sin grupo asignado',
+      bgIcon: 'bg-gradient-to-br from-indigo-500 via-violet-600 to-purple-600 text-white shadow-md shadow-indigo-500/30 border-none',
+      topBorder: 'stat-card-indigo',
+      isHighlighted: !!userGroupName,
+    },
+    {
+      icon: <Users size={22} className="stroke-[2.5]" />,
+      label: 'GP Registrados',
+      value: `${homeData?.totalGroupsCount || 0} Equipos`,
+      bgIcon: 'bg-gradient-to-br from-amber-500 via-orange-500 to-amber-600 text-white shadow-md shadow-amber-500/30 border-none',
+      topBorder: 'stat-card-amber',
+    },
+    {
+      icon: <Zap size={22} className="stroke-[2.5]" />,
+      label: 'Sincronización',
+      value: null,
+      bgIcon: 'bg-gradient-to-br from-emerald-500 via-teal-600 to-cyan-600 text-white shadow-md shadow-emerald-500/30 border-none',
+      topBorder: 'stat-card-emerald',
+    },
   ] : [
-    // REGULAR USER STAT CARDS (Removed 'Puntuación Colectiva' and 'Ranking de Grupos')
+    // REGULAR USER STAT CARDS
     {
       icon: <HeartHandshake size={22} className="stroke-[2.5]" />,
       label: 'Mi Grupo Pequeño',
@@ -364,13 +407,13 @@ export const DashboardPage: React.FC = () => {
       </div>
 
       {/* ═══════ HERO SLIDER PREMIUM ═══════ */}
-      <div className="relative rounded-2xl overflow-hidden min-h-[340px] md:min-h-[380px] shadow-2xl dark:shadow-[0_20px_50px_rgba(0,0,0,0.6)] border border-slate-200/40 dark:border-slate-700/40 transition-colors duration-300 group/slider">
+      <div className="relative rounded-3xl overflow-hidden min-h-[350px] md:min-h-[390px] shadow-2xl dark:shadow-[0_20px_50px_rgba(0,0,0,0.7)] border-2 border-slate-200/50 dark:border-slate-700/50 transition-colors duration-300 group/slider">
         {slides.map((slide, index) => {
           const isActive = index === activeSlide;
           return (
             <div
               key={slide.id}
-              className={`absolute inset-0 w-full h-full flex flex-col justify-between p-7 md:p-9 text-white transition-all duration-700 ease-in-out ${
+              className={`absolute inset-0 w-full h-full flex flex-col justify-between p-7 md:p-10 text-white transition-all duration-700 ease-in-out ${
                 isActive ? "opacity-100 scale-100 z-10" : "opacity-0 scale-105 pointer-events-none z-0"
               }`}
               style={{
@@ -379,41 +422,42 @@ export const DashboardPage: React.FC = () => {
                 backgroundPosition: 'center'
               }}
             >
-              <div className="absolute top-4 right-4 grid grid-cols-3 gap-1.5 opacity-20">
+              {/* Glowing ambient backdrop orbs */}
+              <div className="absolute -right-16 -bottom-16 w-96 h-96 bg-white/15 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute -left-16 -top-16 w-80 h-80 bg-white/10 rounded-full blur-3xl pointer-events-none" />
+
+              <div className="absolute top-4 right-4 grid grid-cols-3 gap-1.5 opacity-25">
                 {[...Array(9)].map((_, i) => (
                   <div key={i} className="w-1 h-1 bg-white rounded-full" />
                 ))}
               </div>
 
               <div className="flex justify-between items-start w-full relative z-10">
-                <span className="px-4 py-1.5 text-[9px] font-black uppercase tracking-[0.2em] bg-white/10 backdrop-blur-md rounded-lg border border-white/15 flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse shadow-[0_0_6px_rgba(52,211,153,0.7)]"></span>
-                  {slide.badge}
-                </span>
-                <span className="text-xs font-mono font-black text-white/70 tracking-wider bg-black/20 px-3 py-1 rounded-lg backdrop-blur-sm">
-                  {slide.points}
-                </span>
+                <div className="flex items-center gap-3">
+                  <div className={`p-2.5 ${slide.iconBg} rounded-xl shadow-lg inline-flex items-center justify-center shrink-0`}>
+                    {React.cloneElement(slide.icon as React.ReactElement<any>, { size: 22 })}
+                  </div>
+                  <span className={`px-3.5 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] backdrop-blur-md rounded-xl border ${slide.badgeBg} flex items-center gap-2 shadow-xs`}>
+                    <span className="w-2 h-2 rounded-full animate-pulse bg-current shadow-[0_0_8px_rgba(255,255,255,0.8)]"></span>
+                    {slide.badge}
+                  </span>
+                </div>
               </div>
 
-              <div className="space-y-5 max-w-2xl relative z-10 text-left">
-                <div className="flex items-center gap-5">
-                  <div className="p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/10 transform transition-transform duration-300 hover:scale-110 hover:rotate-3">
-                    {slide.icon}
-                  </div>
-                  <h2 className="text-3xl md:text-5xl font-black tracking-tighter uppercase leading-[0.95] drop-shadow-[0_2px_20px_rgba(0,0,0,0.4)]">
-                    {slide.title}
-                  </h2>
-                </div>
-                <p className="text-sm text-white/80 font-medium leading-relaxed max-w-xl">
+              <div className="space-y-4 max-w-2xl relative z-10 text-left my-auto">
+                <h2 className="text-3xl md:text-5xl font-black tracking-tight uppercase leading-[1.05] drop-shadow-[0_4px_25px_rgba(0,0,0,0.6)]">
+                  {slide.title}
+                </h2>
+                <p className="text-sm md:text-base text-white/90 font-medium leading-relaxed max-w-xl">
                   {slide.subtitle}
                 </p>
-                <div>
+                <div className="pt-1">
                   <Link
                     to={slide.link}
-                    className="inline-flex items-center gap-2.5 px-6 py-3 bg-white/15 hover:bg-white/25 backdrop-blur-md text-white font-black text-[10px] uppercase tracking-[0.15em] rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:scale-95 cursor-pointer border border-white/20 hover:border-white/40 group/btn"
+                    className={`inline-flex items-center justify-center gap-3 px-8 sm:px-9 py-3.5 ${slide.btnBg} font-black text-xs uppercase tracking-wider rounded-2xl transition-all duration-300 shadow-xl hover:scale-[1.03] active:scale-95 cursor-pointer whitespace-nowrap group/btn`}
                   >
-                    {slide.buttonText}
-                    <ArrowRight size={14} className="group-hover/btn:translate-x-1 transition-transform" />
+                    <span>{slide.buttonText}</span>
+                    <ArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform stroke-[3] shrink-0" />
                   </Link>
                 </div>
               </div>
@@ -424,10 +468,10 @@ export const DashboardPage: React.FC = () => {
                   <button
                     key={s.id}
                     onClick={() => setActiveSlide(idx)}
-                    className={`flex-1 h-1.5 rounded-full relative overflow-hidden transition-all cursor-pointer ${idx === activeSlide ? 'bg-white/30' : 'bg-white/10 hover:bg-white/20'}`}
+                    className={`flex-1 h-2 rounded-full relative overflow-hidden transition-all cursor-pointer ${idx === activeSlide ? 'bg-white/40' : 'bg-white/15 hover:bg-white/30'}`}
                   >
                     <div
-                      className="absolute left-0 top-0 h-full bg-gradient-to-r from-white to-white/80 rounded-full"
+                      className="absolute left-0 top-0 h-full bg-gradient-to-r from-white via-white to-amber-300 rounded-full shadow-sm"
                       style={{
                         width: idx === activeSlide ? "100%" : "0%",
                         transitionDuration: idx === activeSlide ? "6000ms" : "0ms",
