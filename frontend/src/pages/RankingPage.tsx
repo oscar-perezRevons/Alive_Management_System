@@ -6,7 +6,7 @@ import { resolveAccessRole } from '../utils/access';
 import { 
   Trophy, Shield, Star, RefreshCw,
   ArrowUp, ArrowDown, Calendar, Download, Settings2, X, Clock, Zap, TrendingUp, FileText, BarChart3, Sparkles,
-  Maximize2, Minimize2, Eye, EyeOff
+  Maximize2, Minimize2, Eye, EyeOff, Users
 } from 'lucide-react';
 
 // ─── Custom Loader animation matching reference image ───────────────────────
@@ -85,6 +85,7 @@ export const RankingPage: React.FC = () => {
   const [grupos, setGrupos]           = useState<any[]>([]);
   const [tablaRanking, setTablaRanking] = useState<any[]>([]);
   const [selectedGroupId, setSelectedGroupId] = useState<number>(0);
+  const [userHasNoGroup, setUserHasNoGroup]   = useState<boolean>(false);
   const [loading, setLoading]         = useState(false);
   const [initialLoad, setInitialLoad] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<string>('');
@@ -140,9 +141,19 @@ export const RankingPage: React.FC = () => {
   const cargarRankingGlobal = useCallback(async () => {
     try {
       setLoading(true);
+      setUserHasNoGroup(false);
       const res = await rankingService.getGeneral();
       const fetchedRanking = res.data.ranking || [];
       const fetchedGrupos  = res.data.grupos  || [];
+
+      if (!isAdmin && fetchedGrupos.length === 0) {
+        setUserHasNoGroup(true);
+        setGrupos([]);
+        setSelectedGroupId(0);
+        setTablaRanking([]);
+        return;
+      }
+
       const visibleGroups  = isAdmin ? fetchedGrupos : fetchedGrupos.slice(0,1);
       const fallback       = visibleGroups[0]?.id || 0;
       const effectiveId    = selectedGroupId!==0 && visibleGroups.some((g:any)=>g.id===selectedGroupId) ? selectedGroupId : fallback;
@@ -150,7 +161,15 @@ export const RankingPage: React.FC = () => {
       setSelectedGroupId(effectiveId);
       setTablaRanking(isAdmin ? fetchedRanking : fetchedRanking.filter((it:any)=>it.id===effectiveId));
       formatearFechaActual();
-    } catch { triggerToast('Error al conectar con el servidor.'); }
+    } catch (err: any) { 
+      if (!isAdmin) {
+        setUserHasNoGroup(true);
+        setGrupos([]);
+        setSelectedGroupId(0);
+      } else {
+        triggerToast('Error al conectar con el servidor.'); 
+      }
+    }
     finally { setLoading(false); setInitialLoad(false); }
   }, [isAdmin, selectedGroupId, formatearFechaActual]);
 
@@ -570,6 +589,29 @@ export const RankingPage: React.FC = () => {
               </div>
             </FlowBorder>
           </div>
+        </div>
+      ) : userHasNoGroup || (!isAdmin && !loading && !initialLoad && (grupos.length === 0 || !selectedGroupId)) ? (
+        /* ─── USER NO-GROUP LAYOUT: Informative message only ────────── */
+        <div className="anim-up">
+          <FlowBorder gradient={G.fuchsia} className="shadow-xl">
+            <div className="p-10 sm:p-16 text-center flex flex-col items-center justify-center min-h-[380px] space-y-6">
+              <div className="w-20 h-20 bg-gradient-to-br from-indigo-500/20 via-purple-500/20 to-pink-500/20 dark:from-indigo-500/30 dark:to-pink-500/30 rounded-3xl flex items-center justify-center border border-indigo-500/30 shadow-lg shadow-indigo-500/10">
+                <Users size={38} className="text-indigo-600 dark:text-indigo-400" />
+              </div>
+              <div className="space-y-3 max-w-md">
+                <h3 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">
+                  Sin Grupo Pequeño Asignado
+                </h3>
+                <p className="text-xs sm:text-sm font-semibold text-slate-500 dark:text-slate-400 leading-relaxed">
+                  Para poder ver la puntuación, el progreso y el historial de tu equipo, debes pertenecer a un Grupo Pequeño.
+                </p>
+              </div>
+              <div className="inline-flex items-center gap-2 px-4 py-2.5 bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200 dark:border-indigo-800/60 text-indigo-700 dark:text-indigo-300 rounded-2xl font-bold text-xs shadow-sm">
+                <Sparkles size={14} className="text-indigo-500 shrink-0" />
+                <span>Solicita a tu líder o secretario que te registre en su Grupo Pequeño</span>
+              </div>
+            </div>
+          </FlowBorder>
         </div>
       ) : (
         /* ─── USER LAYOUT: full width, 2 columns ────────── */

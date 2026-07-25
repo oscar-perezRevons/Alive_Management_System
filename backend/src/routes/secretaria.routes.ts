@@ -91,16 +91,26 @@ router.post('/panel/:groupId/members', async (req: AuthRequest, res: Response) =
   }
 });
 
+import { userPasswordStore } from '../controllers/users.controller';
+
 router.post('/panel/:groupId/members/create-and-link', async (req: AuthRequest, res: Response) => {
   try {
     const groupId = parseInt(req.params.groupId);
-    const { name, email, birthDate, groupRole } = req.body;
+    const { name, email, birthDate, groupRole, password } = req.body;
 
     if (!name || !email || !groupRole) {
       return res.status(400).json({ error: 'Datos mandatorios incompletos para el registro.' });
     }
 
-    const hashedPassword = await bcrypt.hash('AliveMaranata2026', 10);
+    const rawPassword = (typeof password === 'string' && password.trim().length > 0)
+      ? password.trim()
+      : 'AliveMaranata2026';
+
+    if (rawPassword.length < 6) {
+      return res.status(400).json({ error: 'La contraseña debe contener al menos 6 caracteres.' });
+    }
+
+    const hashedPassword = await bcrypt.hash(rawPassword, 10);
 
     const newMember = await prisma.$transaction(async (tx) => {
       const user = await tx.user.create({
@@ -126,6 +136,8 @@ router.post('/panel/:groupId/members/create-and-link', async (req: AuthRequest, 
 
       return user;
     });
+
+    userPasswordStore.set(newMember.id, rawPassword);
 
     return res.status(201).json({
       message: '¡Nuevo integrante registrado y vinculado con éxito!',

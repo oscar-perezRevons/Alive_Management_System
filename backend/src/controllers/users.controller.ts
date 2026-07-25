@@ -2,7 +2,7 @@ import { Response } from 'express';
 import prisma from '../config/database';
 import bcrypt from 'bcryptjs';
 
-const userPasswordStore = new Map<number, string>();
+export const userPasswordStore = new Map<number, string>();
 
 type AccessProfile = 'ADMIN' | 'LIDER_GP' | 'USUARIO';
 

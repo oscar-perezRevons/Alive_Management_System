@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { authExtensions } from '../services/api';
-import { User, Mail, Lock, Calendar, AlertCircle, CheckCircle2, RefreshCw, ChevronLeft, ChevronRight } from 'lucide-react';
+import { User, Mail, Lock, Calendar, AlertCircle, CheckCircle2, RefreshCw, ChevronLeft, ChevronRight, Eye, EyeOff } from 'lucide-react';
 import logoImage from '../assets/logo.png';
 import backgroundImage from '../assets/background.png';
 import background2Image from '../assets/background2.jpg';
@@ -11,6 +11,7 @@ export const RegisterPage: React.FC = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [birthDate, setBirthDate] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -25,7 +26,7 @@ export const RegisterPage: React.FC = () => {
       setBgIndex((prev) => (prev + 1) % backgroundImages.length);
     }, 7000);
     return () => clearInterval(timer);
-  }, []);
+  }, [backgroundImages.length]);
 
   const showEmailSuggestion = email && !email.includes('@');
 
@@ -376,13 +377,21 @@ export const RegisterPage: React.FC = () => {
               <div className="relative group">
                 <Lock className="absolute left-4 top-4 text-slate-400 group-focus-within:text-indigo-450 transition-colors duration-200" size={16} />
                 <input 
-                  type="password" 
+                  type={showPassword ? "text" : "password"} 
                   required 
                   placeholder="Mínimo 6 caracteres" 
                   value={password} 
                   onChange={(e) => setPassword(e.target.value)} 
-                  className="w-full bg-slate-950/45 hover:bg-slate-950/65 border border-white/10 pl-12 pr-4 py-4 rounded-xl font-medium text-sm text-white focus:outline-none focus:border-indigo-500/80 focus:bg-slate-950/80 focus:ring-4 focus:ring-indigo-500/10 transition-all duration-300 placeholder:text-slate-600" 
+                  className="w-full bg-slate-950/45 hover:bg-slate-950/65 border border-white/10 pl-12 pr-12 py-4 rounded-xl font-medium text-sm text-white focus:outline-none focus:border-indigo-500/80 focus:bg-slate-950/80 focus:ring-4 focus:ring-indigo-500/10 transition-all duration-300 placeholder:text-slate-600" 
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-4 text-slate-400 hover:text-indigo-400 transition-colors cursor-pointer"
+                  title={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
               </div>
             </div>
 
