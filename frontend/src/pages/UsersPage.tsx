@@ -178,10 +178,15 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({ value, options, onChang
   const handleToggle = useCallback((openState: boolean) => {
     if (openState && buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
+      const popoverWidth = Math.max(rect.width, 175);
+      let left = rect.left + window.scrollX;
+      if (left + popoverWidth > window.innerWidth - 16) {
+        left = Math.max(16, window.innerWidth - popoverWidth - 16);
+      }
       setCoords({
         top: rect.bottom + window.scrollY + 6,
-        left: rect.left + window.scrollX,
-        minWidth: Math.max(rect.width, 175)
+        left,
+        minWidth: popoverWidth
       });
     }
     setIsOpen(openState);
@@ -202,7 +207,7 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({ value, options, onChang
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [handleToggle]);
 
-  const widthClass = type === 'systemRole' ? 'min-w-[175px] sm:min-w-[185px]' : 'min-w-[160px] sm:min-w-[175px]';
+  const widthClass = type === 'systemRole' ? 'w-full min-w-0 sm:w-auto sm:min-w-[170px]' : 'w-full min-w-0 sm:w-auto sm:min-w-[155px]';
 
   return (
     <div ref={dropdownRef} className={`relative inline-block text-left ${widthClass}`}>
@@ -211,15 +216,15 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({ value, options, onChang
         type="button"
         disabled={disabled}
         onClick={() => handleToggle(!isOpen)}
-        className={`w-full flex items-center justify-between gap-2 px-3.5 py-2 rounded-2xl border-2 font-black text-xs uppercase tracking-wider transition-all duration-200 cursor-pointer shadow-2xs hover:shadow-md ${
+        className={`w-full flex items-center justify-between gap-1.5 px-2.5 sm:px-3.5 py-2 rounded-2xl border-2 font-black text-[10px] sm:text-xs uppercase tracking-wider transition-all duration-200 cursor-pointer shadow-2xs hover:shadow-md ${
           selectedOption.badge || 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700'
         } ${disabled ? 'opacity-50 cursor-not-allowed' : 'hover:scale-[1.02] active:scale-95'}`}
       >
-        <div className="flex items-center gap-2 whitespace-nowrap">
-          <SelectedIcon size={14} className="shrink-0" />
-          <span className="whitespace-nowrap">{selectedOption.label}</span>
+        <div className="flex items-center gap-1.5 min-w-0 truncate">
+          <SelectedIcon size={13} className="shrink-0" />
+          <span className="truncate">{selectedOption.label}</span>
         </div>
-        <ChevronDown size={14} className={`shrink-0 ml-1 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown size={13} className={`shrink-0 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} />
       </button>
 
       {isOpen && !disabled && createPortal(
@@ -516,25 +521,25 @@ export const UsersPage: React.FC = () => {
       <div className="relative bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-lg overflow-hidden anim-up">
         <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-500 via-indigo-500 via-violet-500 via-fuchsia-500 to-orange-400"
           style={{ backgroundSize: '200% 100%', animation: 'shimmer 4s linear infinite' }} />
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-5 pt-7">
-          <div className="flex items-center gap-4">
-            <div className="relative">
-              <div className="bg-gradient-to-br from-violet-600 to-fuchsia-600 p-3.5 rounded-2xl shadow-lg shadow-violet-500/30">
-                <ShieldCheck size={28} className="text-white" />
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3.5 sm:gap-4 p-4 sm:p-5 pt-6 sm:pt-7">
+          <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+            <div className="relative shrink-0">
+              <div className="bg-gradient-to-br from-violet-600 to-fuchsia-600 p-2.5 sm:p-3.5 rounded-2xl shadow-lg shadow-violet-500/30">
+                <ShieldCheck size={24} className="text-white sm:w-7 sm:h-7" />
               </div>
               <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-white dark:border-slate-900 animate-pulse" />
             </div>
-            <div>
-              <h1 className="text-2xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 to-violet-700 dark:from-indigo-400 dark:to-violet-300">
+            <div className="min-w-0">
+              <h1 className="text-xl sm:text-2xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 to-violet-700 dark:from-indigo-400 dark:to-violet-300 truncate">
                 Control de Usuarios
               </h1>
-              <p className="text-xs text-slate-400 dark:text-slate-400 font-bold uppercase tracking-widest mt-0.5">
+              <p className="text-[10px] sm:text-xs text-slate-400 dark:text-slate-400 font-bold uppercase tracking-widest mt-0.5 truncate">
                 Gestión de cargos de Grupo Pequeño, roles de acceso y perfiles
               </p>
             </div>
           </div>
           <button onClick={loadData} disabled={loading}
-            className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white text-xs font-black uppercase tracking-wider rounded-2xl shadow-lg shadow-violet-500/25 hover:scale-[1.02] active:scale-95 transition-all duration-200 disabled:opacity-50 cursor-pointer">
+            className="flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white text-[11px] sm:text-xs font-black uppercase tracking-wider rounded-2xl shadow-lg shadow-violet-500/25 hover:scale-[1.02] active:scale-95 transition-all duration-200 disabled:opacity-50 cursor-pointer w-full sm:w-auto shrink-0">
             <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
             Sincronizar
           </button>
@@ -576,15 +581,15 @@ export const UsersPage: React.FC = () => {
                 placeholder="Buscar por nombre o correo..."
                 className="w-full rounded-2xl border-2 border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800/80 py-2.5 pl-9 pr-3 text-sm font-semibold text-slate-700 dark:text-slate-100 outline-none transition focus:border-violet-500 dark:focus:border-violet-400 focus:bg-white dark:focus:bg-slate-800 focus:ring-4 focus:ring-violet-500/20" />
             </div>
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex items-center gap-2 w-full lg:w-auto">
               {(statFilter !== 'ALL' || search !== '') && (
                 <button
                   onClick={() => { setStatFilter('ALL'); setSearch(''); }}
-                  className="flex items-center gap-1.5 px-3.5 py-2.5 bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-rose-600 dark:text-rose-300 border border-rose-200 dark:border-rose-900/60 text-[11px] font-black uppercase tracking-wider rounded-2xl transition-all duration-200 active:scale-95 cursor-pointer shadow-xs"
+                  className="flex items-center justify-center gap-1.5 px-3 py-2 sm:px-3.5 sm:py-2.5 bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-rose-600 dark:text-rose-300 border border-rose-200 dark:border-rose-900/60 text-[10px] sm:text-[11px] font-black uppercase tracking-wider rounded-2xl transition-all duration-200 active:scale-95 cursor-pointer shadow-xs whitespace-nowrap"
                   title="Limpiar todos los filtros"
                 >
-                  <X size={13} />
-                  Limpiar Filtros
+                  <X size={12} className="shrink-0" />
+                  Limpiar
                 </button>
               )}
               {([
@@ -592,14 +597,14 @@ export const UsersPage: React.FC = () => {
                 { key: 'NO_GROUP' as const, label: 'Sin Grupo', icon: UserPlus, count: usersNoGroup.length }
               ]).map(tab => (
                 <button key={tab.key} onClick={() => setActiveTab(tab.key)}
-                  className={`flex items-center gap-2 rounded-2xl border px-4 py-2.5 text-[11px] font-black uppercase tracking-wider transition-all duration-200 cursor-pointer ${
+                  className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 sm:gap-2 rounded-2xl border px-3 sm:px-4 py-2 sm:py-2.5 text-[10px] sm:text-[11px] font-black uppercase tracking-wider transition-all duration-200 cursor-pointer whitespace-nowrap ${
                     activeTab === tab.key
                       ? 'border-transparent bg-gradient-to-r from-violet-600 to-fuchsia-600 text-white shadow-lg shadow-violet-500/25'
                       : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:border-violet-300 dark:hover:border-violet-700 hover:text-violet-600 dark:hover:text-violet-300'
                   }`}>
-                  <tab.icon size={13} />
-                  {tab.label}
-                  <span className={`ml-1 px-2 py-0.5 rounded-full text-[10px] font-black ${
+                  <tab.icon size={12} className="shrink-0" />
+                  <span>{tab.label}</span>
+                  <span className={`ml-0.5 px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-black ${
                     activeTab === tab.key ? 'bg-white/20 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300'
                   }`}>{tab.count}</span>
                 </button>
@@ -881,20 +886,20 @@ const UserRow: React.FC<UserRowProps> = ({
   return (
     <div
       style={{ zIndex: calculatedZIndex }}
-      className={`flex flex-col xl:flex-row items-start xl:items-center justify-between gap-3.5 px-5 py-4 transition-all duration-200 hover:bg-violet-50/30 dark:hover:bg-violet-950/20 ${
+      className={`flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-3 sm:gap-3.5 p-3.5 sm:p-4.5 transition-all duration-200 hover:bg-violet-50/30 dark:hover:bg-violet-950/20 ${
         isSelf ? 'bg-indigo-50/20 dark:bg-indigo-950/30' : ''
       } relative`}
     >
       {/* Avatar + Name */}
-      <div className="flex items-center gap-3 min-w-[210px] shrink-0">
+      <div className="flex items-center gap-3 min-w-0 sm:min-w-[210px] shrink-0">
         <div className={`flex h-10 w-10 items-center justify-center rounded-2xl bg-gradient-to-br ${getAvatarGradient(user.id)} text-sm font-black text-white shadow-md shrink-0`}>
           {user.name?.charAt(0).toUpperCase() || 'U'}
         </div>
-        <div className="min-w-0">
-          <p className="text-sm font-black text-slate-800 dark:text-slate-100 truncate">{user.name}</p>
+        <div className="min-w-0 flex-1">
+          <p className="text-xs sm:text-sm font-black text-slate-800 dark:text-slate-100 truncate">{user.name}</p>
           <p className="text-[10px] font-semibold text-slate-400 dark:text-slate-400 font-mono truncate">{user.email}</p>
           {isSelf && (
-            <span className="text-[9px] font-black uppercase tracking-wider text-violet-600 dark:text-violet-300 bg-violet-50 dark:bg-violet-950/50 px-1.5 py-0.5 rounded-md border border-violet-100 dark:border-violet-900/50 mt-0.5 inline-block font-extrabold">
+            <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-wider text-violet-600 dark:text-violet-300 bg-violet-50 dark:bg-violet-950/50 px-1.5 py-0.5 rounded-md border border-violet-100 dark:border-violet-900/50 mt-0.5 inline-block font-extrabold">
               Tu cuenta
             </span>
           )}
@@ -902,9 +907,9 @@ const UserRow: React.FC<UserRowProps> = ({
       </div>
 
       {/* Selectors Group */}
-      <div className="flex flex-wrap items-center gap-3 my-1 xl:my-0">
+      <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 sm:gap-3 my-0.5 xl:my-0 w-full xl:w-auto min-w-0">
         {/* Cargo en Grupo Pequeño */}
-        <div className="flex flex-col">
+        <div className="flex flex-col min-w-0 w-full sm:w-auto">
           <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-400 mb-1 px-1">Cargo GP</span>
           <CustomDropdown
             value={groupRoleConfig.label}
@@ -917,7 +922,7 @@ const UserRow: React.FC<UserRowProps> = ({
         </div>
 
         {/* Rol de Sistema */}
-        <div className="flex flex-col">
+        <div className="flex flex-col min-w-0 w-full sm:w-auto">
           <span className="text-[9px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-400 mb-1 px-1">Acceso</span>
           <CustomDropdown
             value={user.role}
@@ -930,9 +935,9 @@ const UserRow: React.FC<UserRowProps> = ({
         </div>
       </div>
 
-      {/* Status badge & Actions */}
-      <div className="flex items-center gap-2 shrink-0 self-end xl:self-center mt-1 xl:mt-0">
-        <span className={`inline-flex items-center gap-1.5 rounded-2xl border px-3 py-1.5 text-[10px] font-black uppercase tracking-wider shadow-xs ${
+      {/* Status badge & Actions Bar */}
+      <div className="flex items-center justify-between gap-1.5 sm:gap-2 shrink-0 w-full xl:w-auto mt-1 xl:mt-0 pt-2 border-t border-slate-100 dark:border-slate-800/60 xl:border-none xl:pt-0 min-w-0">
+        <span className={`inline-flex items-center gap-1 rounded-xl border px-2 sm:px-3 py-1.5 text-[9px] sm:text-[10px] font-black uppercase tracking-wider shadow-xs shrink-0 ${
           user.isActive
             ? 'border-emerald-200 dark:border-emerald-900/50 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300'
             : 'border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300'
@@ -941,42 +946,44 @@ const UserRow: React.FC<UserRowProps> = ({
           {user.isActive ? 'Activo' : 'Inactivo'}
         </span>
 
-        {/* Password */}
-        <button onClick={() => onOpenPasswordModal(user)}
-          disabled={isActionLoading}
-          title="Cambiar contraseña"
-          className="p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-violet-50 dark:hover:bg-violet-950/50 hover:border-violet-300 dark:hover:border-violet-700 text-slate-500 dark:text-slate-300 hover:text-violet-600 dark:hover:text-violet-300 transition-all duration-200 active:scale-90 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shadow-2xs">
-          <Key size={14} />
-        </button>
-
-        {/* Toggle status */}
-        <button onClick={() => onToggleStatus(user)}
-          disabled={isSelf || isActionLoading}
-          className={`rounded-xl border px-3 py-2 text-[10px] font-black uppercase tracking-wider transition-all duration-200 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer shadow-2xs ${
-            user.isActive
-              ? 'border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-900/60'
-              : 'border-emerald-200 dark:border-emerald-900/50 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/60'
-          }`}>
-          {isActionLoading ? '...' : user.isActive ? 'Desactivar' : 'Activar'}
-        </button>
-
-        {/* Assign to group (for no-group users) */}
-        {showAssignButton && onOpenAssignModal && (
-          <button onClick={() => onOpenAssignModal(user)}
-            className="rounded-xl border border-blue-200 dark:border-blue-900/50 bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/60 px-3.5 py-2 text-[10px] font-black uppercase tracking-wider transition-all duration-200 active:scale-95 cursor-pointer shadow-2xs flex items-center gap-1.5">
-            <UserPlus size={12} /> Asignar
-          </button>
-        )}
-
-        {/* Remove / Leave group (for in-group users) */}
-        {showGroupActions && onRemoveFromGroup && (
-          <button onClick={() => onRemoveFromGroup(user)}
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          {/* Password */}
+          <button onClick={() => onOpenPasswordModal(user)}
             disabled={isActionLoading}
-            title={isSelf ? "Salir del grupo" : "Remover del grupo"}
-            className="p-2 rounded-xl border border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-900/60 transition-all duration-200 active:scale-90 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shadow-2xs">
-            <UserMinus size={14} />
+            title="Cambiar contraseña"
+            className="p-1.5 sm:p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-violet-50 dark:hover:bg-violet-950/50 hover:border-violet-300 dark:hover:border-violet-700 text-slate-500 dark:text-slate-300 hover:text-violet-600 dark:hover:text-violet-300 transition-all duration-200 active:scale-90 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shadow-2xs">
+            <Key size={13} />
           </button>
-        )}
+
+          {/* Toggle status */}
+          <button onClick={() => onToggleStatus(user)}
+            disabled={isSelf || isActionLoading}
+            className={`rounded-xl border px-2.5 sm:px-3 py-1.5 sm:py-2 text-[9px] sm:text-[10px] font-black uppercase tracking-wider transition-all duration-200 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 cursor-pointer shadow-2xs ${
+              user.isActive
+                ? 'border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/50 text-rose-700 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-900/60'
+                : 'border-emerald-200 dark:border-emerald-900/50 bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/60'
+            }`}>
+            {isActionLoading ? '...' : user.isActive ? 'Desactivar' : 'Activar'}
+          </button>
+
+          {/* Assign to group (for no-group users) */}
+          {showAssignButton && onOpenAssignModal && (
+            <button onClick={() => onOpenAssignModal(user)}
+              className="rounded-xl border border-blue-200 dark:border-blue-900/50 bg-blue-50 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/60 px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-[9px] sm:text-[10px] font-black uppercase tracking-wider transition-all duration-200 active:scale-95 cursor-pointer shadow-2xs flex items-center gap-1">
+              <UserPlus size={11} /> Asignar
+            </button>
+          )}
+
+          {/* Remove / Leave group (for in-group users) */}
+          {showGroupActions && onRemoveFromGroup && (
+            <button onClick={() => onRemoveFromGroup(user)}
+              disabled={isActionLoading}
+              title={isSelf ? "Salir del grupo" : "Remover del grupo"}
+              className="p-1.5 sm:p-2 rounded-xl border border-rose-200 dark:border-rose-900/50 bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-300 hover:bg-rose-100 dark:hover:bg-rose-900/60 transition-all duration-200 active:scale-90 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer shadow-2xs">
+              <UserMinus size={13} />
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
