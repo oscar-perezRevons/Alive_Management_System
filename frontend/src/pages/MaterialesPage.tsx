@@ -98,8 +98,8 @@ export const MaterialesPage: React.FC = () => {
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('Reglamentos');
   const [isCategoryDropdownOpen, setIsCategoryDropdownOpen] = useState(false);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [filePreview, setFilePreview] = useState<string | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [filePreviews, setFilePreviews] = useState<(string | null)[]>([]);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
 
@@ -119,11 +119,14 @@ export const MaterialesPage: React.FC = () => {
   const [editDescription, setEditDescription] = useState('');
   const [editCategory, setEditCategory] = useState('');
   const [isEditCategoryDropdownOpen, setIsEditCategoryDropdownOpen] = useState(false);
+  const [editSelectedFiles, setEditSelectedFiles] = useState<File[]>([]);
+  const [editFilePreviews, setEditFilePreviews] = useState<(string | null)[]>([]);
   const [updatingMaterial, setUpdatingMaterial] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
 
   // Fullscreen Preview Lightbox
   const [previewMaterial, setPreviewMaterial] = useState<any | null>(null);
+  const [activePreviewIndex, setActivePreviewIndex] = useState<number>(0);
 
   const fetchMaterials = useCallback(async () => {
     setLoading(true);
@@ -146,7 +149,6 @@ export const MaterialesPage: React.FC = () => {
         const names = response.data.categories.map((c: any) => c.name);
         setCategories(names);
         
-        // Ensure standard category defaults are always present or set a fallback category
         if (names.length > 0 && !names.includes(category)) {
           setCategory(names[0]);
         }
@@ -161,35 +163,80 @@ export const MaterialesPage: React.FC = () => {
     fetchCategories();
   }, [fetchMaterials, fetchCategories]);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setSelectedFile(file);
+  // Handle adding files for Upload modal (Max 2)
+  const handleUploadFilesAdd = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const incoming = Array.from(e.target.files);
+      const combined = [...selectedFiles, ...incoming].slice(0, 2);
+      setSelectedFiles(combined);
       setUploadError(null);
-      
-      if (file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          setFilePreview(reader.result as string);
-        };
-        reader.readAsDataURL(file);
-      } else {
-        setFilePreview(null);
-      }
+
+      // Generate previews
+      combined.forEach((file, idx) => {
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            setFilePreviews((prev) => {
+              const copy = [...prev];
+              copy[idx] = reader.result as string;
+              return copy;
+            });
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+      setFilePreviews(combined.map(() => null));
     }
+  };
+
+  const removeUploadFile = (index: number) => {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+    setFilePreviews(prev => prev.filter((_, i) => i !== index));
+  };
+
+  // Handle adding files for Edit modal (Max 2)
+  const handleEditFilesAdd = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const incoming = Array.from(e.target.files);
+      const combined = [...editSelectedFiles, ...incoming].slice(0, 2);
+      setEditSelectedFiles(combined);
+      setEditError(null);
+
+      combined.forEach((file, idx) => {
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            setEditFilePreviews((prev) => {
+              const copy = [...prev];
+              copy[idx] = reader.result as string;
+              return copy;
+            });
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+      setEditFilePreviews(combined.map(() => null));
+    }
+  };
+
+  const removeEditFile = (index: number) => {
+    setEditSelectedFiles(prev => prev.filter((_, i) => i !== index));
+    setEditFilePreviews(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleUploadSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedFile) {
-      setUploadError('Por favor selecciona un archivo PDF o imagen.');
+    if (selectedFiles.length === 0) {
+      setUploadError('Por favor selecciona al menos un archivo PDF o imagen.');
       return;
     }
     setUploadError(null);
     setUploading(true);
 
     const formData = new FormData();
-    formData.append('file', selectedFile);
+    selectedFiles.forEach((file) => {
+      formData.append('files', file);
+    });
     formData.append('title', title);
     formData.append('description', description);
     formData.append('category', category);
@@ -199,8 +246,8 @@ export const MaterialesPage: React.FC = () => {
       if (res.data.success) {
         setTitle('');
         setDescription('');
-        setSelectedFile(null);
-        setFilePreview(null);
+        setSelectedFiles([]);
+        setFilePreviews([]);
         setIsUploadModalOpen(false);
         fetchMaterials();
       }
@@ -213,14 +260,19 @@ export const MaterialesPage: React.FC = () => {
 
   const handleCreateCategorySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newCategoryName.trim()) return;
+    const createdName = newCategoryName.trim();
+    if (!createdName) return;
     setCreatingCategory(true);
     setNewCategoryError(null);
     try {
-      const res = await materialsService.createCategory(newCategoryName);
+      const res = await materialsService.createCategory(createdName);
       if (res.data.success) {
         setNewCategoryName('');
         setIsNewCategoryModalOpen(false);
+        setCategory(createdName);
+        if (editMaterial) {
+          setEditCategory(createdName);
+        }
         fetchCategories(); // Refresh local category chips scroller & select options
       }
     } catch (err: any) {
@@ -268,17 +320,24 @@ export const MaterialesPage: React.FC = () => {
     if (!editMaterial) return;
     setUpdatingMaterial(true);
     setEditError(null);
+
+    const formData = new FormData();
+    formData.append('title', editTitle);
+    formData.append('description', editDescription);
+    formData.append('category', editCategory);
+    editSelectedFiles.forEach((file) => {
+      formData.append('files', file);
+    });
+
     try {
-      const response = await materialsService.update(editMaterial.id, {
-        title: editTitle,
-        description: editDescription,
-        category: editCategory
-      });
+      const response = await materialsService.update(editMaterial.id, formData);
       if (response.data.success) {
         setMaterials((prev) => 
           prev.map((m) => m.id === editMaterial.id ? response.data.material : m)
         );
         setEditMaterial(null);
+        setEditSelectedFiles([]);
+        setEditFilePreviews([]);
       } else {
         setEditError(response.data.message || 'Error al actualizar material.');
       }
@@ -330,32 +389,32 @@ export const MaterialesPage: React.FC = () => {
       {/* HEADER PREMIUM */}
       <div className="relative bg-white dark:bg-slate-900/50 backdrop-blur-md rounded-3xl border border-slate-200/80 dark:border-white/10 shadow-lg dark:shadow-2xl overflow-hidden z-10">
         <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-500 via-indigo-500 via-violet-500 via-fuchsia-500 via-pink-500 to-orange-400" style={{ backgroundSize: '200% 100%', animation: 'shimmer 4s linear infinite' }} />
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 p-5 pt-7">
-          <div className="flex items-center gap-4">
-            <div className="relative">
-              <div className="bg-gradient-to-br from-indigo-600 to-violet-600 dark:from-indigo-500 dark:to-violet-500 p-3 rounded-2xl shadow-lg shadow-indigo-550/30">
-                <FileText size={26} className="text-white" />
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3.5 sm:gap-4 p-4 sm:p-5 pt-6 sm:pt-7">
+          <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+            <div className="relative shrink-0">
+              <div className="bg-gradient-to-br from-indigo-600 to-violet-600 dark:from-indigo-500 dark:to-violet-500 p-2.5 sm:p-3 rounded-2xl shadow-lg shadow-indigo-550/30">
+                <FileText size={24} className="text-white sm:w-6 sm:h-6" />
               </div>
-              <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-emerald-450 rounded-full border-2 border-white dark:border-slate-900 animate-pulse" />
+              <div className="absolute -top-1 -right-1 w-3 h-3 sm:w-3.5 sm:h-3.5 bg-emerald-450 rounded-full border-2 border-white dark:border-slate-900 animate-pulse" />
             </div>
-            <div>
-              <h1 className="text-2xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 to-violet-755 dark:from-indigo-400 dark:to-violet-400">
+            <div className="min-w-0">
+              <h1 className="text-xl sm:text-2xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 to-violet-755 dark:from-indigo-400 dark:to-violet-400 truncate">
                 Materiales Académicos
               </h1>
-              <p className="text-xs text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest mt-0.5">Repositorio de recursos didácticos e institucionales</p>
+              <p className="text-[9px] sm:text-xs text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest mt-0.5 truncate">Repositorio de recursos didácticos e institucionales</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto justify-start sm:justify-end">
             {isAdmin && (
               <button
                 onClick={() => setIsUploadModalOpen(true)}
-                className="flex items-center gap-2 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white px-5 py-2.5 rounded-2xl text-xs font-black uppercase tracking-wider transition-all duration-300 shadow-md shadow-indigo-600/20 active:scale-95 cursor-pointer"
+                className="flex items-center justify-center gap-1.5 sm:gap-2 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-2xl text-[10px] sm:text-xs font-black uppercase tracking-wider transition-all duration-300 shadow-md shadow-indigo-600/20 active:scale-95 cursor-pointer flex-1 sm:flex-initial whitespace-nowrap"
               >
                 <Plus size={14} /> Subir Material
               </button>
             )}
-            <div className="flex items-center gap-2 bg-indigo-50 dark:bg-indigo-950/20 px-4 py-2.5 rounded-xl border border-indigo-100 dark:border-indigo-500/10 text-[11px] font-black uppercase tracking-wider text-indigo-650 dark:text-indigo-455">
-              <Shield size={13} className="animate-pulse" />
+            <div className="flex items-center justify-center gap-1.5 sm:gap-2 bg-indigo-50 dark:bg-indigo-950/20 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl border border-indigo-100 dark:border-indigo-500/10 text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-indigo-650 dark:text-indigo-455 flex-1 sm:flex-initial whitespace-nowrap">
+              <Shield size={13} className="animate-pulse shrink-0" />
               Sistema de Archivos
             </div>
           </div>
@@ -363,31 +422,31 @@ export const MaterialesPage: React.FC = () => {
       </div>
 
       {/* STATS CHIPS */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5 z-10 relative animate-fadeIn">
+      <div className="grid grid-cols-3 gap-2.5 sm:gap-5 z-10 relative animate-fadeIn">
         {[
-          { label: 'Archivos', value: totalDocs, icon: FileText, color: 'from-blue-500 to-indigo-600', description: 'Todos los recursos de la biblioteca', type: 'ALL' },
+          { label: 'Archivos', value: totalDocs, icon: FileText, color: 'from-blue-500 to-indigo-600', description: 'Todos los recursos', type: 'ALL' },
           { label: 'PDFs', value: totalPdfs, icon: FileText, color: 'from-violet-500 to-fuchsia-600', description: 'Documentos e instrucciones', type: 'PDF' },
-          { label: 'Imágenes', value: totalImages, icon: Image, color: 'from-pink-500 to-rose-600', description: 'Materiales gráficos y diseños', type: 'IMAGE' }
+          { label: 'Imágenes', value: totalImages, icon: Image, color: 'from-pink-500 to-rose-600', description: 'Materiales gráficos', type: 'IMAGE' }
         ].map((stat, i) => {
           const isSelected = selectedTypeFilter === stat.type;
           return (
             <div 
               key={i} 
               onClick={() => setSelectedTypeFilter(stat.type as any)}
-              className={`backdrop-blur-xl rounded-3xl p-6 border transition-all duration-300 hover:-translate-y-1 group cursor-pointer shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] ${
+              className={`backdrop-blur-xl rounded-2xl sm:rounded-3xl p-3 sm:p-6 border transition-all duration-300 hover:-translate-y-1 group cursor-pointer shadow-[0_8px_30px_rgb(0,0,0,0.04)] dark:shadow-[0_8px_30px_rgb(0,0,0,0.2)] ${
                 isSelected
                   ? 'bg-indigo-50/50 dark:bg-indigo-950/15 border-indigo-500/80 dark:border-indigo-400/80 ring-2 ring-indigo-500/20 shadow-lg shadow-indigo-550/10 scale-[1.01]'
                   : 'bg-white dark:bg-[#0e1629]/40 border-slate-200/70 dark:border-white/[0.06] hover:border-indigo-500/20 dark:hover:border-indigo-500/10 hover:shadow-2xl hover:shadow-indigo-500/5'
               }`}
             >
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">{stat.value}</div>
-                  <div className="text-[11px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200 mt-1">{stat.label}</div>
-                  <p className="text-[9px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest mt-0.5">{stat.description}</p>
+              <div className="flex items-center justify-between min-w-0">
+                <div className="min-w-0">
+                  <div className="text-xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight leading-none">{stat.value}</div>
+                  <div className="text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-700 dark:text-slate-200 mt-1 truncate">{stat.label}</div>
+                  <p className="hidden sm:block text-[9px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-widest mt-0.5 truncate">{stat.description}</p>
                 </div>
-                <div className={`inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br ${stat.color} shadow-lg shadow-indigo-500/10 text-white transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6`}>
-                  <stat.icon size={20} />
+                <div className={`inline-flex items-center justify-center w-8 h-8 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-gradient-to-br ${stat.color} shadow-lg shadow-indigo-500/10 text-white transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6 shrink-0 ml-1`}>
+                  <stat.icon size={16} className="sm:w-5 sm:h-5" />
                 </div>
               </div>
             </div>
@@ -498,9 +557,68 @@ export const MaterialesPage: React.FC = () => {
                 key={mat.id}
                 className={`bg-white dark:bg-slate-900/50 backdrop-blur-md rounded-3xl border border-slate-200/60 dark:border-white/10 shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group flex flex-col ${!mat.isVisible ? 'opacity-70 dark:opacity-60 bg-slate-50/50 dark:bg-slate-950/20' : ''}`}
               >
-                {/* Visual Area (Previsualización Directa) */}
-                <div className="relative h-40 bg-slate-950 overflow-hidden rounded-t-[1.45rem] border-b border-slate-105 dark:border-white/5">
-                  {mat.type === 'IMAGE' ? (
+                {/* Visual Area (Previsualización Directa de 1 o 2 Archivos) */}
+                <div className="relative h-44 bg-slate-950 overflow-hidden rounded-t-[1.45rem] border-b border-slate-105 dark:border-white/5">
+                  {mat.fileUrl2 ? (
+                    /* Layout dividido de 2 Archivos / Imágenes */
+                    <div className="w-full h-full grid grid-cols-2 gap-0.5 bg-slate-950">
+                      {/* Archivo / Imagen #1 */}
+                      <div 
+                        onClick={() => { setPreviewMaterial(mat); setActivePreviewIndex(0); }}
+                        className="relative w-full h-full overflow-hidden group/img1 cursor-pointer border-r border-white/10"
+                        title="Haz clic para ver Imagen 1"
+                      >
+                        {mat.type === 'IMAGE' ? (
+                          <img 
+                            src={getFileAbsoluteUrl(mat.fileUrl)} 
+                            alt={`${mat.title} - Archivo 1`} 
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover/img1:scale-110"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-indigo-950 via-slate-900 to-slate-950 flex flex-col items-center justify-center p-2">
+                            <FileText size={26} className="text-indigo-400" />
+                            <span className="text-[7px] font-black text-indigo-300 uppercase tracking-widest mt-1">PDF #1</span>
+                          </div>
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover/img1:opacity-100 transition-opacity flex items-end p-2">
+                          <span className="text-[7px] font-black text-white uppercase tracking-widest bg-indigo-600/90 px-1.5 py-0.5 rounded">
+                            Ver #1
+                          </span>
+                        </div>
+                        <span className="absolute bottom-1.5 left-1.5 text-[7px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-black/75 text-white backdrop-blur-md border border-white/10">
+                          #1 {mat.type}
+                        </span>
+                      </div>
+
+                      {/* Archivo / Imagen #2 */}
+                      <div 
+                        onClick={() => { setPreviewMaterial(mat); setActivePreviewIndex(1); }}
+                        className="relative w-full h-full overflow-hidden group/img2 cursor-pointer"
+                        title="Haz clic para ver Imagen 2"
+                      >
+                        {mat.type2 === 'IMAGE' ? (
+                          <img 
+                            src={getFileAbsoluteUrl(mat.fileUrl2)} 
+                            alt={`${mat.title} - Archivo 2`} 
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover/img2:scale-110"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gradient-to-br from-violet-950 via-slate-900 to-slate-950 flex flex-col items-center justify-center p-2">
+                            <FileText size={26} className="text-violet-400" />
+                            <span className="text-[7px] font-black text-violet-300 uppercase tracking-widest mt-1">PDF #2</span>
+                          </div>
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover/img2:opacity-100 transition-opacity flex items-end p-2">
+                          <span className="text-[7px] font-black text-white uppercase tracking-widest bg-violet-600/90 px-1.5 py-0.5 rounded">
+                            Ver #2
+                          </span>
+                        </div>
+                        <span className="absolute bottom-1.5 left-1.5 text-[7px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded bg-black/75 text-white backdrop-blur-md border border-white/10">
+                          #2 {mat.type2}
+                        </span>
+                      </div>
+                    </div>
+                  ) : mat.type === 'IMAGE' ? (
                     <img 
                       src={getFileAbsoluteUrl(mat.fileUrl)} 
                       alt={mat.title} 
@@ -516,49 +634,60 @@ export const MaterialesPage: React.FC = () => {
                   )}
 
                   {/* Absolute Badges on the preview area */}
-                  <div className="absolute top-3.5 left-3.5 flex gap-1.5 z-10">
-                    <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-lg ${theme.badge} backdrop-blur-md bg-opacity-80 dark:bg-opacity-25`}>
-                      {mat.type}
-                    </span>
+                  <div className="absolute top-3.5 left-3.5 flex gap-1.5 z-10 pointer-events-none">
+                    {mat.fileUrl2 ? (
+                      <span className="text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded-lg bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 text-white shadow-md backdrop-blur-md">
+                        2 ARCHIVOS
+                      </span>
+                    ) : (
+                      <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-lg ${theme.badge} backdrop-blur-md bg-opacity-80 dark:bg-opacity-25`}>
+                        {mat.type}
+                      </span>
+                    )}
                     <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-lg bg-slate-950/60 text-slate-200 border border-white/10 backdrop-blur-md">
                       {mat.category}
                     </span>
                   </div>
 
-                  {/* Admin Options Overlaid on preview area */}
+                  {/* Admin Options Overlaid on preview area (Unified Single Capsule Bar) */}
                   {isAdmin && (
-                    <div className="absolute top-3.5 right-3.5 flex items-center gap-1.5 z-10">
+                    <div className="absolute top-3 right-3 flex items-center p-1 rounded-2xl bg-slate-950/85 backdrop-blur-xl border border-white/15 shadow-xl z-20 divide-x divide-white/10">
                       <button
+                        type="button"
                         onClick={() => handleToggleVisibility(mat.id)}
-                        className={`p-1.5 rounded-lg border transition backdrop-blur-md bg-opacity-70 cursor-pointer ${
+                        className={`p-2 rounded-xl transition cursor-pointer ${
                           mat.isVisible 
-                            ? 'bg-slate-950/80 border-white/10 text-slate-300 hover:text-indigo-400 hover:border-indigo-500/30' 
-                            : 'bg-amber-950/80 border-amber-500/20 text-amber-400 hover:text-amber-300'
+                            ? 'text-slate-300 hover:text-indigo-400 hover:bg-indigo-500/20' 
+                            : 'text-amber-400 hover:text-amber-300 hover:bg-amber-500/20'
                         }`}
                         title={mat.isVisible ? 'Ocultar a usuarios' : 'Mostrar a usuarios'}
                       >
-                        {mat.isVisible ? <Eye size={12} /> : <EyeOff size={12} />}
+                        {mat.isVisible ? <Eye size={13} /> : <EyeOff size={13} />}
                       </button>
                       <button
+                        type="button"
                         onClick={() => {
                           setEditMaterial(mat);
                           setEditTitle(mat.title);
                           setEditDescription(mat.description || '');
                           setEditCategory(mat.category);
+                          setEditSelectedFiles([]);
+                          setEditFilePreviews([]);
                           setIsEditCategoryDropdownOpen(false);
                           setEditError(null);
                         }}
-                        className="p-1.5 rounded-lg bg-slate-955/80 border border-white/10 text-slate-300 hover:text-amber-400 hover:border-amber-500/30 transition backdrop-blur-md bg-opacity-70 cursor-pointer"
+                        className="p-2 rounded-xl text-slate-300 hover:text-amber-400 hover:bg-amber-500/20 transition cursor-pointer"
                         title="Editar información del recurso"
                       >
-                        <Pencil size={12} />
+                        <Pencil size={13} />
                       </button>
                       <button
+                        type="button"
                         onClick={() => handleDeleteClick(mat.id)}
-                        className="p-1.5 rounded-lg bg-slate-950/80 border border-white/10 text-slate-300 hover:text-rose-400 hover:border-rose-500/30 transition backdrop-blur-md bg-opacity-70 cursor-pointer"
+                        className="p-2 rounded-xl text-slate-300 hover:text-rose-400 hover:bg-rose-500/20 transition cursor-pointer"
                         title="Eliminar de forma permanente"
                       >
-                        <Trash2 size={12} />
+                        <Trash2 size={13} />
                       </button>
                     </div>
                   )}
@@ -582,27 +711,27 @@ export const MaterialesPage: React.FC = () => {
                     </p>
                   </div>
 
-                  <div className="flex items-center justify-between mt-5 pt-4 border-t border-slate-100 dark:border-white/5">
-                    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
-                      {mat.size}
+                  <div className="flex flex-col xs:flex-row items-stretch xs:items-center justify-between gap-2.5 mt-4 pt-3.5 sm:pt-4 border-t border-slate-100 dark:border-white/5">
+                    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider shrink-0">
+                      {mat.fileUrl2 ? `${mat.size} • ${mat.size2}` : mat.size}
                     </span>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1.5 sm:gap-2 w-full xs:w-auto justify-end">
                       {/* Vista Previa Button */}
                       <button
-                        onClick={() => setPreviewMaterial(mat)}
-                        className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-205 active:scale-95 border border-indigo-200 dark:border-indigo-500/25 bg-indigo-50/50 hover:bg-indigo-100/50 dark:bg-indigo-950/20 dark:hover:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 hover:scale-[1.03] cursor-pointer"
+                        onClick={() => { setPreviewMaterial(mat); setActivePreviewIndex(0); }}
+                        className="flex-1 xs:flex-initial flex items-center justify-center gap-1.5 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-[10px] sm:text-xs font-black uppercase tracking-wider transition-all duration-205 active:scale-95 border border-indigo-200 dark:border-indigo-500/25 bg-indigo-50/50 hover:bg-indigo-100/50 dark:bg-indigo-950/20 dark:hover:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 hover:scale-[1.03] cursor-pointer whitespace-nowrap"
                       >
-                        <Eye size={12} />
+                        <Eye size={12} className="shrink-0" />
                         Visualizar
                       </button>
                       <a
                         href={getFileAbsoluteUrl(mat.fileUrl)}
-                        className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-200 active:scale-95 border ${theme.btnBg} hover:scale-[1.03] shadow-sm cursor-pointer`}
+                        className={`flex-1 xs:flex-initial flex items-center justify-center gap-1.5 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-[10px] sm:text-xs font-black uppercase tracking-wider transition-all duration-200 active:scale-95 border ${theme.btnBg} hover:scale-[1.03] shadow-sm cursor-pointer whitespace-nowrap`}
                         target="_blank"
                         rel="noreferrer"
                         download
                       >
-                        <Download size={12} />
+                        <Download size={12} className="shrink-0" />
                         Descargar
                       </a>
                     </div>
@@ -624,7 +753,7 @@ export const MaterialesPage: React.FC = () => {
             className="p-[4px] rounded-[2.5rem] bg-gradient-to-r from-[#ff3366] via-[#ff00ff] via-[#6600ff] via-[#00ffff] via-[#33ff66] via-[#ffcc00] to-[#ff3366] max-w-md w-full relative z-10 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.28)]"
             style={{ backgroundSize: '300% 300%', animation: 'borderRotate 5s linear infinite' }}
           >
-            <div className="bg-gradient-to-b from-white to-slate-50 dark:from-[#0f172a] dark:to-[#0b0f19] backdrop-blur-2xl rounded-[2.45rem] p-6 sm:p-8 space-y-6 border border-slate-200 dark:border-white/5">
+            <div className="bg-gradient-to-b from-white to-slate-50 dark:from-[#0f172a] dark:to-[#0b0f19] backdrop-blur-2xl rounded-[2.45rem] p-5 sm:p-7 space-y-5 border border-slate-200 dark:border-white/5 max-h-[85vh] overflow-y-auto no-scrollbar">
               
               {/* Header */}
               <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/5 pb-4">
@@ -677,7 +806,18 @@ export const MaterialesPage: React.FC = () => {
                 </div>
 
                 <div className="space-y-1.5 relative">
-                  <label className="text-[9px] font-black uppercase text-indigo-650 dark:text-indigo-400 tracking-wider pl-1">Categoría</label>
+                  <div className="flex items-center justify-between pl-1">
+                    <label className="text-[9px] font-black uppercase text-indigo-650 dark:text-indigo-400 tracking-wider">Categoría</label>
+                    {isAdmin && (
+                      <button
+                        type="button"
+                        onClick={() => setIsNewCategoryModalOpen(true)}
+                        className="text-[9px] font-extrabold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 flex items-center gap-1 cursor-pointer hover:underline"
+                      >
+                        <Plus size={11} /> Nueva categoría
+                      </button>
+                    )}
+                  </div>
                   <button
                     type="button"
                     onClick={() => setIsCategoryDropdownOpen(!isCategoryDropdownOpen)}
@@ -706,52 +846,120 @@ export const MaterialesPage: React.FC = () => {
                           <span>{cat}</span>
                         </button>
                       ))}
+
+                      {isAdmin && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsCategoryDropdownOpen(false);
+                            setIsNewCategoryModalOpen(true);
+                          }}
+                          className="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-black tracking-wide text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 border border-dashed border-indigo-300 dark:border-indigo-500/30 transition cursor-pointer flex items-center gap-2 mt-1"
+                        >
+                          <Plus size={14} className="shrink-0 text-indigo-500" />
+                          <span>+ Crear nueva categoría</span>
+                        </button>
+                      )}
                     </div>
                   )}
                 </div>
 
-                {/* Styled Drag & Drop with Live Local Preview */}
-                <div className="space-y-1.5">
-                  <label className="text-[9px] font-black uppercase text-indigo-650 dark:text-indigo-400 tracking-wider pl-1">Archivo (PDF o Imagen)</label>
-                  <div className="relative border border-dashed border-slate-205 dark:border-white/10 hover:border-slate-350 dark:hover:border-white/20 rounded-2xl p-6 text-center cursor-pointer transition-all bg-slate-50/50 dark:bg-white/[0.02] hover:bg-slate-100/50 dark:hover:bg-white/[0.04] shadow-inner">
-                    <input 
-                      type="file" 
-                      required
-                      accept="application/pdf,image/*" 
-                      onChange={handleFileChange}
-                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                    />
-                    
-                    {selectedFile ? (
-                      <div className="space-y-3 relative z-20">
-                        {filePreview ? (
-                          <div className="relative w-28 h-28 mx-auto rounded-lg overflow-hidden border border-slate-200 dark:border-white/10 shadow-md animate-fadeIn">
-                            <img src={filePreview} alt="Vista previa local" className="w-full h-full object-cover" />
+                {/* Styled Drag & Drop for Up to 2 Files */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between pl-1">
+                    <label className="text-[9px] font-black uppercase text-indigo-650 dark:text-indigo-400 tracking-wider">
+                      Archivos Adjuntos (Máximo 2)
+                    </label>
+                    <span className="text-[9px] font-bold text-slate-400 font-mono">
+                      {selectedFiles.length}/2 seleccionados
+                    </span>
+                  </div>
+
+                  {selectedFiles.length > 0 ? (
+                    <div className="space-y-2 bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-200/80 dark:border-indigo-500/20 rounded-2xl p-3">
+                      <div className="grid grid-cols-1 gap-3">
+                        {selectedFiles.map((file, idx) => (
+                          <div 
+                            key={idx}
+                            className="bg-gradient-to-br from-white via-slate-50 to-indigo-50/40 dark:from-slate-900 dark:via-slate-900 dark:to-indigo-950/40 border border-indigo-200/90 dark:border-indigo-500/30 rounded-2xl p-3 flex items-center gap-3.5 relative group shadow-md hover:shadow-indigo-500/10 transition-all animate-fadeIn"
+                          >
+                            {filePreviews[idx] ? (
+                              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden border border-indigo-500/20 shrink-0 bg-slate-950 shadow-inner relative group/img">
+                                <img src={filePreviews[idx]!} alt="Vista previa" className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-300" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity flex items-end p-1.5">
+                                  <span className="text-[7px] font-black uppercase text-white tracking-widest bg-indigo-600/90 px-1.5 py-0.5 rounded-md shadow-sm">Vista Previa</span>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl bg-gradient-to-br from-indigo-500/15 via-violet-500/10 to-indigo-500/5 border border-indigo-500/30 flex flex-col items-center justify-center shrink-0 text-indigo-600 dark:text-indigo-400 shadow-inner">
+                                <FileText size={32} className="drop-shadow-md" />
+                                <span className="text-[8px] font-black uppercase tracking-widest mt-1 text-indigo-600 dark:text-indigo-300">PDF DOC</span>
+                              </div>
+                            )}
+
+                            <div className="min-w-0 flex-1 space-y-1">
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <span className="text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-sm">
+                                  Archivo #{idx + 1}
+                                </span>
+                                <span className="text-[8px] font-mono font-bold px-2 py-0.5 rounded-full bg-slate-200/80 dark:bg-white/10 text-slate-700 dark:text-slate-300 border border-slate-300/40 dark:border-white/10">
+                                  {(file.size / (1024 * 1024)).toFixed(2)} MB
+                                </span>
+                              </div>
+                              <p className="text-[11px] font-black text-slate-800 dark:text-slate-100 truncate pt-0.5" title={file.name}>
+                                {file.name}
+                              </p>
+                              <p className="text-[9px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wide flex items-center gap-1">
+                                {file.type.startsWith('image/') ? <Image size={11} /> : <FileText size={11} />}
+                                {file.type.startsWith('image/') ? 'Imagen digital' : 'Documento PDF'}
+                              </p>
+                            </div>
+
+                            <button
+                              type="button"
+                              onClick={() => removeUploadFile(idx)}
+                              className="p-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-600 text-rose-500 hover:text-white border border-rose-500/20 transition-all duration-200 cursor-pointer shrink-0 shadow-sm active:scale-95"
+                              title="Remover este archivo"
+                            >
+                              <Trash2 size={16} />
+                            </button>
                           </div>
-                        ) : (
-                          <div className="w-14 h-14 bg-indigo-500/10 border border-indigo-500/20 rounded-xl flex items-center justify-center mx-auto text-indigo-600 dark:text-indigo-400 shadow-inner animate-fadeIn">
-                            <FileText size={28} />
-                          </div>
-                        )}
-                        <div>
-                          <p className="text-[11px] font-bold text-slate-700 dark:text-slate-200 truncate max-w-[280px] mx-auto">
-                            {selectedFile.name}
-                          </p>
-                          <p className="text-[9px] text-slate-400 dark:text-slate-500 mt-0.5">
-                            {(selectedFile.size / (1024 * 1024)).toFixed(2)} MB
+                        ))}
+                      </div>
+
+                      {selectedFiles.length < 2 && (
+                        <div className="relative border border-dashed border-indigo-300 dark:border-indigo-500/30 hover:border-indigo-500 rounded-xl p-2.5 text-center cursor-pointer transition bg-white/60 dark:bg-slate-900/40 hover:bg-white dark:hover:bg-slate-900">
+                          <input 
+                            type="file" 
+                            accept="application/pdf,image/*" 
+                            onChange={handleUploadFilesAdd}
+                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                          />
+                          <p className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 flex items-center justify-center gap-1.5">
+                            <Plus size={12} /> Adjuntar 2do archivo (PDF o Imagen)
                           </p>
                         </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="relative border border-dashed border-slate-205 dark:border-white/10 hover:border-slate-350 dark:hover:border-white/20 rounded-2xl p-6 text-center cursor-pointer transition-all bg-slate-50/50 dark:bg-white/[0.02] hover:bg-slate-100/50 dark:hover:bg-white/[0.04] shadow-inner group">
+                      <input 
+                        type="file" 
+                        required
+                        multiple
+                        accept="application/pdf,image/*" 
+                        onChange={handleUploadFilesAdd}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                      />
+                      <div className="w-12 h-12 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl flex items-center justify-center mx-auto text-indigo-600 dark:text-indigo-400 mb-2 group-hover:scale-110 transition-transform">
+                        <Upload size={22} />
                       </div>
-                    ) : (
-                      <>
-                        <Upload size={24} className="mx-auto text-indigo-600 dark:text-indigo-400 mb-2" />
-                        <p className="text-[11px] font-bold text-slate-700 dark:text-slate-350">
-                          Haz clic para explorar o arrastra el archivo
-                        </p>
-                        <p className="text-[9px] text-slate-400 dark:text-slate-500 mt-1">Formatos admitidos: PDF, PNG, JPG, JPEG, WEBP, GIF</p>
-                      </>
-                    )}
-                  </div>
+                      <p className="text-[11px] font-bold text-slate-700 dark:text-slate-350">
+                        Haz clic o arrastra 1 o 2 archivos (PDF o Imagen)
+                      </p>
+                      <p className="text-[9px] text-slate-400 dark:text-slate-500 mt-1 font-semibold">Formatos admitidos: PDF, PNG, JPG, JPEG, WEBP, GIF (Máx. 2 por material)</p>
+                    </div>
+                  )}
                 </div>
 
                 <button
@@ -849,7 +1057,7 @@ export const MaterialesPage: React.FC = () => {
             className="p-[4px] rounded-[2.5rem] bg-gradient-to-r from-[#ff3366] via-[#ff00ff] via-[#6600ff] via-[#00ffff] via-[#33ff66] via-[#ffcc00] to-[#ff3366] max-w-md w-full relative z-10 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.28)]"
             style={{ backgroundSize: '300% 300%', animation: 'borderRotate 5s linear infinite' }}
           >
-            <div className="bg-gradient-to-b from-white to-slate-50 dark:from-[#0f172a] dark:to-[#0b0f19] backdrop-blur-2xl rounded-[2.45rem] p-6 sm:p-8 space-y-6 border border-slate-200 dark:border-white/5">
+            <div className="bg-gradient-to-b from-white to-slate-50 dark:from-[#0f172a] dark:to-[#0b0f19] backdrop-blur-2xl rounded-[2.45rem] p-5 sm:p-7 space-y-5 border border-slate-200 dark:border-white/5 max-h-[85vh] overflow-y-auto no-scrollbar">
               
               {/* Header */}
               <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/5 pb-4">
@@ -902,7 +1110,18 @@ export const MaterialesPage: React.FC = () => {
                 </div>
 
                 <div className="space-y-1.5 relative">
-                  <label className="text-[9px] font-black uppercase text-indigo-655 dark:text-indigo-400 tracking-wider pl-1">Categoría</label>
+                  <div className="flex items-center justify-between pl-1">
+                    <label className="text-[9px] font-black uppercase text-indigo-655 dark:text-indigo-400 tracking-wider">Categoría</label>
+                    {isAdmin && (
+                      <button
+                        type="button"
+                        onClick={() => setIsNewCategoryModalOpen(true)}
+                        className="text-[9px] font-extrabold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 flex items-center gap-1 cursor-pointer hover:underline"
+                      >
+                        <Plus size={11} /> Nueva categoría
+                      </button>
+                    )}
+                  </div>
                   <button
                     type="button"
                     onClick={() => setIsEditCategoryDropdownOpen(!isEditCategoryDropdownOpen)}
@@ -931,6 +1150,199 @@ export const MaterialesPage: React.FC = () => {
                           <span>{cat}</span>
                         </button>
                       ))}
+
+                      {isAdmin && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsEditCategoryDropdownOpen(false);
+                            setIsNewCategoryModalOpen(true);
+                          }}
+                          className="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-black tracking-wide text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 border border-dashed border-indigo-300 dark:border-indigo-500/30 transition cursor-pointer flex items-center gap-2 mt-1"
+                        >
+                          <Plus size={14} className="shrink-0 text-indigo-500" />
+                          <span>+ Crear nueva categoría</span>
+                        </button>
+                      )}
+                    </div>
+                  )}
+                </div>
+                {/* Visual File Management Zone (Hasta 2 archivos: PDF / Imagen) */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between pl-1">
+                    <label className="text-[9px] font-black uppercase text-indigo-600 dark:text-indigo-400 tracking-wider flex items-center gap-1.5">
+                      <Upload size={12} /> Archivos Adjuntos <span className="text-slate-400 dark:text-slate-500 font-bold">(Máx. 2)</span>
+                    </label>
+                    {editSelectedFiles.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => { setEditSelectedFiles([]); setEditFilePreviews([]); }}
+                        className="text-rose-500 hover:text-rose-600 font-extrabold lowercase text-[10px] cursor-pointer"
+                      >
+                        Deshacer cambios
+                      </button>
+                    )}
+                  </div>
+
+                  {/* If new files ARE selected for replacement */}
+                  {editSelectedFiles.length > 0 ? (
+                    <div className="space-y-2.5 bg-indigo-50/50 dark:bg-indigo-950/20 border border-indigo-200/80 dark:border-indigo-500/20 rounded-2xl p-3">
+                      <div className="grid grid-cols-1 gap-3">
+                        {editSelectedFiles.map((file, idx) => (
+                          <div 
+                            key={idx}
+                            className="bg-gradient-to-br from-white via-slate-50 to-emerald-50/30 dark:from-slate-900 dark:via-slate-900 dark:to-emerald-950/30 border border-emerald-300/80 dark:border-emerald-500/30 rounded-2xl p-3 flex items-center gap-3.5 relative group shadow-md animate-fadeIn"
+                          >
+                            {editFilePreviews[idx] ? (
+                              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl overflow-hidden border border-emerald-500/20 shrink-0 bg-slate-950 shadow-inner relative group/img">
+                                <img src={editFilePreviews[idx]!} alt="Vista previa" className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-300" />
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover/img:opacity-100 transition-opacity flex items-end p-1.5">
+                                  <span className="text-[7px] font-black uppercase text-white tracking-widest bg-emerald-600/90 px-1.5 py-0.5 rounded-md shadow-sm">Vista Previa</span>
+                                </div>
+                              </div>
+                            ) : (
+                              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl bg-gradient-to-br from-emerald-500/15 via-teal-500/10 to-emerald-500/5 border border-emerald-500/30 flex flex-col items-center justify-center shrink-0 text-emerald-600 dark:text-emerald-400 shadow-inner">
+                                <FileText size={32} className="drop-shadow-md" />
+                                <span className="text-[8px] font-black uppercase tracking-widest mt-1 text-emerald-600 dark:text-emerald-300">PDF DOC</span>
+                              </div>
+                            )}
+
+                            <div className="min-w-0 flex-1 space-y-1">
+                              <div className="flex items-center gap-1.5 flex-wrap">
+                                <span className="text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-sm">
+                                  Nuevo #{idx + 1}
+                                </span>
+                                <span className="text-[8px] font-mono font-bold px-2 py-0.5 rounded-full bg-slate-200/80 dark:bg-white/10 text-slate-700 dark:text-slate-300 border border-slate-300/40 dark:border-white/10">
+                                  {(file.size / (1024 * 1024)).toFixed(2)} MB
+                                </span>
+                              </div>
+                              <p className="text-[11px] font-black text-slate-800 dark:text-slate-100 truncate pt-0.5" title={file.name}>
+                                {file.name}
+                              </p>
+                              <p className="text-[9px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide flex items-center gap-1">
+                                {file.type.startsWith('image/') ? <Image size={11} /> : <FileText size={11} />}
+                                {file.type.startsWith('image/') ? 'Imagen digital' : 'Documento PDF'}
+                              </p>
+                            </div>
+
+                            <button
+                              type="button"
+                              onClick={() => removeEditFile(idx)}
+                              className="p-2.5 rounded-xl bg-rose-500/10 hover:bg-rose-600 text-rose-500 hover:text-white border border-rose-500/20 transition-all duration-200 cursor-pointer shrink-0 shadow-sm active:scale-95"
+                              title="Remover este archivo"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Dropzone for adding 2nd file if only 1 is selected */}
+                      {editSelectedFiles.length < 2 && (
+                        <div className="relative border border-dashed border-indigo-300 dark:border-indigo-500/30 hover:border-indigo-500 rounded-xl p-2.5 text-center cursor-pointer transition bg-white/60 dark:bg-slate-900/40 hover:bg-white dark:hover:bg-slate-900">
+                          <input 
+                            type="file" 
+                            accept="application/pdf,image/*" 
+                            onChange={handleEditFilesAdd}
+                            className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                          />
+                          <p className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 flex items-center justify-center gap-1.5">
+                            <Plus size={12} /> Adjuntar 2do archivo (PDF o Imagen)
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    /* Show current files & replacement dropzone */
+                    <div className="space-y-2.5">
+                      {/* Current files preview box */}
+                      <div className="grid grid-cols-1 gap-2.5 bg-slate-100/70 dark:bg-slate-900/60 p-2.5 rounded-2xl border border-slate-200/80 dark:border-white/5">
+                        {/* Current File 1 */}
+                        <div className="flex items-center gap-3 bg-white dark:bg-slate-800/90 p-2.5 rounded-xl border border-slate-200/60 dark:border-white/5 min-w-0 shadow-sm">
+                          {editMaterial.type === 'IMAGE' ? (
+                            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden border border-indigo-500/20 shrink-0 bg-slate-950 shadow-inner">
+                              <img src={getFileAbsoluteUrl(editMaterial.fileUrl)} alt="Actual 1" className="w-full h-full object-cover" />
+                            </div>
+                          ) : (
+                            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex flex-col items-center justify-center shrink-0 text-indigo-600 dark:text-indigo-400">
+                              <FileText size={26} />
+                              <span className="text-[7px] font-black uppercase tracking-wider mt-0.5">PDF</span>
+                            </div>
+                          )}
+                          <div className="min-w-0 flex-1 space-y-0.5">
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300">
+                                Archivo Actual #1
+                              </span>
+                              <span className="text-[8px] font-mono font-bold text-slate-500">
+                                {editMaterial.size}
+                              </span>
+                            </div>
+                            <p className="text-[11px] font-bold text-slate-800 dark:text-slate-100 truncate pt-0.5">
+                              {editMaterial.title}
+                            </p>
+                            <p className="text-[9px] font-semibold text-slate-400 uppercase tracking-wide">
+                              Tipo: {editMaterial.type}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Current File 2 (if exists) */}
+                        {editMaterial.fileUrl2 && (
+                          <div className="flex items-center gap-3 bg-white dark:bg-slate-800/90 p-2.5 rounded-xl border border-slate-200/60 dark:border-white/5 min-w-0 shadow-sm">
+                            {editMaterial.type2 === 'IMAGE' ? (
+                              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden border border-violet-500/20 shrink-0 bg-slate-950 shadow-inner">
+                                <img src={getFileAbsoluteUrl(editMaterial.fileUrl2)} alt="Actual 2" className="w-full h-full object-cover" />
+                              </div>
+                            ) : (
+                              <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-lg bg-violet-500/10 border border-violet-500/20 flex flex-col items-center justify-center shrink-0 text-violet-600 dark:text-violet-400">
+                                <FileText size={26} />
+                                <span className="text-[7px] font-black uppercase tracking-wider mt-0.5">PDF</span>
+                              </div>
+                            )}
+                            <div className="min-w-0 flex-1 space-y-0.5">
+                              <div className="flex items-center gap-1.5">
+                                <span className="text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-violet-100 dark:bg-violet-950/60 text-violet-700 dark:text-violet-300">
+                                  Archivo Actual #2
+                                </span>
+                                <span className="text-[8px] font-mono font-bold text-slate-500">
+                                  {editMaterial.size2}
+                                </span>
+                              </div>
+                              <p className="text-[11px] font-bold text-slate-800 dark:text-slate-100 truncate pt-0.5">
+                                {editMaterial.title} (Adjunto 2)
+                              </p>
+                              <p className="text-[9px] font-semibold text-slate-400 uppercase tracking-wide">
+                                Tipo: {editMaterial.type2}
+                              </p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Replacer Dropzone */}
+                      <div className="relative border border-dashed border-indigo-300/80 dark:border-indigo-500/30 hover:border-indigo-500 rounded-2xl p-3 text-center cursor-pointer transition-all bg-gradient-to-br from-indigo-50/40 via-white to-violet-50/40 dark:from-indigo-950/10 dark:to-slate-900/40 hover:bg-white dark:hover:bg-slate-900 shadow-inner group">
+                        <input 
+                          type="file" 
+                          multiple
+                          accept="application/pdf,image/*" 
+                          onChange={handleEditFilesAdd}
+                          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                        />
+                        <div className="flex items-center justify-center gap-2.5">
+                          <div className="p-2 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-md shadow-indigo-500/20 group-hover:scale-110 transition-transform">
+                            <Upload size={16} />
+                          </div>
+                          <div className="text-left min-w-0">
+                            <p className="text-[11px] font-black text-indigo-900 dark:text-indigo-200 uppercase tracking-wide truncate">
+                              Reemplazar archivo(s)
+                            </p>
+                            <p className="text-[9px] font-semibold text-slate-500 dark:text-slate-400 truncate">
+                              Haz clic o arrastra 1 o 2 nuevos archivos (PDF o Imagen)
+                            </p>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -997,54 +1409,104 @@ export const MaterialesPage: React.FC = () => {
 
       {/* FULLSCREEN PREVIEW LIGHTBOX */}
       {previewMaterial && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fadeIn">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 animate-fadeIn">
           <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md" onClick={() => setPreviewMaterial(null)} />
           
           <div 
-            className="p-[4px] rounded-[2.5rem] bg-gradient-to-r from-[#ff3366] via-[#ff00ff] via-[#6600ff] via-[#00ffff] via-[#33ff66] via-[#ffcc00] to-[#ff3366] max-w-4xl w-full relative z-10 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.4)]"
+            className="p-[3px] sm:p-[4px] rounded-[2rem] sm:rounded-[2.5rem] bg-gradient-to-r from-[#ff3366] via-[#ff00ff] via-[#6600ff] via-[#00ffff] via-[#33ff66] via-[#ffcc00] to-[#ff3366] max-w-4xl w-full relative z-10 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.4)]"
             style={{ backgroundSize: '300% 300%', animation: 'borderRotate 5s linear infinite' }}
           >
-            <div className="bg-gradient-to-b from-white to-slate-50 dark:from-[#0f172a] dark:to-[#0b0f19] backdrop-blur-2xl rounded-[2.45rem] overflow-hidden flex flex-col max-h-[90vh] border border-slate-200 dark:border-white/5">
+            <div className="bg-gradient-to-b from-white to-slate-50 dark:from-[#0f172a] dark:to-[#0b0f19] backdrop-blur-2xl rounded-[1.95rem] sm:rounded-[2.45rem] overflow-hidden flex flex-col max-h-[90vh] border border-slate-200 dark:border-white/5">
               
               {/* Header */}
-              <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/5 p-5 bg-slate-50 dark:bg-slate-950/40">
-                <div>
-                  <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">{previewMaterial.title}</h3>
-                  <p className="text-[10px] font-bold text-indigo-650 dark:text-indigo-400 uppercase tracking-widest mt-0.5">{previewMaterial.category} • {previewMaterial.size}</p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <a
-                    href={getFileAbsoluteUrl(previewMaterial.fileUrl)}
-                    download
-                    className="flex items-center gap-1.5 px-4 py-2 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-black uppercase tracking-wider transition active:scale-95 cursor-pointer shadow-md shadow-indigo-600/20 border-none"
-                  >
-                    <Download size={12} />
-                    Descargar
-                  </a>
+              <div className="border-b border-slate-100 dark:border-white/5 p-4 sm:p-5 bg-slate-50 dark:bg-slate-950/40 space-y-3">
+                {/* Row 1: Title, Category & Close Button */}
+                <div className="flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="text-xs sm:text-base font-black text-slate-900 dark:text-white uppercase tracking-wider truncate">
+                        {previewMaterial.title}
+                      </h3>
+                      {previewMaterial.fileUrl2 && (
+                        <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full bg-gradient-to-r from-indigo-500 to-violet-600 text-white shadow-sm shrink-0">
+                          2 ARCHIVOS
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[9px] sm:text-[11px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest mt-0.5 truncate">
+                      {previewMaterial.category} • {activePreviewIndex === 0 ? previewMaterial.size : previewMaterial.size2}
+                    </p>
+                  </div>
+
+                  {/* Close button always pinned top right */}
                   <button 
                     onClick={() => setPreviewMaterial(null)}
-                    className="p-1.5 hover:bg-slate-200 dark:hover:bg-white/10 rounded-lg text-slate-400 hover:text-slate-800 dark:hover:text-white transition cursor-pointer"
+                    className="p-2 hover:bg-slate-200 dark:hover:bg-white/10 rounded-xl text-slate-400 hover:text-slate-800 dark:hover:text-white transition cursor-pointer shrink-0"
+                    title="Cerrar vista previa"
                   >
-                    <X size={16} />
+                    <X size={18} />
                   </button>
+                </div>
+
+                {/* Row 2: Tabs (if 2 files) & Download Action Button */}
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 pt-1">
+                  {/* Tabs */}
+                  {previewMaterial.fileUrl2 ? (
+                    <div className="flex items-center p-1 bg-slate-200/80 dark:bg-slate-900/80 rounded-xl border border-slate-300/50 dark:border-white/5 w-full sm:w-auto">
+                      <button
+                        type="button"
+                        onClick={() => setActivePreviewIndex(0)}
+                        className={`flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-[10px] sm:text-xs font-black uppercase tracking-wider transition cursor-pointer text-center ${
+                          activePreviewIndex === 0 
+                            ? 'bg-indigo-600 text-white shadow-md' 
+                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                        }`}
+                      >
+                        Archivo #1 ({previewMaterial.type})
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setActivePreviewIndex(1)}
+                        className={`flex-1 sm:flex-initial px-3 py-1.5 rounded-lg text-[10px] sm:text-xs font-black uppercase tracking-wider transition cursor-pointer text-center ${
+                          activePreviewIndex === 1 
+                            ? 'bg-indigo-600 text-white shadow-md' 
+                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                        }`}
+                      >
+                        Archivo #2 ({previewMaterial.type2})
+                      </button>
+                    </div>
+                  ) : (
+                    <div />
+                  )}
+
+                  {/* Download Button */}
+                  <a
+                    href={getFileAbsoluteUrl(activePreviewIndex === 0 ? previewMaterial.fileUrl : previewMaterial.fileUrl2)}
+                    download
+                    className="flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl sm:rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black uppercase tracking-wider transition active:scale-95 cursor-pointer shadow-md shadow-indigo-600/20 border-none whitespace-nowrap w-full sm:w-auto text-center"
+                  >
+                    <Download size={14} className="shrink-0" />
+                    Descargar {previewMaterial.fileUrl2 ? (activePreviewIndex === 1 ? '#2' : '#1') : ''}
+                  </a>
                 </div>
               </div>
               
               {/* Viewer Area */}
-              <div className="p-5 flex-1 overflow-y-auto flex items-center justify-center bg-slate-100 dark:bg-slate-900/50">
-                {previewMaterial.type === 'IMAGE' ? (
-                  <div className="relative max-h-[65vh] rounded-lg overflow-hidden border border-slate-200 dark:border-white/5 shadow-2xl bg-white dark:bg-slate-950">
+              <div className="p-3 sm:p-5 flex-1 overflow-y-auto flex items-center justify-center bg-slate-100 dark:bg-slate-900/50">
+                {((activePreviewIndex === 0 ? previewMaterial.type : previewMaterial.type2) === 'IMAGE') ? (
+                  <div className="relative max-h-[60vh] sm:max-h-[65vh] rounded-lg overflow-hidden border border-slate-200 dark:border-white/5 shadow-2xl bg-white dark:bg-slate-950">
                     <img 
-                      src={getFileAbsoluteUrl(previewMaterial.fileUrl)} 
+                      src={getFileAbsoluteUrl(activePreviewIndex === 0 ? previewMaterial.fileUrl : previewMaterial.fileUrl2)} 
                       alt={previewMaterial.title} 
-                      className="max-w-full max-h-[65vh] object-contain"
+                      className="max-w-full max-h-[60vh] sm:max-h-[65vh] object-contain"
                     />
                   </div>
                 ) : (
                   <iframe
-                    src={getFileAbsoluteUrl(previewMaterial.fileUrl)}
+                    src={getFileAbsoluteUrl(activePreviewIndex === 0 ? previewMaterial.fileUrl : previewMaterial.fileUrl2)}
                     title={previewMaterial.title}
-                    className="w-full h-[65vh] rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-955 shadow-2xl"
+                    className="w-full h-[50vh] sm:h-[65vh] rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-955 shadow-2xl"
                   />
                 )}
               </div>

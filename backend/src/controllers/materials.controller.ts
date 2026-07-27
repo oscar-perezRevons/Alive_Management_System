@@ -79,47 +79,57 @@ export class MaterialsController {
 
   async uploadMaterial(req: any, res: Response): Promise<Response> {
     try {
+      const files: any[] = req.files || (req.file ? [req.file] : []);
       if (!(await verificarPermisosAdmin(req))) {
-        // Borrar el archivo subido si no es admin para no dejar basura
-        if (req.file) {
-          fs.unlinkSync(req.file.path);
-        }
+        files.forEach((f: any) => { if (f.path && fs.existsSync(f.path)) fs.unlinkSync(f.path); });
         return res.status(403).json({ success: false, message: 'Acceso denegado. Se requiere rol de Administrador.' });
       }
 
-      if (!req.file) {
+      if (files.length === 0) {
         return res.status(400).json({ success: false, message: 'No se ha seleccionado ningún archivo.' });
       }
 
       const { title, description, category } = req.body;
       if (!title || !category) {
-        fs.unlinkSync(req.file.path);
+        files.forEach((f: any) => { if (f.path && fs.existsSync(f.path)) fs.unlinkSync(f.path); });
         return res.status(400).json({ success: false, message: 'El título y la categoría son obligatorios.' });
       }
 
-      const sizeFormatted = formatSize(req.file.size);
-      
-      // Determinar si es PDF o IMAGEN por mimetype
-      const type = req.file.mimetype === 'application/pdf' ? 'PDF' : 'IMAGE';
-      const fileUrl = `/uploads/materials/${req.file.filename}`;
+      const f1 = files[0];
+      const type1 = f1.mimetype === 'application/pdf' ? 'PDF' : 'IMAGE';
+      const size1 = formatSize(f1.size);
+      const fileUrl1 = `/uploads/materials/${f1.filename}`;
+
+      let type2 = '';
+      let size2 = '';
+      let fileUrl2 = '';
+
+      if (files.length > 1) {
+        const f2 = files[1];
+        type2 = f2.mimetype === 'application/pdf' ? 'PDF' : 'IMAGE';
+        size2 = formatSize(f2.size);
+        fileUrl2 = `/uploads/materials/${f2.filename}`;
+      }
 
       const newMaterial = await (prisma as any).material.create({
         data: {
           title,
           description: description || '',
           category,
-          type,
-          size: sizeFormatted,
-          fileUrl,
+          type: type1,
+          size: size1,
+          fileUrl: fileUrl1,
+          type2,
+          size2,
+          fileUrl2,
           isVisible: true
         }
       });
 
       return res.status(201).json({ success: true, message: 'Material subido correctamente.', material: newMaterial });
     } catch (error: any) {
-      if (req.file && fs.existsSync(req.file.path)) {
-        fs.unlinkSync(req.file.path);
-      }
+      const files: any[] = req.files || (req.file ? [req.file] : []);
+      files.forEach((f: any) => { if (f.path && fs.existsSync(f.path)) fs.unlinkSync(f.path); });
       return res.status(500).json({ success: false, message: 'Error al subir material', error: error.message });
     }
   }
@@ -161,11 +171,21 @@ export class MaterialsController {
         return res.status(404).json({ success: false, message: 'Material no encontrado.' });
       }
 
-      // Eliminar el archivo físico
-      const filename = path.basename(material.fileUrl);
-      const filepath = path.join(__dirname, '../../uploads/materials', filename);
-      if (fs.existsSync(filepath)) {
-        fs.unlinkSync(filepath);
+      // Eliminar los archivos físicos
+      if (material.fileUrl) {
+        const filename = path.basename(material.fileUrl);
+        const filepath = path.join(__dirname, '../../uploads/materials', filename);
+        if (fs.existsSync(filepath)) {
+          try { fs.unlinkSync(filepath); } catch (e) {}
+        }
+      }
+
+      if (material.fileUrl2) {
+        const filename2 = path.basename(material.fileUrl2);
+        const filepath2 = path.join(__dirname, '../../uploads/materials', filename2);
+        if (fs.existsSync(filepath2)) {
+          try { fs.unlinkSync(filepath2); } catch (e) {}
+        }
       }
 
       await (prisma as any).material.delete({ where: { id } });
@@ -178,7 +198,9 @@ export class MaterialsController {
 
   async updateMaterial(req: any, res: Response): Promise<Response> {
     try {
+      const files: any[] = req.files || (req.file ? [req.file] : []);
       if (!(await verificarPermisosAdmin(req))) {
+        files.forEach((f: any) => { if (f.path && fs.existsSync(f.path)) fs.unlinkSync(f.path); });
         return res.status(403).json({ success: false, message: 'Acceso denegado. Se requiere rol de Administrador.' });
       }
 
@@ -186,25 +208,66 @@ export class MaterialsController {
       const material = await (prisma as any).material.findUnique({ where: { id } });
 
       if (!material) {
+        files.forEach((f: any) => { if (f.path && fs.existsSync(f.path)) fs.unlinkSync(f.path); });
         return res.status(404).json({ success: false, message: 'Material no encontrado.' });
       }
 
       const { title, description, category } = req.body;
       if (!title || !category) {
+        files.forEach((f: any) => { if (f.path && fs.existsSync(f.path)) fs.unlinkSync(f.path); });
         return res.status(400).json({ success: false, message: 'El título y la categoría son obligatorios.' });
+      }
+
+      const updateData: any = {
+        title,
+        description: description || '',
+        category
+      };
+
+      if (files.length > 0) {
+        // Eliminar el archivo antiguo 1 del servidor
+        if (material.fileUrl) {
+          const oldFilename = path.basename(material.fileUrl);
+          const oldFilepath = path.join(__dirname, '../../uploads/materials', oldFilename);
+          if (fs.existsSync(oldFilepath)) {
+            try { fs.unlinkSync(oldFilepath); } catch (e) {}
+          }
+        }
+        // Eliminar el archivo antiguo 2 del servidor
+        if (material.fileUrl2) {
+          const oldFilename2 = path.basename(material.fileUrl2);
+          const oldFilepath2 = path.join(__dirname, '../../uploads/materials', oldFilename2);
+          if (fs.existsSync(oldFilepath2)) {
+            try { fs.unlinkSync(oldFilepath2); } catch (e) {}
+          }
+        }
+
+        const f1 = files[0];
+        updateData.size = formatSize(f1.size);
+        updateData.type = f1.mimetype === 'application/pdf' ? 'PDF' : 'IMAGE';
+        updateData.fileUrl = `/uploads/materials/${f1.filename}`;
+
+        if (files.length > 1) {
+          const f2 = files[1];
+          updateData.size2 = formatSize(f2.size);
+          updateData.type2 = f2.mimetype === 'application/pdf' ? 'PDF' : 'IMAGE';
+          updateData.fileUrl2 = `/uploads/materials/${f2.filename}`;
+        } else {
+          updateData.size2 = '';
+          updateData.type2 = '';
+          updateData.fileUrl2 = '';
+        }
       }
 
       const updated = await (prisma as any).material.update({
         where: { id },
-        data: {
-          title,
-          description: description || '',
-          category
-        }
+        data: updateData
       });
 
       return res.status(200).json({ success: true, message: 'Material actualizado correctamente.', material: updated });
     } catch (error: any) {
+      const files: any[] = req.files || (req.file ? [req.file] : []);
+      files.forEach((f: any) => { if (f.path && fs.existsSync(f.path)) fs.unlinkSync(f.path); });
       return res.status(500).json({ success: false, message: 'Error al actualizar material', error: error.message });
     }
   }

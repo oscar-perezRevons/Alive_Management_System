@@ -486,47 +486,47 @@ export const ProgramaPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100 bg-[#f0f2fc] dark:bg-slate-950 p-4 min-h-screen transition-colors duration-300 w-full">
+    <div className="space-y-4 sm:space-y-6 font-sans text-slate-800 dark:text-slate-100 bg-[#f0f2fc] dark:bg-slate-950 px-2 sm:px-6 py-4 min-h-screen transition-colors duration-300 w-full select-none pb-12">
       
       {/* ═══════ HEADER CON GRADIENTE ANIMADO ═══════ */}
-      <div className="relative flex flex-col sm:flex-row justify-between items-center gap-4 bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-lg transition-all duration-300 z-20 overflow-hidden">
+      <div className="relative flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl sm:rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-lg transition-all duration-300 z-20 overflow-hidden">
         {/* Barra de gradiente animada superior */}
         <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-500 via-indigo-500 via-violet-500 via-fuchsia-500 to-orange-400" style={{backgroundSize: '200% 100%', animation: 'shimmer 4s linear infinite'}} />
         <style>{`@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }`}</style>
         
-        <div className="flex items-center gap-3 w-full pt-1">
-          <div className="relative">
-            <div className="bg-gradient-to-br from-indigo-600 to-violet-600 p-3 rounded-2xl shadow-lg shadow-indigo-500/30">
-              <Calendar size={26} className="stroke-[2.5] text-white" />
+        <div className="flex items-center gap-3 min-w-0 pt-1">
+          <div className="relative shrink-0">
+            <div className="bg-gradient-to-br from-indigo-600 to-violet-600 p-2.5 sm:p-3 rounded-2xl shadow-lg shadow-indigo-500/30">
+              <Calendar size={22} className="stroke-[2.5] text-white sm:w-6 sm:h-6" />
             </div>
             <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-emerald-400 rounded-full border-2 border-white dark:border-slate-900 animate-pulse" />
           </div>
-          <div>
-            <h1 className="text-2xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 dark:from-indigo-400 to-violet-700 dark:to-violet-400">📅 Programa General</h1>
-            <p className="text-xs text-slate-400 dark:text-slate-400 font-bold uppercase tracking-widest mt-0.5">Sistema Oficial de Programación</p>
+          <div className="min-w-0">
+            <h1 className="text-xl sm:text-2xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 dark:from-indigo-400 to-violet-700 dark:to-violet-400 truncate">📅 Programa General</h1>
+            <p className="text-[10px] sm:text-xs text-slate-400 dark:text-slate-400 font-bold uppercase tracking-widest mt-0.5 truncate">Sistema Oficial de Programación</p>
           </div>
         </div>
-        <div className="flex items-center gap-2 bg-indigo-50 dark:bg-indigo-950/60 px-4 py-2 rounded-xl border border-indigo-100 dark:border-indigo-800/60 text-[11px] font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-300">
+        <div className="w-full sm:w-auto flex items-center justify-center gap-2 bg-indigo-50 dark:bg-indigo-950/60 px-3.5 py-2 rounded-xl border border-indigo-100 dark:border-indigo-800/60 text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-300 shrink-0">
           <Calendar size={13} className="animate-pulse" />
           Programa Sabático
         </div>
       </div>
 
       {/* SECCIÓN ACCIONES RÁPIDAS */}
-      <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border-l-4 border-l-indigo-500 border border-slate-200/60 dark:border-slate-800 shadow-md hover:shadow-xl hover:-translate-y-0.5 flex flex-col sm:flex-row items-center justify-between gap-4 relative overflow-hidden group transition-all duration-300">
+      <div className="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl sm:rounded-3xl border-l-4 border-l-indigo-500 border border-slate-200/60 dark:border-slate-800 shadow-md hover:shadow-xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative overflow-hidden group transition-all duration-300">
         <div className="absolute right-0 top-0 opacity-5 rotate-12 pointer-events-none transition-transform group-hover:scale-110">
           <Calendar size={120} className="text-indigo-500" />
         </div>
-        <div className="flex items-center gap-4 relative z-10 w-full sm:w-auto">
-          <div className="w-14 h-14 bg-gradient-to-br from-indigo-400 to-blue-600 text-white rounded-full flex items-center justify-center shrink-0 shadow-lg shadow-indigo-500/20"><ListCollapse size={24} /></div>
+        <div className="flex items-center gap-3.5 sm:gap-4 relative z-10 w-full sm:w-auto">
+          <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-indigo-400 to-blue-600 text-white rounded-full flex items-center justify-center shrink-0 shadow-lg shadow-indigo-500/20"><ListCollapse size={22} className="sm:w-6 sm:h-6" /></div>
           <div>
-            <h3 className="text-sm font-black text-slate-900 dark:text-white">Programa Oficial Sabático</h3>
-            <p className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold mt-0.5">Estructura vigente y panel interactivo del itinerario de la iglesia.</p>
+            <h3 className="text-xs sm:text-sm font-black text-slate-900 dark:text-white">Programa Oficial Sabático</h3>
+            <p className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-semibold mt-0.5">Estructura vigente y panel interactivo del itinerario de la iglesia.</p>
           </div>
         </div>
         <button 
           onClick={() => setIsPreviewModalOpen(true)}
-          className="w-full sm:w-auto bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white text-[11px] font-black py-3 px-6 rounded-xl transition-all shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 uppercase tracking-wider flex items-center justify-center gap-1.5 relative z-10 active:scale-95 cursor-pointer"
+          className="w-full sm:w-auto bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white text-[10px] sm:text-[11px] font-black py-2.5 sm:py-3 px-5 sm:px-6 rounded-xl transition-all shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/50 uppercase tracking-wider flex items-center justify-center gap-1.5 relative z-10 active:scale-95 cursor-pointer shrink-0"
         >
           <Eye size={14} className="stroke-[3]" /> Ver Programa Oficial (Vista Previa) →
         </button>
@@ -650,27 +650,27 @@ export const ProgramaPage: React.FC = () => {
       )}
 
       {/* ═══════ SECCIÓN CENTRAL DE TRABAJO E ITINERARIOS ═══════ */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 items-start">
         
         {/* PANEL TABLA GENERAL EN ANCHO 2/3 */}
-        <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-3xl shadow-lg border border-slate-200/80 dark:border-slate-800 overflow-hidden relative">
+        <div className="lg:col-span-2 bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl shadow-lg border border-slate-200/80 dark:border-slate-800 overflow-hidden relative">
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-400 via-indigo-500 to-purple-500" />
-          <div className="p-4 bg-slate-50 dark:bg-slate-800/80 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 px-5">
+          <div className="p-4 bg-slate-50 dark:bg-slate-800/80 border-b border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 px-4 sm:px-5">
             <div className="flex items-center gap-3">
-              <div className="p-1.5 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg text-white shadow-md shadow-indigo-500/20"><FileText size={14} /></div>
+              <div className="p-1.5 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg text-white shadow-md shadow-indigo-500/20 shrink-0"><FileText size={14} /></div>
               <div>
                 <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">Puntos de Actividades Registrados</h3>
                 <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold">Gestión continua de eventos e himnos dominicales/sabáticos.</p>
               </div>
             </div>
-            <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end flex-wrap">
+            <div className="flex items-center gap-2 w-full sm:w-auto justify-start sm:justify-end flex-wrap">
               {currentUserRole === 'ADMIN' && (
                 <>
-                  <button onClick={openCreateModal} className="text-[10px] font-black uppercase text-white bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 py-2.5 px-4 rounded-xl flex items-center gap-1 transition-all active:scale-95 shadow-md shadow-indigo-500/20 hover:scale-[1.02] cursor-pointer"><Plus size={13} className="stroke-[3]" /> Agregar Punto</button>
-                  <button onClick={handleClearAllEventsClick} className="text-[10px] font-black uppercase text-white bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 py-2.5 px-4 rounded-xl flex items-center gap-1 transition-all active:scale-95 shadow-md shadow-rose-500/20 hover:scale-[1.02] cursor-pointer"><Trash2 size={13} /> Limpiar Programa</button>
+                  <button onClick={openCreateModal} className="flex-1 sm:flex-none justify-center text-[10px] font-black uppercase text-white bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 py-2.5 px-3.5 rounded-xl flex items-center gap-1 transition-all active:scale-95 shadow-md shadow-indigo-500/20 hover:scale-[1.02] cursor-pointer"><Plus size={13} className="stroke-[3]" /> Agregar Punto</button>
+                  <button onClick={handleClearAllEventsClick} className="flex-1 sm:flex-none justify-center text-[10px] font-black uppercase text-white bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 py-2.5 px-3.5 rounded-xl flex items-center gap-1 transition-all active:scale-95 shadow-md shadow-rose-500/20 hover:scale-[1.02] cursor-pointer"><Trash2 size={13} /> Limpiar Programa</button>
                 </>
               )}
-              <button onClick={generatePDFReport} className="text-[10px] font-black uppercase bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white py-2.5 px-4 rounded-xl flex items-center gap-1.5 shadow-md shadow-amber-500/20 transition-all hover:scale-105 active:scale-95 cursor-pointer"><Download size={13} className="stroke-[3]" /> Exportar Reporte</button>
+              <button onClick={generatePDFReport} className="w-full sm:w-auto justify-center text-[10px] font-black uppercase bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white py-2.5 px-4 rounded-xl flex items-center gap-1.5 shadow-md shadow-amber-500/20 transition-all hover:scale-105 active:scale-95 cursor-pointer"><Download size={13} className="stroke-[3]" /> Exportar Reporte</button>
             </div>
           </div>
 
@@ -884,43 +884,43 @@ export const ProgramaPage: React.FC = () => {
 
       {/* 🔍 MODAL DE VISTA PREVIA DEL PROGRAMA PARCIAL */}
       {isPreviewModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm animate-fadeIn">
-          <div className="bg-white dark:bg-slate-900 w-full max-w-3xl p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl space-y-5 mx-4 flex flex-col max-h-[85vh] relative overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-3 sm:p-4 animate-fadeIn">
+          <div className="bg-white dark:bg-slate-900 w-full max-w-3xl p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl space-y-4 sm:space-y-5 my-auto flex flex-col max-h-[85vh] relative overflow-hidden">
             <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-500 via-indigo-500 to-fuchsia-500" />
             <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-3">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-gradient-to-br from-indigo-500 to-blue-600 text-white rounded-xl shadow-lg shadow-indigo-500/20"><ListCollapse size={20} /></div>
+                <div className="p-2 sm:p-2.5 bg-gradient-to-br from-indigo-500 to-blue-600 text-white rounded-xl shadow-lg shadow-indigo-500/20 shrink-0"><ListCollapse size={18} className="sm:w-5 sm:h-5" /></div>
                 <div>
-                  <h3 className="text-base font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-fuchsia-600 dark:from-indigo-400 dark:to-fuchsia-400 uppercase tracking-tight">Vista Previa Parcial</h3>
-                  <p className="text-[11px] text-slate-500 dark:text-slate-400 font-bold">Estado actual de la programación oficial sabática</p>
+                  <h3 className="text-sm sm:text-base font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-fuchsia-600 dark:from-indigo-400 dark:to-fuchsia-400 uppercase tracking-tight">Vista Previa Parcial</h3>
+                  <p className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-bold">Estado actual de la programación oficial sabática</p>
                 </div>
               </div>
-              <button onClick={() => setIsPreviewModalOpen(false)} className="text-slate-400 p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"><X size={18} /></button>
+              <button onClick={() => setIsPreviewModalOpen(false)} className="text-slate-400 p-1.5 sm:p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"><X size={18} /></button>
             </div>
             
-            <div className="overflow-y-auto flex-1 border border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50/50 dark:bg-slate-950/30">
+            <div className="overflow-x-auto overflow-y-auto flex-1 border border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50/50 dark:bg-slate-950/30 scrollbar-none">
               {events.length === 0 ? (
                 <div className="p-8 text-center text-slate-400 font-bold text-xs uppercase">No hay puntos registrados en el programa parcial todavía.</div>
               ) : (
                 <table className="w-full text-left border-collapse">
                   <thead>
                     <tr className="bg-gradient-to-r from-indigo-600 to-blue-700 text-white text-[10px] uppercase tracking-wider sticky top-0 z-10 shadow-md">
-                      <th className="p-4 text-center w-12 rounded-tl-xl pl-6">#</th>
-                      <th className="p-4 w-32">Horario</th>
-                      <th className="p-4">Actividad / Punto</th>
-                      <th className="p-4 rounded-tr-xl pr-6">Responsable</th>
+                      <th className="p-3 sm:p-4 text-center w-12 rounded-tl-xl pl-4 sm:pl-6">#</th>
+                      <th className="p-3 sm:p-4 w-28 sm:w-32">Horario</th>
+                      <th className="p-3 sm:p-4">Actividad / Punto</th>
+                      <th className="p-3 sm:p-4 rounded-tr-xl pr-4 sm:pr-6">Responsable</th>
                     </tr>
                   </thead>
                   <tbody className="text-xs font-bold text-slate-600 dark:text-slate-300 bg-white dark:bg-slate-900/50">
                     {events.map((event, index) => (
                       <tr key={event.id} className={`border-b border-slate-100 dark:border-slate-800 transition-colors ${index % 2 === 0 ? 'bg-transparent' : 'bg-slate-50/50 dark:bg-slate-800/30'} ${!event.isActive ? 'opacity-40 line-through' : ''}`}>
-                        <td className="p-4 pl-6 text-center font-mono text-slate-400 dark:text-slate-500 font-black">{index + 1}</td>
-                        <td className="p-4 font-mono text-indigo-600 dark:text-indigo-400 font-black flex items-center gap-2.5 text-lg"><span className="w-2.5 h-2.5 rounded-full bg-indigo-500 shadow-sm animate-pulse" /> {event.timeSlot}</td>
-                        <td className="p-4 font-black text-slate-800 dark:text-slate-200 uppercase tracking-tight">
+                        <td className="p-3 sm:p-4 pl-4 sm:pl-6 text-center font-mono text-slate-400 dark:text-slate-500 font-black">{index + 1}</td>
+                        <td className="p-3 sm:p-4 font-mono text-indigo-600 dark:text-indigo-400 font-black flex items-center gap-2 text-base sm:text-lg"><span className="w-2 h-2 rounded-full bg-indigo-500 shadow-sm animate-pulse shrink-0" /> {event.timeSlot}</td>
+                        <td className="p-3 sm:p-4 font-black text-slate-800 dark:text-slate-200 uppercase tracking-tight">
                           <div>{event.title}</div>
                           {event.description && <span className="text-[10px] text-slate-400 dark:text-slate-500 font-medium normal-case block mt-0.5">{event.description}</span>}
                         </td>
-                        <td className="p-4 pr-6 text-slate-500 dark:text-slate-400 font-bold uppercase">
+                        <td className="p-3 sm:p-4 pr-4 sm:pr-6 text-slate-500 dark:text-slate-400 font-bold uppercase">
                           <span className="bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-md">{event.responsible || '-'}</span>
                         </td>
                       </tr>
@@ -931,7 +931,7 @@ export const ProgramaPage: React.FC = () => {
             </div>
 
             <div className="flex justify-end pt-2 border-t border-slate-100 dark:border-slate-800">
-              <button type="button" onClick={() => setIsPreviewModalOpen(false)} className="px-6 py-3 bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-700 hover:to-slate-800 dark:from-slate-700 dark:to-slate-600 text-white rounded-xl font-black text-xs uppercase tracking-wider shadow-lg shadow-slate-900/20 transition-all hover:scale-105 active:scale-95">Cerrar Vista Previa</button>
+              <button type="button" onClick={() => setIsPreviewModalOpen(false)} className="w-full sm:w-auto px-6 py-2.5 sm:py-3 bg-gradient-to-r from-slate-800 to-slate-900 hover:from-slate-700 hover:to-slate-800 dark:from-slate-700 dark:to-slate-600 text-white rounded-xl font-black text-xs uppercase tracking-wider shadow-lg shadow-slate-900/20 transition-all active:scale-95 cursor-pointer">Cerrar Vista Previa</button>
             </div>
           </div>
         </div>
@@ -939,15 +939,15 @@ export const ProgramaPage: React.FC = () => {
 
       {/* MODAL CONFIGURACIÓN BLOQUE */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs animate-fadeIn">
-          <div className="bg-white dark:bg-slate-900 w-full max-w-sm p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl shadow-indigo-500/10 space-y-4 mx-4 relative overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/60 backdrop-blur-sm p-3 sm:p-4 animate-fadeIn overflow-y-auto">
+          <div className="bg-white dark:bg-slate-900 w-full max-w-md p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl space-y-4 my-auto relative overflow-hidden max-h-[90vh] flex flex-col">
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 to-fuchsia-500" />
-            <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-3 mb-2">
-              <h3 className="text-sm font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-fuchsia-600 dark:from-indigo-400 dark:to-fuchsia-400 uppercase flex items-center gap-2"><Clock size={16} className="text-indigo-500" /> Configurar Bloque</h3>
-              <button onClick={() => setIsModalOpen(false)} className="text-slate-400 p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"><X size={16} /></button>
+            <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-800 pb-3">
+              <h3 className="text-xs sm:text-sm font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-fuchsia-600 dark:from-indigo-400 dark:to-fuchsia-400 uppercase flex items-center gap-2"><Clock size={16} className="text-indigo-500" /> Configurar Bloque</h3>
+              <button onClick={() => setIsModalOpen(false)} className="text-slate-400 p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"><X size={16} /></button>
             </div>
             
-            <form onSubmit={handleFormSubmit} className="space-y-4 text-xs font-bold text-slate-600">
+            <form onSubmit={handleFormSubmit} className="space-y-4 text-xs font-bold text-slate-600 overflow-y-auto pr-1">
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <label className="text-[10px] font-black text-slate-400 uppercase">Horario</label>

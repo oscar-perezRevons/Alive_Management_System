@@ -347,25 +347,25 @@ export const DashboardPage: React.FC = () => {
     <div className="space-y-6 font-sans text-slate-800 dark:text-slate-200 animate-fadeIn w-full select-none transition-colors duration-300">
 
       {/* ═══════ HEADER CARD (Tailored for Admin vs User) ═══════ */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl p-6 rounded-2xl border border-slate-200/60 dark:border-slate-800/80 shadow-premium transition-all duration-300 relative overflow-hidden">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl p-4 sm:p-6 rounded-2xl border border-slate-200/60 dark:border-slate-800/80 shadow-premium transition-all duration-300 relative overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-violet-500 to-purple-500" />
         
         <div className="space-y-1">
-          <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
-            <div className="p-2 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-xl text-white shadow-lg shadow-indigo-500/25">
-              {isAdmin ? <Crown size={20} /> : <Sparkles size={20} />}
+          <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-2.5 sm:gap-3">
+            <div className="p-1.5 sm:p-2 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-xl text-white shadow-lg shadow-indigo-500/25 shrink-0">
+              {isAdmin ? <Crown size={18} className="sm:w-5 sm:h-5" /> : <Sparkles size={18} className="sm:w-5 sm:h-5" />}
             </div>
             {isAdmin ? 'Panel de Administración' : `Bienvenido, ${userNameFirst}`}
           </h1>
-          <p className="text-xs text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider pl-12">
+          <p className="text-[10px] sm:text-xs text-slate-400 dark:text-slate-500 font-semibold uppercase tracking-wider pl-0 sm:pl-12">
             {isAdminOrLeader
               ? 'Centro neurálgico de operaciones, supervisión y gestión colectiva'
               : 'Tu portal interactivo del Ministerio Joven Alive Maranata Adoración'}
           </p>
         </div>
 
-        <div className="flex items-center gap-2 bg-gradient-to-r from-indigo-50 to-violet-50 dark:from-indigo-950/50 dark:to-violet-950/30 border border-indigo-200/50 dark:border-indigo-800/40 px-4 py-2.5 rounded-xl text-xs font-bold text-indigo-700 dark:text-indigo-300 uppercase tracking-wide shadow-sm transition-colors">
-          <Calendar size={15} className="text-indigo-500 dark:text-indigo-400" />
+        <div className="w-full sm:w-auto flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-50 to-violet-50 dark:from-indigo-950/50 dark:to-violet-950/30 border border-indigo-200/50 dark:border-indigo-800/40 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl text-[11px] sm:text-xs font-bold text-indigo-700 dark:text-indigo-300 uppercase tracking-wide shadow-sm transition-colors shrink-0">
+          <Calendar size={14} className="text-indigo-500 dark:text-indigo-400 shrink-0" />
           <span>{fechaHoy}</span>
         </div>
       </div>
@@ -378,27 +378,27 @@ export const DashboardPage: React.FC = () => {
       )}
 
       {/* ═══════ KPI STATS CARDS ═══════ */}
-      <div className={`grid grid-cols-1 sm:grid-cols-2 ${statCards.length === 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-4`}>
+      <div className={`grid grid-cols-2 ${statCards.length === 4 ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-2.5 sm:gap-4`}>
         {statCards.map((card, i) => (
           <div
             key={i}
-            className={`${card.topBorder} bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl p-5 rounded-2xl border border-slate-200/50 dark:border-slate-800/60 shadow-premium flex items-center gap-4 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-card-hover dark:hover:shadow-card-hover-dark group cursor-default relative overflow-hidden`}
+            className={`${card.topBorder} bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl p-3.5 sm:p-5 rounded-2xl border border-slate-200/50 dark:border-slate-800/60 shadow-premium flex items-center gap-2.5 sm:gap-4 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-card-hover dark:hover:shadow-card-hover-dark group cursor-default relative overflow-hidden`}
             style={{ animationDelay: `${i * 100}ms` }}
           >
             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 dark:via-white/5 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000 pointer-events-none" />
 
-            <div className={`p-3 ${card.bgIcon} rounded-xl shrink-0 border transition-transform duration-300 group-hover:scale-110`}>
+            <div className={`p-2.5 sm:p-3 ${card.bgIcon} rounded-xl shrink-0 border transition-transform duration-300 group-hover:scale-110`}>
               {card.icon}
             </div>
             <div className="space-y-0.5 min-w-0 relative z-10">
-              <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block">{card.label}</span>
+              <span className="text-[9px] sm:text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider block truncate">{card.label}</span>
               {card.value ? (
-                <span className={`text-base font-extrabold tracking-tight block ${card.isHighlighted ? 'text-indigo-600 dark:text-indigo-400 uppercase truncate font-black' : 'text-slate-900 dark:text-white'}`}>
+                <span className={`text-xs sm:text-base font-extrabold tracking-tight block ${card.isHighlighted ? 'text-indigo-600 dark:text-indigo-400 uppercase truncate font-black' : 'text-slate-900 dark:text-white'}`}>
                   {card.value}
                 </span>
               ) : (
-                <button onClick={fetchHomeData} className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5 mt-1 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors cursor-pointer uppercase tracking-wider group/btn">
-                  <RefreshCw size={12} className="animate-spin [animation-duration:3s] group-hover/btn:text-emerald-500" /> Actualizar UI
+                <button onClick={fetchHomeData} className="text-[9px] sm:text-[10px] font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1 mt-0.5 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors cursor-pointer uppercase tracking-wider group/btn">
+                  <RefreshCw size={11} className="animate-spin [animation-duration:3s] group-hover/btn:text-emerald-500" /> Actualizar
                 </button>
               )}
             </div>
@@ -407,13 +407,13 @@ export const DashboardPage: React.FC = () => {
       </div>
 
       {/* ═══════ HERO SLIDER PREMIUM ═══════ */}
-      <div className="relative rounded-3xl overflow-hidden min-h-[350px] md:min-h-[390px] shadow-2xl dark:shadow-[0_20px_50px_rgba(0,0,0,0.7)] border-2 border-slate-200/50 dark:border-slate-700/50 transition-colors duration-300 group/slider">
+      <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden min-h-[290px] sm:min-h-[350px] md:min-h-[390px] shadow-2xl dark:shadow-[0_20px_50px_rgba(0,0,0,0.7)] border-2 border-slate-200/50 dark:border-slate-700/50 transition-colors duration-300 group/slider">
         {slides.map((slide, index) => {
           const isActive = index === activeSlide;
           return (
             <div
               key={slide.id}
-              className={`absolute inset-0 w-full h-full flex flex-col justify-between p-7 md:p-10 text-white transition-all duration-700 ease-in-out ${
+              className={`absolute inset-0 w-full h-full flex flex-col justify-between p-4 sm:p-7 md:p-10 text-white transition-all duration-700 ease-in-out ${
                 isActive ? "opacity-100 scale-100 z-10" : "opacity-0 scale-105 pointer-events-none z-0"
               }`}
               style={{
@@ -433,42 +433,42 @@ export const DashboardPage: React.FC = () => {
               </div>
 
               <div className="flex justify-between items-start w-full relative z-10">
-                <div className="flex items-center gap-3">
-                  <div className={`p-2.5 ${slide.iconBg} rounded-xl shadow-lg inline-flex items-center justify-center shrink-0`}>
-                    {React.cloneElement(slide.icon as React.ReactElement<any>, { size: 22 })}
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <div className={`p-2 sm:p-2.5 ${slide.iconBg} rounded-xl shadow-lg inline-flex items-center justify-center shrink-0`}>
+                    {React.cloneElement(slide.icon as React.ReactElement<any>, { size: 18 })}
                   </div>
-                  <span className={`px-3.5 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] backdrop-blur-md rounded-xl border ${slide.badgeBg} flex items-center gap-2 shadow-xs`}>
-                    <span className="w-2 h-2 rounded-full animate-pulse bg-current shadow-[0_0_8px_rgba(255,255,255,0.8)]"></span>
+                  <span className={`px-2.5 sm:px-3.5 py-1 sm:py-1.5 text-[9px] sm:text-[10px] font-black uppercase tracking-[0.15em] sm:tracking-[0.2em] backdrop-blur-md rounded-xl border ${slide.badgeBg} flex items-center gap-1.5 shadow-xs`}>
+                    <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full animate-pulse bg-current shadow-[0_0_8px_rgba(255,255,255,0.8)]"></span>
                     {slide.badge}
                   </span>
                 </div>
               </div>
 
-              <div className="space-y-4 max-w-2xl relative z-10 text-left my-auto">
-                <h2 className="text-3xl md:text-5xl font-black tracking-tight uppercase leading-[1.05] drop-shadow-[0_4px_25px_rgba(0,0,0,0.6)]">
+              <div className="space-y-2 sm:space-y-4 max-w-2xl relative z-10 text-left my-auto">
+                <h2 className="text-2xl sm:text-4xl md:text-5xl font-black tracking-tight uppercase leading-[1.05] drop-shadow-[0_4px_25px_rgba(0,0,0,0.6)]">
                   {slide.title}
                 </h2>
-                <p className="text-sm md:text-base text-white/90 font-medium leading-relaxed max-w-xl">
+                <p className="text-xs sm:text-sm md:text-base text-white/90 font-medium leading-relaxed max-w-xl line-clamp-2 sm:line-clamp-none">
                   {slide.subtitle}
                 </p>
                 <div className="pt-1">
                   <Link
                     to={slide.link}
-                    className={`inline-flex items-center justify-center gap-3 px-8 sm:px-9 py-3.5 ${slide.btnBg} font-black text-xs uppercase tracking-wider rounded-2xl transition-all duration-300 shadow-xl hover:scale-[1.03] active:scale-95 cursor-pointer whitespace-nowrap group/btn`}
+                    className={`inline-flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-9 py-2.5 sm:py-3.5 ${slide.btnBg} font-black text-[11px] sm:text-xs uppercase tracking-wider rounded-xl sm:rounded-2xl transition-all duration-300 shadow-xl hover:scale-[1.03] active:scale-95 cursor-pointer whitespace-nowrap group/btn`}
                   >
                     <span>{slide.buttonText}</span>
-                    <ArrowRight size={16} className="group-hover/btn:translate-x-1 transition-transform stroke-[3] shrink-0" />
+                    <ArrowRight size={15} className="group-hover/btn:translate-x-1 transition-transform stroke-[3] shrink-0" />
                   </Link>
                 </div>
               </div>
 
               {/* Slide Progress indicators */}
-              <div className="flex gap-3 items-center w-full relative z-10 pt-3">
+              <div className="flex gap-2 sm:gap-3 items-center w-full relative z-10 pt-2 sm:pt-3">
                 {slides.map((s, idx) => (
                   <button
                     key={s.id}
                     onClick={() => setActiveSlide(idx)}
-                    className={`flex-1 h-2 rounded-full relative overflow-hidden transition-all cursor-pointer ${idx === activeSlide ? 'bg-white/40' : 'bg-white/15 hover:bg-white/30'}`}
+                    className={`flex-1 h-1.5 sm:h-2 rounded-full relative overflow-hidden transition-all cursor-pointer ${idx === activeSlide ? 'bg-white/40' : 'bg-white/15 hover:bg-white/30'}`}
                   >
                     <div
                       className="absolute left-0 top-0 h-full bg-gradient-to-r from-white via-white to-amber-300 rounded-full shadow-sm"
@@ -487,39 +487,39 @@ export const DashboardPage: React.FC = () => {
       </div>
 
       {/* ═══════ QUICK ACCESS SECTION (Tailored per role) ═══════ */}
-      <div className="space-y-4 pt-1">
+      <div className="space-y-3 sm:space-y-4 pt-1">
         <div className="flex items-center gap-3 px-1">
           <div className="flex items-center gap-2">
             <div className="w-1 h-6 bg-gradient-to-b from-indigo-500 to-violet-500 rounded-full"></div>
-            <h2 className="text-sm font-black text-slate-900 dark:text-white tracking-wider uppercase">
+            <h2 className="text-xs sm:text-sm font-black text-slate-900 dark:text-white tracking-wider uppercase">
               Accesos Rápidos
             </h2>
           </div>
           <div className="flex-1 h-px bg-gradient-to-r from-slate-200 dark:from-slate-800 to-transparent"></div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           {quickAccessCards.map((card, i) => (
             <Link 
               key={i}
               to={card.to} 
-              className={`group bg-white dark:bg-slate-900/90 backdrop-blur-xl p-5 rounded-2xl border border-slate-200/60 dark:border-slate-800 shadow-premium flex flex-col justify-between gap-4 transition-all duration-300 hover:-translate-y-1.5 active:translate-y-0 active:scale-[0.98] hover:shadow-card-hover dark:hover:shadow-card-hover-dark ${card.borderHover} relative overflow-hidden focus:outline-none`}
+              className={`group bg-white dark:bg-slate-900/90 backdrop-blur-xl p-4 sm:p-5 rounded-2xl border border-slate-200/60 dark:border-slate-800 shadow-premium flex flex-col justify-between gap-3 sm:gap-4 transition-all duration-300 hover:-translate-y-1.5 active:translate-y-0 active:scale-[0.98] hover:shadow-card-hover dark:hover:shadow-card-hover-dark ${card.borderHover} relative overflow-hidden focus:outline-none`}
               style={{ animationDelay: `${i * 80}ms` }}
             >
               <div className={`absolute inset-0 bg-gradient-to-br ${card.gradientOverlay} opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none`} />
               
               <div className="flex items-center justify-between relative z-10">
-                <div className={`p-3 rounded-xl border transition-all duration-300 group-hover:scale-110 ${card.iconBg}`}>
+                <div className={`p-2.5 sm:p-3 rounded-xl border transition-all duration-300 group-hover:scale-110 ${card.iconBg}`}>
                   {card.icon}
                 </div>
                 <span className={`text-[9px] font-bold ${card.tagBg} px-2.5 py-1 rounded-lg uppercase tracking-wider border`}>{card.tag}</span>
               </div>
-              <div className="space-y-1.5 relative z-10">
-                <h3 className={`text-sm font-black text-slate-800 dark:text-white uppercase tracking-tight ${card.titleHover} transition-colors flex items-center gap-2`}>
+              <div className="space-y-1 sm:space-y-1.5 relative z-10">
+                <h3 className={`text-xs sm:text-sm font-black text-slate-800 dark:text-white uppercase tracking-tight ${card.titleHover} transition-colors flex items-center gap-2`}>
                   {card.title}
                   <ArrowRight size={14} className="opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all text-slate-400" />
                 </h3>
-                <p className="text-[11px] text-slate-400 dark:text-slate-500 font-medium leading-relaxed">{card.desc}</p>
+                <p className="text-[10px] sm:text-[11px] text-slate-400 dark:text-slate-500 font-medium leading-relaxed">{card.desc}</p>
               </div>
             </Link>
           ))}

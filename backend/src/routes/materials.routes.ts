@@ -43,9 +43,9 @@ router.use(authMiddleware);
 router.get('/categories', materialsController.getCategories);
 router.post('/categories', materialsController.createCategory);
 router.get('/', materialsController.getMaterials);
-router.post('/upload', upload.single('file'), materialsController.uploadMaterial);
+router.post('/upload', upload.any(), materialsController.uploadMaterial);
 router.put('/:id/visibility', materialsController.toggleVisibility);
-router.put('/:id', materialsController.updateMaterial);
+router.put('/:id', upload.any(), materialsController.updateMaterial);
 router.delete('/:id', materialsController.deleteMaterial);
 
 export default router;

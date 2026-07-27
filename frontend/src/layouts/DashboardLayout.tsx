@@ -17,7 +17,8 @@ import {
   Sun,
   Moon,
   ChevronRight,
-  Sparkles
+  Sparkles,
+  X
 } from 'lucide-react';
 import logoImage from '../assets/logo.png';
 
@@ -31,6 +32,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
   const [avatarBg, setAvatarBg] = useState('bg-gradient-to-tr from-blue-600 to-indigo-700 text-white');
   const [theme, setTheme] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -38,6 +40,12 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
     }
     return 'light';
   });
+
+  const isExpanded = sidebarOpen || mobileSidebarOpen;
+
+  useEffect(() => {
+    setMobileSidebarOpen(false);
+  }, [location.pathname]);
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -68,11 +76,21 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
   return (
     <div className="flex h-screen bg-slate-100 dark:bg-slate-950 font-sans overflow-hidden antialiased text-slate-800 dark:text-slate-200 transition-colors duration-500">
       
-      {/* ═══════ SIDEBAR ═══════ */}
-      <div
-        className={`${
-          sidebarOpen ? 'w-64' : 'w-20'
-        } relative transition-all duration-300 flex flex-col z-20 shrink-0 select-none overflow-hidden`}
+      {/* Mobile Sidebar Overlay (Backdrop) */}
+      {mobileSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-40 lg:hidden transition-opacity duration-300 animate-fadeIn"
+          onClick={() => setMobileSidebarOpen(false)}
+        />
+      )}
+
+      {/* ═══════ SIDEBAR DESKTOP + MOBILE DRAWER ═══════ */}
+      <aside
+        className={`
+          fixed lg:static inset-y-0 left-0 z-50 flex flex-col shrink-0 select-none overflow-hidden transition-all duration-300
+          ${mobileSidebarOpen ? 'translate-x-0 w-64 shadow-2xl' : '-translate-x-full lg:translate-x-0'}
+          ${sidebarOpen ? 'lg:w-64' : 'lg:w-20'}
+        `}
       >
         {/* Sidebar Background — Gradient with animated orbs */}
         <div className="absolute inset-0 bg-gradient-to-b from-indigo-950 via-slate-900 to-slate-950 dark:from-[#060818] dark:via-[#0a0e24] dark:to-[#050711]" />
@@ -82,7 +100,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
 
         {/* Brand Section */}
         <div className="relative p-5 flex flex-col items-center justify-center min-h-[210px] border-b border-white/5">
-          {sidebarOpen ? (
+          {isExpanded ? (
             <div className="text-center space-y-3 animate-fadeIn">
               <div className="w-24 h-24 mx-auto flex items-center justify-center transform transition hover:scale-110 duration-500 relative">
                 <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/30 to-violet-500/30 rounded-2xl blur-xl animate-glow-pulse" />
@@ -109,42 +127,49 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
           )}
           
           <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="absolute top-3 right-3 p-1.5 hover:bg-white/10 rounded-lg text-white/40 hover:text-white transition-all active:scale-90 cursor-pointer"
-            title={sidebarOpen ? "Contraer menú" : "Expandir menú"}
+            onClick={() => {
+              if (mobileSidebarOpen) {
+                setMobileSidebarOpen(false);
+              } else {
+                setSidebarOpen(!sidebarOpen);
+              }
+            }}
+            className="absolute top-3 right-3 p-1.5 hover:bg-white/10 rounded-lg text-white/50 hover:text-white transition-all active:scale-90 cursor-pointer"
+            title={mobileSidebarOpen ? "Cerrar menú" : sidebarOpen ? "Contraer menú" : "Expandir menú"}
           >
-            <Menu size={16} />
+            <span className="hidden lg:inline"><Menu size={16} /></span>
+            <span className="lg:hidden"><X size={18} /></span>
           </button>
         </div>
 
         {/* Navigation */}
         <nav className="relative mt-3 flex-1 space-y-1 px-3 overflow-y-auto custom-scrollbar">
-          <MenuLink to="/dashboard" icon={<Home size={19} />} label="Inicio" open={sidebarOpen} />
+          <MenuLink to="/dashboard" icon={<Home size={19} />} label="Inicio" open={isExpanded} />
           {hasAnyAccessRole(user, ['ADMIN', 'LIDER_GP']) && (
-            <MenuLink to="/dashboard/secretaria" icon={<UserCheck size={19} />} label="Secretaría" open={sidebarOpen} />
+            <MenuLink to="/dashboard/secretaria" icon={<UserCheck size={19} />} label="Secretaría" open={isExpanded} />
           )}
           {hasAnyAccessRole(user, ['ADMIN']) && (
-            <MenuLink to="/dashboard/puntuaciones" icon={<Award size={19} />} label="Puntuaciones" open={sidebarOpen} />
+            <MenuLink to="/dashboard/puntuaciones" icon={<Award size={19} />} label="Puntuaciones" open={isExpanded} />
           )}
           {hasAnyAccessRole(user, ['ADMIN', 'LIDER_GP']) && (
-            <MenuLink to="/dashboard/programa" icon={<CalendarDays size={19} />} label="Programa General" open={sidebarOpen} />
+            <MenuLink to="/dashboard/programa" icon={<CalendarDays size={19} />} label="Programa General" open={isExpanded} />
           )}
-          <MenuLink to="/dashboard/matinales" icon={<BookOpen size={19} />} label="Matinales" open={sidebarOpen} />
-          <MenuLink to="/dashboard/eventos" icon={<Users size={19} />} label="Eventos" open={sidebarOpen} />
-          <MenuLink to="/dashboard/ranking" icon={<BarChart3 size={19} />} label="Ranking" open={sidebarOpen} />
-          <MenuLink to="/dashboard/materiales" icon={<Folder size={19} />} label="Materiales" open={sidebarOpen} />
-          <MenuLink to="/dashboard/profile" icon={<User size={19} />} label="Mi Perfil" open={sidebarOpen} />
+          <MenuLink to="/dashboard/matinales" icon={<BookOpen size={19} />} label="Matinales" open={isExpanded} />
+          <MenuLink to="/dashboard/eventos" icon={<Users size={19} />} label="Eventos" open={isExpanded} />
+          <MenuLink to="/dashboard/ranking" icon={<BarChart3 size={19} />} label="Ranking" open={isExpanded} />
+          <MenuLink to="/dashboard/materiales" icon={<Folder size={19} />} label="Materiales" open={isExpanded} />
+          <MenuLink to="/dashboard/profile" icon={<User size={19} />} label="Mi Perfil" open={isExpanded} />
 
           {user?.role === 'ADMIN' && (
             <div className="pt-3 mt-3 border-t border-white/5 space-y-1">
-              <p className={`text-[9px] font-bold tracking-[0.2em] text-indigo-400/60 uppercase px-4 mb-1 ${sidebarOpen ? 'block' : 'hidden'}`}>Administración</p>
-              <MenuLink to="/dashboard/users" icon={<Users size={18} />} label="Control Usuarios" open={sidebarOpen} />
+              <p className={`text-[9px] font-bold tracking-[0.2em] text-indigo-400/60 uppercase px-4 mb-1 ${isExpanded ? 'block' : 'hidden'}`}>Administración</p>
+              <MenuLink to="/dashboard/users" icon={<Users size={18} />} label="Control Usuarios" open={isExpanded} />
             </div>
           )}
         </nav>
 
         {/* Footer */}
-        {sidebarOpen && (
+        {isExpanded && (
           <div className="relative p-4 flex flex-col items-center justify-center space-y-1 animate-fadeIn border-t border-white/5">
             <div className="text-center">
               <div className="flex items-center gap-1.5 justify-center mb-1">
@@ -156,47 +181,56 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
             </div>
           </div>
         )}
-      </div>
+      </aside>
 
       {/* ═══════ MAIN CONTENT ═══════ */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden min-w-0">
         
         {/* Header */}
-        <header className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-b border-slate-200/70 dark:border-slate-800/80 h-16 px-6 flex justify-between items-center z-10 shadow-sm transition-colors duration-300">
-          <div className="flex items-center gap-2.5">
-            <div className="flex items-center gap-1.5">
+        <header className="bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl border-b border-slate-200/70 dark:border-slate-800/80 h-16 px-3 sm:px-6 flex justify-between items-center z-10 shadow-sm transition-colors duration-300">
+          <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
+            {/* Mobile Sidebar Trigger */}
+            <button
+              onClick={() => setMobileSidebarOpen(true)}
+              className="p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl lg:hidden transition active:scale-95 cursor-pointer shrink-0"
+              title="Abrir menú"
+            >
+              <Menu size={20} />
+            </button>
+
+            <div className="flex items-center gap-1.5 shrink-0">
               <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.5)]"></span>
               <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }}></span>
             </div>
-            <h2 className="text-[11px] font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase">
+            <h2 className="text-[10px] sm:text-[11px] font-bold text-slate-400 dark:text-slate-500 tracking-wider uppercase truncate">
               Sistema de Gestión Colectiva
             </h2>
           </div>
           
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
-              className="p-2.5 text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 rounded-xl transition-all duration-300 cursor-pointer active:scale-90 hover:shadow-md"
+              className="p-2 sm:p-2.5 text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 rounded-xl transition-all duration-300 cursor-pointer active:scale-90"
               title={theme === 'light' ? "Activar Modo Oscuro" : "Activar Modo Claro"}
             >
               {theme === 'light' ? <Moon size={17} /> : <Sun size={17} />}
             </button>
 
-            <div className="w-px h-6 bg-slate-200 dark:bg-slate-800"></div>
+            <div className="w-px h-5 sm:h-6 bg-slate-200 dark:bg-slate-800"></div>
 
             {/* User Profile Link */}
             <Link 
               to="/dashboard/profile" 
-              className="flex items-center gap-3 text-right group transition-all duration-300 py-1.5 px-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 border border-transparent hover:border-slate-200 dark:hover:border-slate-700"
+              className="flex items-center gap-2 sm:gap-3 text-right group transition-all duration-300 py-1 px-1.5 sm:px-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 border border-transparent hover:border-slate-200 dark:hover:border-slate-700"
               title="Ir a mi configuración de perfil"
             >
-              <div className="flex flex-col text-right hidden sm:flex">
+              <div className="flex flex-col text-right hidden md:flex">
                 <span className="text-xs font-bold text-slate-700 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors capitalize">{user?.name}</span>
                 <span className="text-[9px] text-slate-400 dark:text-slate-500 font-mono font-medium mt-0.5">{user?.email}</span>
               </div>
               
-              <div className={`w-9 h-9 ${user?.avatarUrl ? '' : avatarBg} rounded-xl flex items-center justify-center font-bold text-xs overflow-hidden shadow-md border-2 border-white dark:border-slate-700 shrink-0 transform transition-transform duration-200 group-hover:scale-110 ring-2 ring-indigo-500/20`}>
+              <div className={`w-8 h-8 sm:w-9 sm:h-9 ${user?.avatarUrl ? '' : avatarBg} rounded-xl flex items-center justify-center font-bold text-xs overflow-hidden shadow-md border-2 border-white dark:border-slate-700 shrink-0 transform transition-transform duration-200 group-hover:scale-105 ring-2 ring-indigo-500/20`}>
                 {user?.avatarUrl ? (
                   <img src={`http://localhost:5000${user.avatarUrl}`} alt="" className="w-full h-full object-cover" />
                 ) : (
@@ -205,15 +239,15 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
               </div>
             </Link>
             
-            <span className="px-2.5 py-1 text-[9px] font-extrabold rounded-lg bg-gradient-to-r from-indigo-50 to-violet-50 dark:from-indigo-950/60 dark:to-violet-950/40 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800/50 uppercase tracking-wider shadow-sm">
+            <span className="px-2 sm:px-2.5 py-0.5 sm:py-1 text-[8px] sm:text-[9px] font-extrabold rounded-lg bg-gradient-to-r from-indigo-50 to-violet-50 dark:from-indigo-950/60 dark:to-violet-950/40 text-indigo-600 dark:text-indigo-400 border border-indigo-200/60 dark:border-indigo-800/50 uppercase tracking-wider shadow-sm shrink-0">
               {accessRole === 'LIDER_GP' ? 'LIDER GP' : user?.role}
             </span>
             
-            <div className="w-px h-6 bg-slate-200 dark:bg-slate-800"></div>
+            <div className="w-px h-5 sm:h-6 bg-slate-200 dark:bg-slate-800"></div>
 
             <button
               onClick={handleLogout}
-              className="p-2.5 text-slate-400 dark:text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-xl transition-all duration-300 cursor-pointer active:scale-90"
+              className="p-2 sm:p-2.5 text-slate-400 dark:text-slate-500 hover:text-rose-600 dark:hover:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded-xl transition-all duration-300 cursor-pointer active:scale-90 shrink-0"
               title="Cerrar Sesión"
             >
               <LogOut size={17} />
@@ -222,7 +256,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
         </header>
  
         {/* Main Content Area */}
-        <main className="flex-1 overflow-auto p-6 relative z-0 transition-colors duration-500 bg-gradient-to-br from-slate-50 via-indigo-50/30 to-violet-50/20 dark:from-[#080c18] dark:via-[#0c1028] dark:to-[#0a0818]">
+        <main className="flex-1 overflow-auto p-3.5 sm:p-6 relative z-0 transition-colors duration-500 bg-gradient-to-br from-slate-50 via-indigo-50/30 to-violet-50/20 dark:from-[#080c18] dark:via-[#0c1028] dark:to-[#0a0818]">
           {/* Ambient background orbs */}
           <div className="absolute right-0 top-0 w-[500px] h-[500px] rounded-full bg-indigo-400/8 dark:bg-indigo-500/5 blur-[150px] pointer-events-none -z-10 animate-float-slow"></div>
           <div className="absolute left-10 bottom-0 w-[400px] h-[400px] rounded-full bg-violet-400/8 dark:bg-violet-500/5 blur-[130px] pointer-events-none -z-10 animate-float-delayed"></div>

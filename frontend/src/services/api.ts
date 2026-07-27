@@ -157,9 +157,10 @@ export const eventosService = {
   update: (id: number, data: any) => apiClient.put(`/eventos/${id}`, data),
   delete: (id: number) => apiClient.delete(`/eventos/${id}`),
   join: (id: number) => apiClient.post(`/eventos/${id}/participar`),
-  leave: (id: number) => apiClient.delete(`/eventos/${id}/participar`),
+  leave: (id: number, groupId?: number) => apiClient.delete(`/eventos/${id}/participar`, { params: groupId ? { groupId } : {} }),
   getMyParticipations: () => apiClient.get('/eventos/mis-participaciones'),
   getMyGroupMembers: () => apiClient.get('/eventos/mi-grupo-miembros'),
+  getEventAdminDetails: (id: number) => apiClient.get(`/eventos/${id}/admin-details`),
   updateConfirmedMembers: (eventId: number, userIds: number[]) => apiClient.post(`/eventos/${eventId}/participantes`, { userIds }),
   uploadFile: (formData: FormData) => {
     const token = localStorage.getItem('token');
@@ -199,8 +200,14 @@ export const materialsService = {
     apiClient.post('/materials/upload', formData, {
       headers: { 'Content-Type': 'multipart/form-data' }
     }),
-  update: (id: number, data: { title: string; description: string; category: string }) => 
-    apiClient.put(`/materials/${id}`, data),
+  update: (id: number, data: FormData | { title: string; description: string; category: string }) => {
+    if (data instanceof FormData) {
+      return apiClient.put(`/materials/${id}`, data, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+    }
+    return apiClient.put(`/materials/${id}`, data);
+  },
   toggleVisibility: (id: number) => apiClient.put(`/materials/${id}/visibility`),
   delete: (id: number) => apiClient.delete(`/materials/${id}`),
   getCategories: () => apiClient.get('/materials/categories'),

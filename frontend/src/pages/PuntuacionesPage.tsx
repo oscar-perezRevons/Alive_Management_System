@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { scoreService, secretariaService } from '../services/api';
 import { 
   Trophy, BarChart3, AlertTriangle, RefreshCw, Star, Shield,
@@ -9,6 +9,19 @@ import { Loader } from '../components/Loader';
 
 export const PuntuacionesPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'OPERACIONES' | 'MATRIZ'>('OPERACIONES');
+  const categoryScrollRef = useRef<HTMLDivElement>(null);
+  
+  const scrollCategoriesLeft = () => {
+    if (categoryScrollRef.current) {
+      categoryScrollRef.current.scrollBy({ left: -280, behavior: 'smooth' });
+    }
+  };
+
+  const scrollCategoriesRight = () => {
+    if (categoryScrollRef.current) {
+      categoryScrollRef.current.scrollBy({ left: 280, behavior: 'smooth' });
+    }
+  };
   
   const [kpis, setKpis] = useState<any>(null);
   const [categories, setCategories] = useState<any[]>([]);
@@ -254,60 +267,60 @@ export const PuntuacionesPage: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6 font-sans text-slate-800 dark:text-slate-200 bg-[#f4f6fc] dark:bg-[#090d1a] p-4 min-h-screen transition-colors duration-300">
+    <div className="space-y-4 sm:space-y-6 font-sans text-slate-800 dark:text-slate-200 bg-[#f4f6fc] dark:bg-[#090d1a] px-2 sm:px-6 py-4 min-h-screen transition-colors duration-300">
       
       {/* ═══════ HEADER CON GRADIENTE ANIMADO ═══════ */}
-      <div className="relative flex flex-col sm:flex-row justify-between items-center gap-4 bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200/80 dark:border-slate-800/80 shadow-lg transition-all duration-300 z-20 overflow-hidden">
+      <div className="relative flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl sm:rounded-3xl border border-slate-200/80 dark:border-slate-800/80 shadow-lg transition-all duration-300 z-20 overflow-hidden">
         {/* Barra de gradiente animada superior */}
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-violet-500 via-fuchsia-500 via-pink-500 via-amber-400 to-emerald-400" style={{backgroundSize: '200% 100%', animation: 'shimmer 3s linear infinite'}} />
         <style>{`@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }`}</style>
         
         <div className="flex items-center gap-3">
-          <div className="relative">
-            <div className="bg-gradient-to-br from-violet-500 to-indigo-600 p-3 rounded-2xl shadow-lg shadow-indigo-500/25">
-              <Trophy size={24} className="stroke-[2.5] text-white" />
+          <div className="relative shrink-0">
+            <div className="bg-gradient-to-br from-violet-500 to-indigo-600 p-2.5 sm:p-3 rounded-2xl shadow-lg shadow-indigo-500/25">
+              <Trophy size={22} className="stroke-[2.5] text-white sm:w-6 sm:h-6" />
             </div>
             <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-emerald-400 rounded-full border-2 border-white dark:border-slate-900 animate-pulse" />
           </div>
           <div>
-            <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">🏆 Puntuaciones</h1>
-            <p className="text-xs text-transparent bg-clip-text bg-gradient-to-r from-violet-500 to-fuchsia-500 font-black uppercase tracking-wider">Sistema Oficial de Puntos</p>
+            <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white tracking-tight">🏆 Puntuaciones</h1>
+            <p className="text-[10px] sm:text-xs text-transparent bg-clip-text bg-gradient-to-r from-violet-500 to-fuchsia-500 font-black uppercase tracking-wider">Sistema Oficial de Puntos</p>
           </div>
         </div>
 
-        <div className="flex bg-slate-100/80 dark:bg-slate-950 p-1 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-inner">
+        <div className="w-full sm:w-auto flex bg-slate-100/80 dark:bg-slate-950 p-1 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-inner">
           <button 
             onClick={() => setActiveTab('OPERACIONES')}
-            className={`px-5 py-2.5 text-xs font-black rounded-xl transition-all duration-300 uppercase tracking-wider cursor-pointer ${activeTab === 'OPERACIONES' ? 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-lg shadow-indigo-500/25' : 'text-slate-500 hover:text-violet-600 dark:hover:text-indigo-400'}`}
+            className={`flex-1 sm:flex-none text-center px-3 sm:px-5 py-2.5 text-[10px] sm:text-xs font-black rounded-xl transition-all duration-300 uppercase tracking-wider cursor-pointer ${activeTab === 'OPERACIONES' ? 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-lg shadow-indigo-500/25' : 'text-slate-500 hover:text-violet-600 dark:hover:text-indigo-400'}`}
           >
             ⚡ Panel Operativo
           </button>
           <button 
             onClick={() => setActiveTab('MATRIZ')}
-            className={`px-5 py-2.5 text-xs font-black rounded-xl transition-all duration-300 uppercase tracking-wider cursor-pointer ${activeTab === 'MATRIZ' ? 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-lg shadow-indigo-500/25' : 'text-slate-500 hover:text-violet-600 dark:hover:text-indigo-400'}`}
+            className={`flex-1 sm:flex-none text-center px-3 sm:px-5 py-2.5 text-[10px] sm:text-xs font-black rounded-xl transition-all duration-300 uppercase tracking-wider cursor-pointer ${activeTab === 'MATRIZ' ? 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-lg shadow-indigo-500/25' : 'text-slate-500 hover:text-violet-600 dark:hover:text-indigo-400'}`}
           >
-            📊 Matriz de Criterios
+            📊 Matriz Criterios
           </button>
         </div>
       </div>
 
       {kpis && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 animate-fadeIn">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 animate-fadeIn">
           {/* GP Registrados */}
-          <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border-l-4 border-l-emerald-500 border border-slate-200/80 dark:border-slate-800/80 shadow-md hover:shadow-emerald-500/15 transition-all duration-300 flex items-center gap-4 hover:-translate-y-0.5 group">
-            <div className="p-3 bg-gradient-to-br from-emerald-400 to-teal-600 text-white rounded-2xl shadow-lg shadow-emerald-500/20 group-hover:scale-110 transition-transform duration-300"><Users size={20} /></div>
-            <div><span className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-wider block">GP Registrados</span><span className="text-2xl font-black text-slate-800 dark:text-white">{kpis.totalGroups} <span className="text-xs text-slate-400 dark:text-slate-500 font-bold">Equipos</span></span></div>
+          <div className="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl sm:rounded-3xl border-l-4 border-l-emerald-500 border border-slate-200/80 dark:border-slate-800/80 shadow-md hover:shadow-emerald-500/15 transition-all duration-300 flex items-center gap-3.5 sm:gap-4 hover:-translate-y-0.5 group">
+            <div className="p-2.5 sm:p-3 bg-gradient-to-br from-emerald-400 to-teal-600 text-white rounded-2xl shadow-lg shadow-emerald-500/20 group-hover:scale-110 transition-transform duration-300 shrink-0"><Users size={20} /></div>
+            <div><span className="text-[9px] sm:text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-wider block">GP Registrados</span><span className="text-xl sm:text-2xl font-black text-slate-800 dark:text-white">{kpis.totalGroups} <span className="text-xs text-slate-400 dark:text-slate-500 font-bold">Equipos</span></span></div>
           </div>
           {/* Puntos Totales */}
-          <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border-l-4 border-l-amber-500 border border-slate-200/80 dark:border-slate-800/80 shadow-md hover:shadow-amber-500/15 transition-all duration-300 flex items-center gap-4 md:col-span-2 hover:-translate-y-0.5 group">
-            <div className="p-3 bg-gradient-to-br from-amber-400 to-orange-600 text-white rounded-2xl shadow-lg shadow-amber-500/20 group-hover:scale-110 transition-transform duration-300"><Star size={20} className="fill-white/30" /></div>
-            <div><span className="text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-wider block">⭐ Puntos Totales Acumulados</span><span className="text-2xl font-mono font-black text-slate-800 dark:text-white">{kpis.totalPointsAccumulated.toLocaleString()} <span className="text-xs text-slate-400 dark:text-slate-500 font-bold">pts</span></span></div>
+          <div className="bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl sm:rounded-3xl border-l-4 border-l-amber-500 border border-slate-200/80 dark:border-slate-800/80 shadow-md hover:shadow-amber-500/15 transition-all duration-300 flex items-center gap-3.5 sm:gap-4 sm:col-span-2 hover:-translate-y-0.5 group">
+            <div className="p-2.5 sm:p-3 bg-gradient-to-br from-amber-400 to-orange-600 text-white rounded-2xl shadow-lg shadow-amber-500/20 group-hover:scale-110 transition-transform duration-300 shrink-0"><Star size={20} className="fill-white/30" /></div>
+            <div><span className="text-[9px] sm:text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-wider block">⭐ Puntos Totales Acumulados</span><span className="text-xl sm:text-2xl font-mono font-black text-slate-800 dark:text-white">{kpis.totalPointsAccumulated.toLocaleString()} <span className="text-xs text-slate-400 dark:text-slate-500 font-bold">pts</span></span></div>
           </div>
           {/* GP Líder */}
-          <div className="relative bg-white dark:bg-slate-900 p-5 rounded-3xl border-l-4 border-l-violet-500 border border-slate-200/80 dark:border-slate-800/80 shadow-md hover:shadow-violet-500/15 transition-all duration-300 flex items-center gap-4 hover:-translate-y-0.5 group overflow-hidden">
-            <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-violet-500/10 to-transparent rounded-bl-full" />
-            <div className="p-3 bg-gradient-to-br from-violet-500 to-purple-700 text-white rounded-2xl shadow-lg shadow-violet-500/20 group-hover:scale-110 transition-transform duration-300"><Trophy size={20} /></div>
-            <div className="relative z-10"><span className="text-[10px] font-black text-violet-600 dark:text-violet-400 uppercase tracking-wider block">👑 GP Líder Actual</span><span className="text-sm font-black text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-fuchsia-600 dark:from-violet-400 dark:to-fuchsia-400 block uppercase tracking-tight">GP {kpis.leaderGroupName}</span><span className="text-[11px] text-slate-400 dark:text-slate-500 font-mono font-black">{kpis.leaderGroupPoints} puntos</span></div>
+          <div className="relative bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl sm:rounded-3xl border-l-4 border-l-violet-500 border border-slate-200/80 dark:border-slate-800/80 shadow-md hover:shadow-violet-500/15 transition-all duration-300 flex items-center gap-3.5 sm:gap-4 hover:-translate-y-0.5 group overflow-hidden">
+            <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-bl from-violet-500/10 to-transparent rounded-bl-full pointer-events-none" />
+            <div className="p-2.5 sm:p-3 bg-gradient-to-br from-violet-500 to-purple-700 text-white rounded-2xl shadow-lg shadow-violet-500/20 group-hover:scale-110 transition-transform duration-300 shrink-0"><Trophy size={20} /></div>
+            <div className="relative z-10"><span className="text-[9px] sm:text-[10px] font-black text-violet-600 dark:text-violet-400 uppercase tracking-wider block">👑 GP Líder Actual</span><span className="text-xs sm:text-sm font-black text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-fuchsia-600 dark:from-violet-400 dark:to-fuchsia-400 block uppercase tracking-tight">GP {kpis.leaderGroupName}</span><span className="text-[10px] sm:text-[11px] text-slate-400 dark:text-slate-500 font-mono font-black">{kpis.leaderGroupPoints} puntos</span></div>
           </div>
         </div>
       )}
@@ -333,12 +346,58 @@ export const PuntuacionesPage: React.FC = () => {
                 <p className="text-xs text-transparent bg-clip-text bg-gradient-to-r from-violet-500 to-fuchsia-500 font-bold">Configura dinámicamente las columnas de puntuación sabática</p>
               </div>
             </div>
-            <div className="flex gap-2">
-              <button onClick={() => setIsCategoryModalOpen(true)} className="flex items-center gap-1.5 text-[11px] font-black bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white px-5 py-2.5 rounded-xl transition-all cursor-pointer shadow-lg shadow-fuchsia-500/30 hover:shadow-fuchsia-500/50 hover:scale-105 hover:-translate-y-0.5"><Plus size={14} className="stroke-[3]" /> Nueva Categoría</button>
+            <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap justify-between sm:justify-end">
+              {/* Botones de navegación deslizable (Deslizar izquierda/derecha) */}
+              <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800/90 p-1 rounded-xl border border-slate-200 dark:border-slate-700/80 shadow-xs">
+                <button 
+                  type="button"
+                  onClick={scrollCategoriesLeft}
+                  className="p-1.5 hover:bg-white dark:hover:bg-slate-700 text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 rounded-lg transition-all duration-200 active:scale-90 cursor-pointer shadow-xs"
+                  title="Deslizar hacia la izquierda"
+                >
+                  <ChevronLeft size={16} className="stroke-[3]" />
+                </button>
+                <span className="text-[9px] font-black uppercase tracking-wider text-slate-500 dark:text-slate-400 px-1.5 select-none hidden xs:inline">
+                  Deslizar
+                </span>
+                <button 
+                  type="button"
+                  onClick={scrollCategoriesRight}
+                  className="p-1.5 hover:bg-white dark:hover:bg-slate-700 text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 rounded-lg transition-all duration-200 active:scale-90 cursor-pointer shadow-xs"
+                  title="Deslizar hacia la derecha"
+                >
+                  <ChevronRight size={16} className="stroke-[3]" />
+                </button>
+              </div>
+
+              <button onClick={() => setIsCategoryModalOpen(true)} className="flex items-center gap-1.5 text-[11px] font-black bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white px-4 py-2.5 rounded-xl transition-all cursor-pointer shadow-lg shadow-fuchsia-500/30 hover:shadow-fuchsia-500/50 hover:scale-105 hover:-translate-y-0.5">
+                <Plus size={14} className="stroke-[3]" /> Nueva Categoría
+              </button>
             </div>
           </div>
 
-          <div className="overflow-x-auto pb-4 border-transparent select-text scrollbar-none [&::-webkit-scrollbar]:hidden">
+          {/* Indicador visual de deslizamiento en pantallas móviles */}
+          <div className="flex items-center justify-between text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 px-3.5 py-2 rounded-xl shadow-xs">
+            <button 
+              type="button"
+              onClick={scrollCategoriesLeft} 
+              className="flex items-center gap-1 text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 cursor-pointer transition-colors"
+            >
+              <ChevronLeft size={14} className="animate-pulse stroke-[3]" />
+              <span>Volver a la izquierda</span>
+            </button>
+            <span className="text-[9px] text-slate-400 font-bold hidden sm:inline">Desliza para explorar categorías</span>
+            <button 
+              type="button"
+              onClick={scrollCategoriesRight} 
+              className="flex items-center gap-1 text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 cursor-pointer transition-colors"
+            >
+              <span>Deslizar a la derecha</span>
+              <ChevronRight size={14} className="animate-pulse stroke-[3]" />
+            </button>
+          </div>
+
+          <div ref={categoryScrollRef} className="overflow-x-auto pb-4 border-transparent select-text scrollbar-none [&::-webkit-scrollbar]:hidden scroll-smooth">
             <div className="flex gap-4 min-w-[1100px] items-stretch">
               {categories.map((cat, idx) => {
                 const colColors = ['from-violet-500 to-indigo-500', 'from-fuchsia-500 to-pink-500', 'from-amber-400 to-orange-500', 'from-emerald-400 to-teal-500', 'from-cyan-400 to-blue-500', 'from-rose-400 to-red-500'];
@@ -394,12 +453,12 @@ export const PuntuacionesPage: React.FC = () => {
       )}
 
       {activeTab === 'OPERACIONES' && (
-        <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 items-start animate-fadeIn relative z-20">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 items-start animate-fadeIn relative z-20">
           
           {/* ═══════ RANKING GENERAL CARD ═══════ */}
-          <div className="xl:col-span-3 bg-white dark:bg-slate-900/50 rounded-3xl shadow-lg border border-slate-200/80 dark:border-slate-800/80 overflow-hidden transition duration-300 relative">
+          <div className="lg:col-span-12 xl:col-span-3 bg-white dark:bg-slate-900/50 rounded-2xl sm:rounded-3xl shadow-lg border border-slate-200/80 dark:border-slate-800/80 overflow-hidden transition duration-300 relative">
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500" />
-            <div className="p-4 border-b border-slate-150 dark:border-slate-800 bg-gradient-to-r from-slate-50 to-amber-50/30 dark:from-slate-950/50 dark:to-amber-950/10 flex items-center gap-2">
+            <div className="p-3.5 sm:p-4 border-b border-slate-150 dark:border-slate-800 bg-gradient-to-r from-slate-50 to-amber-50/30 dark:from-slate-950/50 dark:to-amber-950/10 flex items-center gap-2">
               <div className="p-1.5 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg text-white shadow-md shadow-amber-500/20"><BarChart3 size={13} /></div>
               <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">🏅 Ranking General</h3>
             </div>
@@ -414,8 +473,8 @@ export const PuntuacionesPage: React.FC = () => {
                   return (
                   <div key={g.id} className={`p-3.5 hover:bg-amber-50/30 dark:hover:bg-amber-950/10 transition-all relative ${index < 3 ? 'bg-gradient-to-r from-transparent to-amber-50/20 dark:to-amber-950/5' : ''}`}>
                     <div className="flex justify-between items-center mb-1.5">
-                      <div className="flex items-center gap-2.5">
-                        <span className={`w-7 h-7 rounded-full flex items-center justify-center font-mono text-xs font-black shadow-md ${
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <span className={`w-7 h-7 rounded-full flex items-center justify-center font-mono text-xs font-black shadow-md shrink-0 ${
                           index === 0 
                             ? 'bg-gradient-to-tr from-amber-400 to-yellow-500 text-white border-2 border-amber-300' 
                             : index === 1 
@@ -424,9 +483,9 @@ export const PuntuacionesPage: React.FC = () => {
                                 ? 'bg-gradient-to-tr from-amber-600 to-orange-500 text-white border-2 border-orange-400' 
                                 : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-500'
                         }`}>{index + 1}</span>
-                        <div className="flex items-center gap-1.5">
-                          {medal && <span className="text-base">{medal}</span>}
-                          <Shield size={14} className={`${
+                        <div className="flex items-center gap-1.5 truncate">
+                          {medal && <span className="text-base shrink-0">{medal}</span>}
+                          <Shield size={14} className={`shrink-0 ${
                             index === 0 
                               ? 'text-amber-500 fill-amber-300 dark:fill-amber-500/20 animate-pulse' 
                               : index === 1 
@@ -435,10 +494,10 @@ export const PuntuacionesPage: React.FC = () => {
                                   ? 'text-amber-600 fill-amber-200 dark:fill-amber-600/20' 
                                   : 'text-slate-300 dark:text-slate-600'
                           }`} />
-                          <span className="text-slate-800 dark:text-slate-200 font-black tracking-tight uppercase text-sm">GP {g.name}</span>
+                          <span className="text-slate-800 dark:text-slate-200 font-black tracking-tight uppercase text-xs sm:text-sm truncate">GP {g.name}</span>
                         </div>
                       </div>
-                      <span className="font-black text-emerald-600 dark:text-emerald-400 font-mono text-base">{g.totalPoints?.toLocaleString() || 0}</span>
+                      <span className="font-black text-emerald-600 dark:text-emerald-400 font-mono text-sm sm:text-base shrink-0 ml-2">{g.totalPoints?.toLocaleString() || 0}</span>
                     </div>
                     {/* Barra de progreso */}
                     <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
@@ -451,7 +510,7 @@ export const PuntuacionesPage: React.FC = () => {
           </div>
 
           {/* ═══════ FORMULARIO REGISTRAR PUNTUACIÓN ═══════ */}
-          <div className="xl:col-span-4 bg-white dark:bg-slate-900/50 rounded-3xl shadow-lg border border-slate-200/80 dark:border-slate-800/80 p-5 space-y-4 relative z-40">
+          <div className="lg:col-span-6 xl:col-span-4 bg-white dark:bg-slate-900/50 rounded-2xl sm:rounded-3xl shadow-lg border border-slate-200/80 dark:border-slate-800/80 p-4 sm:p-5 space-y-4 relative z-40">
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-400 via-teal-500 to-cyan-500 rounded-t-3xl" />
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
               <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-2">
@@ -790,8 +849,8 @@ export const PuntuacionesPage: React.FC = () => {
           </div>
 
           {/* ═══════ HISTORIAL Y PENALIZACIONES ═══════ */}
-          <div className="xl:col-span-5 space-y-5">
-            <div className="bg-white dark:bg-slate-900/50 rounded-3xl shadow-lg border border-slate-200/80 dark:border-slate-800/80 overflow-hidden relative">
+          <div className="lg:col-span-6 xl:col-span-5 space-y-5">
+            <div className="bg-white dark:bg-slate-900/50 rounded-2xl sm:rounded-3xl shadow-lg border border-slate-200/80 dark:border-slate-800/80 overflow-hidden relative">
               <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-400 via-blue-500 to-violet-500" />
               <div className="p-4 border-b border-slate-100 dark:border-slate-800 bg-gradient-to-r from-slate-50 to-cyan-50/30 dark:from-slate-950/50 dark:to-cyan-950/10 flex justify-between items-center">
                 <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider flex items-center gap-1.5"><div className="p-1 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-md text-white shadow-sm"><Clock size={12} /></div> 📜 Historial Reciente</h3>
@@ -822,7 +881,7 @@ export const PuntuacionesPage: React.FC = () => {
             </div>
 
             {/* Penalizaciones */}
-            <div className="bg-white dark:bg-slate-900/50 rounded-3xl shadow-lg border border-slate-200/80 dark:border-slate-800/80 overflow-hidden relative">
+            <div className="bg-white dark:bg-slate-900/50 rounded-2xl sm:rounded-3xl shadow-lg border border-slate-200/80 dark:border-slate-800/80 overflow-hidden relative">
               <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-rose-400 via-red-500 to-orange-500" />
               <div className="p-4 border-b border-slate-100 dark:border-slate-800 bg-gradient-to-r from-slate-50 to-rose-50/30 dark:from-slate-950/50 dark:to-rose-950/10 flex justify-between items-center">
                 <h3 className="text-xs font-black text-rose-600 dark:text-rose-400 uppercase tracking-wider flex items-center gap-1.5"><div className="p-1 bg-gradient-to-br from-rose-400 to-red-600 rounded-md text-white shadow-sm"><ShieldAlert size={12} /></div> ⚠️ Penalizaciones</h3>
@@ -851,10 +910,10 @@ export const PuntuacionesPage: React.FC = () => {
       )}
 
       {/* ═══════ GUÍA DE CICLO OPERATIVO ═══════ */}
-      <div className="bg-white dark:bg-slate-900/50 p-5 rounded-3xl border border-slate-200/80 dark:border-slate-800/80 shadow-lg space-y-4 relative overflow-hidden">
+      <div className="bg-white dark:bg-slate-900/50 p-4 sm:p-5 rounded-2xl sm:rounded-3xl border border-slate-200/80 dark:border-slate-800/80 shadow-lg space-y-4 relative overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-violet-500 via-fuchsia-500 via-amber-400 to-emerald-400" />
         <h4 className="text-xs font-black text-slate-900 dark:text-white flex items-center gap-1.5"><div className="p-1 bg-gradient-to-br from-violet-500 to-indigo-600 rounded-md text-white shadow-sm"><HelpCircle size={12} /></div> 💡 ¿Cómo funciona el ciclo operativo?</h4>
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 text-center font-bold text-[11px] leading-relaxed">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4 text-center font-bold text-[10px] sm:text-[11px] leading-relaxed">
           {[
             { num: '1', label: 'Selecciona el GP', emoji: '🎯', gradient: 'from-violet-500 to-indigo-500', bg: 'from-violet-50 to-indigo-50 dark:from-violet-950/20 dark:to-indigo-950/20', border: 'border-violet-200 dark:border-violet-800/40' },
             { num: '2', label: 'Elige Categoría', emoji: '📂', gradient: 'from-fuchsia-500 to-pink-500', bg: 'from-fuchsia-50 to-pink-50 dark:from-fuchsia-950/20 dark:to-pink-950/20', border: 'border-fuchsia-200 dark:border-fuchsia-800/40' },

@@ -359,42 +359,42 @@ export const MatinalesPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100 bg-[#f0f2fc] dark:bg-slate-950 p-4 sm:p-6 min-h-screen relative selection:bg-fuchsia-500 selection:text-white transition-colors duration-300 w-full">
+    <div className="space-y-4 sm:space-y-6 font-sans text-slate-800 dark:text-slate-100 bg-[#f0f2fc] dark:bg-slate-950 px-2 sm:px-6 py-4 min-h-screen relative selection:bg-fuchsia-500 selection:text-white transition-colors duration-300 w-full select-none pb-12">
       
       {/* HEADER PREMIUM */}
-      <div className="relative flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-lg z-20 overflow-hidden">
+      <div className="relative flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl sm:rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-lg z-20 overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-500 via-indigo-500 via-violet-500 via-fuchsia-500 to-orange-400" style={{backgroundSize: '200% 100%', animation: 'shimmer 4s linear infinite'}} />
         <style>{`@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }`}</style>
         
-        <div className="flex items-center gap-3.5 pt-1">
-          <div className="relative">
-            <div className="bg-gradient-to-br from-indigo-500 to-fuchsia-600 p-3 rounded-2xl shadow-lg shadow-fuchsia-500/25">
-              <BookOpen size={28} className="text-white" />
+        <div className="flex items-center gap-3 min-w-0 pt-1">
+          <div className="relative shrink-0">
+            <div className="bg-gradient-to-br from-indigo-500 to-fuchsia-600 p-2.5 sm:p-3 rounded-2xl shadow-lg shadow-fuchsia-500/25">
+              <BookOpen size={24} className="text-white sm:w-7 sm:h-7" />
             </div>
             <div className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-emerald-400 rounded-full border-2 border-white dark:border-slate-900 animate-pulse" />
           </div>
-          <div>
-            <h1 className="text-2xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 dark:from-indigo-400 to-fuchsia-600 dark:to-fuchsia-400">
+          <div className="min-w-0">
+            <h1 className="text-xl sm:text-2xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 dark:from-indigo-400 to-fuchsia-600 dark:to-fuchsia-400 truncate">
               Matinales por Edades
             </h1>
-            <p className="text-xs text-slate-400 dark:text-slate-400 font-bold uppercase tracking-widest mt-0.5">Distribución Devocional de Aulas</p>
+            <p className="text-[10px] sm:text-xs text-slate-400 dark:text-slate-400 font-bold uppercase tracking-widest mt-0.5 truncate">Distribución Devocional de Aulas</p>
           </div>
         </div>
-        <div className="flex items-center gap-2 bg-indigo-50 dark:bg-indigo-950/60 px-4 py-2 rounded-xl border border-indigo-100 dark:border-indigo-800/60 shadow-sm text-[11px] font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-300">
+        <div className="w-full sm:w-auto flex items-center justify-center gap-2 bg-indigo-50 dark:bg-indigo-950/60 px-3.5 py-2 rounded-xl border border-indigo-100 dark:border-indigo-800/60 shadow-sm text-[10px] sm:text-[11px] font-black uppercase tracking-wider text-indigo-600 dark:text-indigo-300 shrink-0">
           <Shield size={14} className={currentUserRole === 'ADMIN' ? 'text-indigo-600 dark:text-indigo-400 animate-pulse' : 'text-slate-400'} />
           Módulo: <span className={currentUserRole === 'ADMIN' ? 'text-indigo-700 dark:text-indigo-300' : 'text-slate-700 dark:text-slate-300'}>{currentUserRole}</span>
         </div>
       </div>
 
       {/* SECTOR DE FECHAS SÁBADO (CALENDARIO DE SÁBADOS) */}
-      <div className="bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-3xl border-l-[6px] border-l-indigo-600 border-t border-r border-b border-slate-200/60 dark:border-slate-800/80 shadow-xl space-y-6">
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
-          <div className="space-y-1">
-            <h3 className="text-xs font-black text-slate-400 dark:text-slate-400 uppercase tracking-widest">
+      <div className="bg-white dark:bg-slate-900 p-4 sm:p-6 lg:p-8 rounded-2xl sm:rounded-3xl border-l-[6px] border-l-indigo-600 border-t border-r border-b border-slate-200/60 dark:border-slate-800/80 shadow-xl space-y-4 sm:space-y-6">
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 lg:gap-6">
+          <div className="space-y-1 min-w-0">
+            <h3 className="text-[10px] sm:text-xs font-black text-slate-400 dark:text-slate-400 uppercase tracking-widest">
               Calendario Devocional Activo
             </h3>
-            <p className="text-xl sm:text-2xl font-black text-slate-800 dark:text-white uppercase tracking-tight flex items-center gap-2">
-              <span className="text-indigo-600 dark:text-indigo-400">📅</span> Sábado: {
+            <p className="text-lg sm:text-2xl font-black text-slate-800 dark:text-white uppercase tracking-tight flex items-center gap-2 flex-wrap">
+              <span className="text-indigo-600 dark:text-indigo-400 shrink-0">📅</span> Sábado: {
                 (() => {
                   const match = saturdaysList.find(s => s.dateStr === selectedDate);
                   if (match) return match.formatted;
@@ -410,7 +410,7 @@ export const MatinalesPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 bg-slate-100/60 dark:bg-slate-800/80 border border-slate-200/85 dark:border-slate-700/80 p-2.5 rounded-2xl shadow-inner w-full lg:w-auto relative">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 bg-slate-100/60 dark:bg-slate-800/80 border border-slate-200/85 dark:border-slate-700/80 p-2 sm:p-2.5 rounded-2xl shadow-inner w-full lg:w-auto relative">
             <div className="flex items-center gap-2 sm:pl-2 shrink-0">
               <Calendar size={16} className="text-indigo-600 dark:text-indigo-400" />
               <span className="text-[10px] font-black uppercase text-slate-600 dark:text-slate-300 tracking-wider">Búsqueda Rápida:</span>
@@ -436,7 +436,7 @@ export const MatinalesPage: React.FC = () => {
               </button>
               
               {showCalendarDropdown && (
-                <div className="absolute right-0 top-full mt-2 w-72 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl p-4 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
+                <div className="absolute left-0 sm:right-0 top-full mt-2 w-full sm:w-72 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl p-3.5 sm:p-4 z-50 animate-in fade-in slide-in-from-top-2 duration-150">
                   {/* CALENDAR HEADER */}
                   <div className="flex items-center justify-between mb-3 pb-2 border-b border-slate-100 dark:border-slate-800/80">
                     <button 
@@ -811,33 +811,33 @@ export const MatinalesPage: React.FC = () => {
       )}
 
       {isModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-fadeIn">
-          <div className="bg-white dark:bg-slate-900 rounded-3xl max-w-md w-full shadow-2xl border border-slate-200/60 dark:border-slate-800 overflow-hidden transform transition-all duration-300">
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center z-50 p-3 sm:p-4 animate-fadeIn overflow-y-auto">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl max-w-md w-full my-auto shadow-2xl border border-slate-200/60 dark:border-slate-800 overflow-hidden transform transition-all duration-300 max-h-[90vh] flex flex-col">
             
             {/* RICH DARK INDIGO GRADIENT ACCENT HEADER */}
-            <div className="bg-gradient-to-r from-indigo-900 via-indigo-950 to-slate-950 px-6 py-5 text-white flex justify-between items-center relative overflow-hidden">
+            <div className="bg-gradient-to-r from-indigo-900 via-indigo-950 to-slate-950 px-4 sm:px-6 py-4 sm:py-5 text-white flex justify-between items-center relative overflow-hidden shrink-0">
               <div className="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full blur-2xl -mr-8 -mt-8 pointer-events-none"></div>
               <div className="flex items-center gap-3 relative z-10">
-                <div className="bg-white/10 p-2.5 rounded-xl backdrop-blur-sm border border-white/10 text-indigo-300 shadow-inner">
+                <div className="bg-white/10 p-2 sm:p-2.5 rounded-xl backdrop-blur-sm border border-white/10 text-indigo-300 shadow-inner shrink-0">
                   <SlidersHorizontal size={16} />
                 </div>
-                <div>
-                  <h3 className="font-black text-xs uppercase tracking-widest text-white">Configurar Contenido</h3>
-                  <p className="text-[9px] text-indigo-300 font-bold uppercase tracking-wider mt-0.5">Editar detalles de la categoría</p>
+                <div className="min-w-0">
+                  <h3 className="font-black text-xs uppercase tracking-widest text-white truncate">Configurar Contenido</h3>
+                  <p className="text-[9px] text-indigo-300 font-bold uppercase tracking-wider mt-0.5 truncate">Editar detalles de la categoría</p>
                 </div>
               </div>
               <button 
                 onClick={() => setIsModalOpen(false)} 
-                className="p-1.5 hover:bg-white/10 rounded-lg text-slate-400 hover:text-white transition-all active:scale-90 relative z-10"
+                className="p-1.5 hover:bg-white/10 rounded-lg text-slate-400 hover:text-white transition-all active:scale-90 relative z-10 cursor-pointer shrink-0"
               >
                 <X size={16} />
               </button>
             </div>
 
-            <form onSubmit={handleUpdateInfo} className="p-6 space-y-6">
+            <form onSubmit={handleUpdateInfo} className="p-4 sm:p-6 space-y-4 sm:space-y-6 overflow-y-auto">
               {/* EDITABLE FIELDS WITH COLORED LABELS AND PREMIUM BORDERS */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                <div className="space-y-1.5 sm:space-y-2">
                   <label className="text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 tracking-wider flex items-center gap-1.5">
                     <Users size={12} className="shrink-0" />
                     Categoría
@@ -847,10 +847,10 @@ export const MatinalesPage: React.FC = () => {
                     required
                     value={formFields.category}
                     onChange={(e) => setFormFields({ ...formFields, category: e.target.value })}
-                    className="w-full text-xs font-bold bg-slate-50/50 dark:bg-slate-955 text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-slate-800 px-4 py-3 rounded-2xl focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-white dark:focus:bg-slate-900 transition-all shadow-inner uppercase"
+                    className="w-full text-xs font-bold bg-slate-50/50 dark:bg-slate-955 text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-slate-800 px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-2xl focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-white dark:focus:bg-slate-900 transition-all shadow-inner uppercase"
                   />
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-1.5 sm:space-y-2">
                   <label className="text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 tracking-wider flex items-center gap-1.5">
                     <SlidersHorizontal size={12} className="shrink-0" />
                     Rango de Edad
@@ -860,12 +860,12 @@ export const MatinalesPage: React.FC = () => {
                     required
                     value={formFields.range}
                     onChange={(e) => setFormFields({ ...formFields, range: e.target.value })}
-                    className="w-full text-xs font-bold bg-slate-50/50 dark:bg-slate-955 text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-slate-800 px-4 py-3 rounded-2xl focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-white dark:focus:bg-slate-900 transition-all shadow-inner"
+                    className="w-full text-xs font-bold bg-slate-50/50 dark:bg-slate-955 text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-slate-800 px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-2xl focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-white dark:focus:bg-slate-900 transition-all shadow-inner"
                   />
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1.5 sm:space-y-2">
                 <label className="text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 tracking-wider flex items-center gap-1.5">
                   <BookOpen size={12} className="shrink-0" />
                   Nombre Devocional Matutino
@@ -876,24 +876,24 @@ export const MatinalesPage: React.FC = () => {
                   value={formFields.currentTheme}
                   onChange={(e) => setFormFields({ ...formFields, currentTheme: e.target.value })}
                   placeholder="Ej: Héroes o Villanos..."
-                  className="w-full text-xs font-bold bg-slate-50/50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-slate-800 px-4 py-3.5 rounded-2xl focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-white dark:focus:bg-slate-900 transition-all shadow-inner"
+                  className="w-full text-xs font-bold bg-slate-50/50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 border border-slate-200 dark:border-slate-800 px-3.5 sm:px-4 py-3 sm:py-3.5 rounded-2xl focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 focus:bg-white dark:focus:bg-slate-900 transition-all shadow-inner"
                 />
               </div>
 
               {/* FOOTER ACTION BUTTONS */}
-              <div className="flex items-center justify-end gap-3 pt-5 border-t border-slate-100 dark:border-slate-800 mt-6">
+              <div className="flex items-center justify-end gap-2.5 sm:gap-3 pt-4 sm:pt-5 border-t border-slate-100 dark:border-slate-800 mt-4 sm:mt-6">
                 <button
                   type="button"
                   disabled={actionLoading === 'update'}
                   onClick={() => setIsModalOpen(false)}
-                  className="px-5 py-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700/80 text-slate-600 dark:text-slate-350 rounded-2xl text-xs font-black uppercase tracking-widest border border-slate-200/50 dark:border-slate-700/50 transition-all disabled:opacity-50 cursor-pointer shadow-3xs hover:scale-[1.01]"
+                  className="px-4 sm:px-5 py-2.5 sm:py-3 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700/80 text-slate-600 dark:text-slate-350 rounded-2xl text-xs font-black uppercase tracking-widest border border-slate-200/50 dark:border-slate-700/50 transition-all disabled:opacity-50 cursor-pointer shadow-3xs hover:scale-[1.01]"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={actionLoading === 'update'}
-                  className="flex items-center gap-1.5 px-6 py-3 bg-gradient-to-r from-indigo-500 to-indigo-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-md shadow-indigo-500/25 hover:shadow-lg hover:shadow-indigo-500/35 hover:scale-[1.01] active:scale-95 disabled:opacity-50 cursor-pointer"
+                  className="flex items-center gap-1.5 px-5 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-indigo-500 to-indigo-600 text-white rounded-2xl text-xs font-black uppercase tracking-widest transition-all shadow-md shadow-indigo-500/25 hover:shadow-lg hover:shadow-indigo-500/35 hover:scale-[1.01] active:scale-95 disabled:opacity-50 cursor-pointer"
                 >
                   <Check size={14} /> {actionLoading === 'update' ? 'Guardando...' : 'Guardar Cambios'}
                 </button>
@@ -905,30 +905,30 @@ export const MatinalesPage: React.FC = () => {
 
       {/* FULLSCREEN DOCUMENT VIEWER MODAL */}
       {viewingFile && (
-        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center z-50 p-4 sm:p-6 animate-fadeIn">
-          <div className="bg-white dark:bg-slate-900 rounded-3xl w-full max-w-4xl h-[85vh] shadow-2xl border border-slate-200/60 dark:border-slate-800 flex flex-col overflow-hidden animate-scaleUp">
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center z-50 p-3 sm:p-6 animate-fadeIn">
+          <div className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl w-full max-w-4xl h-[85vh] my-auto shadow-2xl border border-slate-200/60 dark:border-slate-800 flex flex-col overflow-hidden animate-scaleUp">
             
             {/* VIEWER HEADER */}
-            <div className="bg-slate-50 dark:bg-slate-900/80 px-6 py-4 border-b border-slate-100 dark:border-slate-800 text-slate-800 dark:text-white flex justify-between items-center relative overflow-hidden shrink-0">
-              <div className="flex items-center gap-3">
-                <div className="bg-indigo-50 dark:bg-indigo-950/40 p-2.5 rounded-xl text-indigo-600 dark:text-indigo-400">
+            <div className="bg-slate-50 dark:bg-slate-900/80 px-4 sm:px-6 py-3 sm:py-4 border-b border-slate-100 dark:border-slate-800 text-slate-800 dark:text-white flex justify-between items-center relative overflow-hidden shrink-0">
+              <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+                <div className="bg-indigo-50 dark:bg-indigo-950/40 p-2 sm:p-2.5 rounded-xl text-indigo-600 dark:text-indigo-400 shrink-0">
                   {viewingFile.type === 'image' ? <Eye size={18} /> : <FileText size={18} />}
                 </div>
-                <div>
-                  <h3 className="font-black text-xs uppercase tracking-widest text-slate-700 dark:text-slate-250">Previsualizar Documento</h3>
-                  <p className="text-[10px] text-slate-400 dark:text-slate-500 font-extrabold uppercase tracking-wider mt-0.5 truncate max-w-[200px] sm:max-w-xl">{viewingFile.name}</p>
+                <div className="min-w-0">
+                  <h3 className="font-black text-[11px] sm:text-xs uppercase tracking-widest text-slate-700 dark:text-slate-250 truncate">Previsualizar Documento</h3>
+                  <p className="text-[9px] sm:text-[10px] text-slate-400 dark:text-slate-500 font-extrabold uppercase tracking-wider mt-0.5 truncate max-w-[140px] xs:max-w-[200px] sm:max-w-xl">{viewingFile.name}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
                 <button 
                   onClick={() => handleDownload(viewingFile.url, viewingFile.name)}
-                  className="flex items-center gap-1.5 h-9 px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-[10px] font-black uppercase tracking-wider transition-all shadow-md shadow-indigo-600/10 hover:shadow-indigo-600/20 active:scale-95 cursor-pointer"
+                  className="flex items-center gap-1 sm:gap-1.5 h-8 sm:h-9 px-3 sm:px-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-[9px] sm:text-[10px] font-black uppercase tracking-wider transition-all shadow-md shadow-indigo-600/10 hover:shadow-indigo-600/20 active:scale-95 cursor-pointer"
                 >
-                  <Download size={12} /> Descargar
+                  <Download size={12} /> <span className="hidden xs:inline">Descargar</span>
                 </button>
                 <button 
                   onClick={() => setViewingFile(null)} 
-                  className="flex items-center justify-center h-9 w-9 bg-rose-50 hover:bg-rose-600 text-rose-500 hover:text-white dark:bg-rose-955/25 dark:hover:bg-rose-600 dark:text-rose-400 dark:hover:text-white rounded-xl transition-all duration-200 active:scale-95 cursor-pointer shadow-sm hover:shadow-md hover:shadow-rose-500/10 border border-rose-100 dark:border-rose-900/30 hover:border-rose-600 dark:hover:border-rose-600 hover:scale-105 group/close shrink-0"
+                  className="flex items-center justify-center h-8 sm:h-9 w-8 sm:w-9 bg-rose-50 hover:bg-rose-600 text-rose-500 hover:text-white dark:bg-rose-955/25 dark:hover:bg-rose-600 dark:text-rose-400 dark:hover:text-white rounded-xl transition-all duration-200 active:scale-95 cursor-pointer shadow-sm hover:shadow-md hover:shadow-rose-500/10 border border-rose-100 dark:border-rose-900/30 hover:border-rose-600 dark:hover:border-rose-600 hover:scale-105 group/close shrink-0"
                   title="Cerrar Visor"
                 >
                   <X size={15} className="shrink-0 transition-transform duration-200 group-hover/close:rotate-90 group-hover/close:scale-110" />
@@ -937,7 +937,7 @@ export const MatinalesPage: React.FC = () => {
             </div>
 
             {/* VIEWER CONTENT */}
-            <div className="flex-1 bg-slate-950 flex items-center justify-center p-4 relative overflow-auto">
+            <div className="flex-1 bg-slate-950 flex items-center justify-center p-2 sm:p-4 relative overflow-auto">
               {viewingFile.type === 'image' ? (
                 <img 
                   src={viewingFile.url} 

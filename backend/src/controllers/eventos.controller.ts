@@ -248,37 +248,43 @@ export class EventosController {
         .replace(/[_\s]+/g, '')
         .trim();
 
-      const isAllowedToCancel = user.role === 'ADMIN' || ['LIDER', 'SUBLIDER', 'COLIDER', 'SECRETARIO', 'SECRETARIA'].includes(normGroupRole);
+      const isAllowedToCancel = user.role === 'ADMIN' || ['LIDER', 'SUBLIDER'].includes(normGroupRole);
 
       if (!isAllowedToCancel) {
-        return res.status(403).json({ success: false, message: 'No tienes permisos para cancelar la inscripción de tu grupo. Solo el Líder, Colíder o Secretario pueden hacerlo.' });
+        return res.status(403).json({ success: false, message: 'No tienes permisos para cancelar la inscripción. Solo el Administrador o el Líder del Grupo Pequeño pueden hacerlo.' });
       }
 
-      const userGroup = await (prisma as any).groupSmall.findFirst({
-        where: {
-          OR: [
-            { administratorId: userId },
-            { members: { some: { id: userId } } }
-          ]
-        }
-      });
+      let targetGroupId: number | null = null;
+      if (user.role === 'ADMIN' && (req.body?.groupId || req.query?.groupId)) {
+        targetGroupId = parseInt(req.body?.groupId || req.query?.groupId);
+      } else {
+        const userGroup = await (prisma as any).groupSmall.findFirst({
+          where: {
+            OR: [
+              { administratorId: userId },
+              { members: { some: { id: userId } } }
+            ]
+          }
+        });
+        if (userGroup) targetGroupId = userGroup.id;
+      }
 
-      if (!userGroup) {
-        return res.status(400).json({ success: false, message: 'No perteneces a ningún Grupo Pequeño calificado.' });
+      if (!targetGroupId) {
+        return res.status(400).json({ success: false, message: 'Grupo no encontrado para cancelar la inscripción.' });
       }
 
       await (prisma as any).eventParticipation.delete({
         where: {
           eventId_groupId: {
             eventId,
-            groupId: userGroup.id
+            groupId: targetGroupId
           }
         }
       });
 
       return res.status(200).json({ success: true, message: 'Inscripción cancelada con éxito.' });
     } catch (error: any) {
-      return res.status(400).json({ success: false, message: 'No se pudo cancelar la participación o tu grupo no estaba inscrito.' });
+      return res.status(400).json({ success: false, message: 'No se pudo cancelar la participación o el grupo no estaba inscrito.' });
     }
   };
 
@@ -295,6 +301,127 @@ export class EventosController {
     } catch (error: any) {
       console.error('Error en getMyParticipations:', error);
       return res.status(200).json({ success: true, participations: [] });
+    }
+  };
+
+  getEventAdminDetails = async (req: any, res: Response) => {
+    try {
+      const eventId = parseInt(req.params.id);
+      const userId = extraerUserIdDesdeToken(req);
+      if (!userId) {
+        return res.status(401).json({ success: false, message: 'Usuario no autenticado.' });
+      }
+
+      const event = await (prisma as any).event.findUnique({
+        where: { id: eventId },
+        include: {
+          participations: {
+            include: {
+              groupSmall: {
+                include: {
+                  administrator: { select: { id: true, name: true, email: true } },
+                  members: { select: { id: true, name: true, groupRole: true, email: true } }
+                }
+              }
+            }
+          }
+        }
+      });
+
+      if (!event) {
+        return res.status(404).json({ success: false, message: 'Evento no encontrado.' });
+      }
+
+      const allGroups = await (prisma as any).groupSmall.findMany({
+        include: {
+          administrator: { select: { id: true, name: true, email: true } },
+          members: { select: { id: true, name: true, groupRole: true, email: true } }
+        },
+        orderBy: { name: 'asc' }
+      });
+
+      const enrolledMap = new Map();
+      event.participations.forEach((p: any) => {
+        enrolledMap.set(p.groupId, p);
+      });
+
+      const enrolledGroups = [];
+      const notEnrolledGroups = [];
+
+      for (const group of allGroups) {
+        const leaderMember = group.members.find((m: any) => {
+          const norm = (m.groupRole || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toUpperCase()
+            .replace(/[_\s-]+/g, '')
+            .trim();
+          return norm === 'LIDER';
+        });
+        const computedLeaderName = leaderMember
+          ? leaderMember.name
+          : (group.leaderName && group.leaderName.trim() ? group.leaderName.trim() : 'Sin Líder Asignado');
+
+        const participation = enrolledMap.get(group.id);
+        if (participation) {
+          const confirmedIds = participation.confirmedMembers
+            ? participation.confirmedMembers.split(',').map(Number).filter((id: number) => !isNaN(id))
+            : [];
+
+          enrolledGroups.push({
+            id: group.id,
+            name: group.name,
+            leaderName: computedLeaderName,
+            participationId: participation.id,
+            enrolledAt: participation.enrolledAt,
+            status: participation.status,
+            confirmedCount: confirmedIds.length,
+            totalMembersCount: group.members.length,
+            members: group.members.map((m: any) => ({
+              id: m.id,
+              name: m.name,
+              groupRole: m.groupRole,
+              isConfirmed: confirmedIds.includes(m.id)
+            }))
+          });
+        } else {
+          notEnrolledGroups.push({
+            id: group.id,
+            name: group.name,
+            leaderName: computedLeaderName,
+            totalMembersCount: group.members.length,
+            members: group.members.map((m: any) => ({
+              id: m.id,
+              name: m.name,
+              groupRole: m.groupRole
+            }))
+          });
+        }
+      }
+
+      return res.status(200).json({
+        success: true,
+        data: {
+          event: {
+            id: event.id,
+            title: event.title,
+            description: event.description,
+            category: event.category,
+            typeTag: event.typeTag,
+            startDate: event.startDate,
+            timeSlot: event.timeSlot,
+            location: event.location,
+            maxSpots: event.maxSpots,
+            status: event.status,
+            imageUrl: event.imageUrl,
+            pdfUrl: event.pdfUrl
+          },
+          enrolledGroups,
+          notEnrolledGroups
+        }
+      });
+    } catch (error: any) {
+      return res.status(500).json({ success: false, message: error.message });
     }
   };
 }

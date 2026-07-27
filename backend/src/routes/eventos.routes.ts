@@ -35,6 +35,7 @@ router.delete('/:id', requireAccessRoles(['ADMIN']), eventosController.removeEve
 router.post('/:id/participar', eventosController.joinEvent);
 router.delete('/:id/participar', eventosController.leaveEvent);
 router.post('/:id/participantes', eventosController.updateConfirmedMembers);
+router.get('/:id/admin-details', eventosController.getEventAdminDetails);
 router.get('/mis-participaciones', eventosController.getMyParticipations);
 
 router.post('/upload', upload.single('file'), (req: any, res: any) => {

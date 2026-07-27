@@ -15,6 +15,9 @@ async function runStartupMigrations() {
     await (prisma as any).$executeRawUnsafe('ALTER TABLE "EventParticipation" ADD COLUMN IF NOT EXISTS "confirmedMembers" TEXT DEFAULT \'\';');
     await (prisma as any).$executeRawUnsafe('ALTER TABLE "Event" ADD COLUMN IF NOT EXISTS "imageUrl" TEXT DEFAULT \'\';');
     await (prisma as any).$executeRawUnsafe('ALTER TABLE "Event" ADD COLUMN IF NOT EXISTS "pdfUrl" TEXT DEFAULT \'\';');
+    await (prisma as any).$executeRawUnsafe('ALTER TABLE "Material" ADD COLUMN IF NOT EXISTS "type2" TEXT DEFAULT \'\';');
+    await (prisma as any).$executeRawUnsafe('ALTER TABLE "Material" ADD COLUMN IF NOT EXISTS "size2" TEXT DEFAULT \'\';');
+    await (prisma as any).$executeRawUnsafe('ALTER TABLE "Material" ADD COLUMN IF NOT EXISTS "fileUrl2" TEXT DEFAULT \'\';');
     
     // Crear tabla de Materiales si no existe
     await (prisma as any).$executeRawUnsafe(`
@@ -26,6 +29,9 @@ async function runStartupMigrations() {
         "size" TEXT NOT NULL,
         "category" TEXT NOT NULL,
         "fileUrl" TEXT NOT NULL,
+        "type2" TEXT DEFAULT '',
+        "size2" TEXT DEFAULT '',
+        "fileUrl2" TEXT DEFAULT '',
         "isVisible" BOOLEAN NOT NULL DEFAULT TRUE,
         "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
         "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP

@@ -369,7 +369,7 @@ export const SecretariaPage: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6 font-sans text-slate-800 dark:text-slate-100 animate-fadeIn bg-[#f0f2fc] dark:bg-slate-950 w-full px-2 sm:px-4 select-none pb-12 transition-colors duration-300">
+    <div className="space-y-4 sm:space-y-6 font-sans text-slate-800 dark:text-slate-100 animate-fadeIn bg-[#f0f2fc] dark:bg-slate-950 w-full px-2 sm:px-6 select-none pb-12 transition-colors duration-300">
       <style>{`
         @keyframes gradient-flow {
           0% { background-position: 0% 50%; }
@@ -451,38 +451,40 @@ export const SecretariaPage: React.FC = () => {
       `}</style>
       
       {/* HEADER CARD */}
-      <div className="relative flex flex-col sm:flex-row justify-between items-center gap-4 bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-lg hover:shadow-xl transition-all duration-300 z-20">
+      <div className="relative flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 bg-white dark:bg-slate-900 p-4 sm:p-5 rounded-2xl sm:rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-lg hover:shadow-xl transition-all duration-300 z-20">
         <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500 rounded-t-3xl" style={{backgroundSize: '200% 100%', animation: 'shimmer 4s linear infinite'}} />
         <div className="flex items-center gap-3 pt-1">
-          <div className="relative">
+          <div className="relative shrink-0">
             <div className="bg-gradient-to-br from-amber-400 to-orange-500 p-2.5 text-white rounded-2xl shadow-lg shadow-amber-500/25 transform transition duration-300 hover:rotate-3">
-              <Users size={24} className="stroke-[2.5]" />
+              <Users size={22} className="stroke-[2.5] sm:w-6 sm:h-6" />
             </div>
             <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-400 rounded-full border-2 border-white dark:border-slate-900 animate-pulse" />
           </div>
-          <div className="space-y-0.5">
-            <h1 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-600 dark:from-amber-400 to-orange-600 dark:to-orange-400 tracking-tight">Secretaría</h1>
-            <p className="text-xs text-slate-400 dark:text-slate-400 font-bold uppercase tracking-widest mt-0.5">Sistema de Gestión de Grupos Pequeños (GP)</p>
+          <div className="space-y-0.5 min-w-0">
+            <h1 className="text-xl sm:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-amber-600 dark:from-amber-400 to-orange-600 dark:to-orange-400 tracking-tight">Secretaría</h1>
+            <p className="text-[10px] sm:text-xs text-slate-400 dark:text-slate-400 font-bold uppercase tracking-widest mt-0.5 truncate">Sistema de Gestión de Grupos Pequeños (GP)</p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end relative">
+        <div className="flex flex-wrap sm:flex-nowrap items-center gap-2 sm:gap-2.5 w-full sm:w-auto justify-start sm:justify-end relative">
           <button 
             onClick={openCreateModal} 
-            className="p-2.5 bg-gradient-to-br from-amber-400 to-orange-500 text-white hover:from-amber-500 hover:to-orange-600 rounded-xl shadow-md shadow-amber-500/25 hover:shadow-amber-500/40 transition-all duration-200 cursor-pointer hover:scale-105 hover:-translate-y-0.5 active:scale-95" 
+            className="p-2.5 bg-gradient-to-br from-amber-400 to-orange-500 text-white hover:from-amber-500 hover:to-orange-600 rounded-xl shadow-md shadow-amber-500/25 hover:shadow-amber-500/40 transition-all duration-200 cursor-pointer hover:scale-105 hover:-translate-y-0.5 active:scale-95 shrink-0" 
             title="Crear Nuevo Grupo"
           >
             <Plus size={16} />
           </button>
           
           {groups.length > 0 && (
-            <div className="relative inline-block text-left">
+            <div className="relative inline-block text-left flex-1 sm:flex-none min-w-0">
               <button 
                 onClick={() => setGpDropdownOpen(!gpDropdownOpen)}
-                className="flex items-center gap-2 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 rounded-xl text-xs font-black text-white cursor-pointer uppercase tracking-wider transition-all hover:scale-[1.02] active:scale-95 shadow-md shadow-indigo-500/20 focus:outline-none"
+                className="w-full sm:w-auto flex items-center justify-between sm:justify-start gap-2 px-3.5 sm:px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 rounded-xl text-xs font-black text-white cursor-pointer uppercase tracking-wider transition-all hover:scale-[1.02] active:scale-95 shadow-md shadow-indigo-500/20 focus:outline-none"
               >
-                <Users size={13} className="text-white shrink-0 animate-pulse" />
-                <span>GP: {groups.find(g => g.id === activeGroupId)?.name.toUpperCase() || 'SELECCIONAR'}</span>
+                <div className="flex items-center gap-2 truncate">
+                  <Users size={13} className="text-white shrink-0 animate-pulse" />
+                  <span className="truncate">GP: {groups.find(g => g.id === activeGroupId)?.name.toUpperCase() || 'SELECCIONAR'}</span>
+                </div>
                 <Sliders size={13} className={`transition-transform duration-200 text-white shrink-0 ${gpDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
               
@@ -521,72 +523,72 @@ export const SecretariaPage: React.FC = () => {
         <div className="space-y-6 animate-fadeIn">
           
           {/* TARJETAS DE MÉTRICAS (Estilo Puntuaciones) */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
             {/* Card 1: Integrantes */}
-            <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-md hover:shadow-lg transition-all duration-300 p-5 border-l-4 border-l-emerald-500 flex items-center gap-4 relative overflow-hidden group">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-md hover:shadow-lg transition-all duration-300 p-4 sm:p-5 border-l-4 border-l-emerald-500 flex items-center gap-3.5 sm:gap-4 relative overflow-hidden group">
               <div className="absolute right-0 top-0 opacity-5 rotate-12 pointer-events-none transition-transform group-hover:scale-110">
                 <Users size={90} className="text-emerald-500" />
               </div>
-              <div className="bg-emerald-500/10 p-3 rounded-2xl text-emerald-600 dark:text-emerald-400 shrink-0 shadow-sm">
-                <Users size={24} className="stroke-[2.5]" />
+              <div className="bg-emerald-500/10 p-2.5 sm:p-3 rounded-2xl text-emerald-600 dark:text-emerald-400 shrink-0 shadow-sm">
+                <Users size={22} className="stroke-[2.5] sm:w-6 sm:h-6" />
               </div>
               <div>
-                <span className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest block">GP Integrantes</span>
-                <span className="text-2xl font-black text-slate-900 dark:text-white block mt-0.5">{members.length}</span>
-                <span className="text-[10px] text-slate-400 dark:text-slate-400 font-bold uppercase tracking-wider block mt-0.5">Feligreses Activos</span>
+                <span className="text-[9px] sm:text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest block">GP Integrantes</span>
+                <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white block mt-0.5">{members.length}</span>
+                <span className="text-[9px] sm:text-[10px] text-slate-400 dark:text-slate-400 font-bold uppercase tracking-wider block mt-0.5">Feligreses Activos</span>
               </div>
             </div>
 
             {/* Card 2: Seguro de Vida */}
-            <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-md hover:shadow-lg transition-all duration-300 p-5 border-l-4 border-l-sky-500 flex items-center gap-4 relative overflow-hidden group">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-md hover:shadow-lg transition-all duration-300 p-4 sm:p-5 border-l-4 border-l-sky-500 flex items-center gap-3.5 sm:gap-4 relative overflow-hidden group">
               <div className="absolute right-0 top-0 opacity-5 rotate-12 pointer-events-none transition-transform group-hover:scale-110">
                 <Shield size={90} className="text-sky-500" />
               </div>
-              <div className="bg-gradient-to-br from-sky-400 to-indigo-600 p-3 rounded-2xl text-white shrink-0 shadow-md shadow-blue-500/20">
-                <Shield size={24} className="stroke-[2.5]" />
+              <div className="bg-gradient-to-br from-sky-400 to-indigo-600 p-2.5 sm:p-3 rounded-2xl text-white shrink-0 shadow-md shadow-blue-500/20">
+                <Shield size={22} className="stroke-[2.5] sm:w-6 sm:h-6" />
               </div>
               <div>
-                <span className="text-[10px] font-black text-sky-600 dark:text-sky-400 uppercase tracking-widest block">Seguro de Vida</span>
-                <span className="text-2xl font-black text-slate-900 dark:text-white block mt-0.5">
+                <span className="text-[9px] sm:text-[10px] font-black text-sky-600 dark:text-sky-400 uppercase tracking-widest block">Seguro de Vida</span>
+                <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white block mt-0.5">
                   {members.filter(m => m.hasLifeInsurance).length} <span className="text-xs text-slate-400 dark:text-slate-400 font-bold">de {members.length}</span>
                 </span>
-                <span className="text-[10px] text-slate-400 dark:text-slate-400 font-bold uppercase tracking-wider block mt-0.5">Cobertura Vigente</span>
+                <span className="text-[9px] sm:text-[10px] text-slate-400 dark:text-slate-400 font-bold uppercase tracking-wider block mt-0.5">Cobertura Vigente</span>
               </div>
             </div>
 
             {/* Card 3: Directiva */}
-            <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-md hover:shadow-lg transition-all duration-300 p-5 border-l-4 border-l-violet-500 flex items-center gap-4 relative overflow-hidden group">
+            <div className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-md hover:shadow-lg transition-all duration-300 p-4 sm:p-5 border-l-4 border-l-violet-500 flex items-center gap-3.5 sm:gap-4 relative overflow-hidden group">
               <div className="absolute right-0 top-0 opacity-5 rotate-12 pointer-events-none transition-transform group-hover:scale-110">
                 <Crown size={90} className="text-violet-500" />
               </div>
-              <div className="bg-violet-500/10 p-3 rounded-2xl text-violet-600 dark:text-violet-400 shrink-0 shadow-sm">
-                <Crown size={24} className="stroke-[2.5]" />
+              <div className="bg-violet-500/10 p-2.5 sm:p-3 rounded-2xl text-violet-600 dark:text-violet-400 shrink-0 shadow-sm">
+                <Crown size={22} className="stroke-[2.5] sm:w-6 sm:h-6" />
               </div>
               <div>
-                <span className="text-[10px] font-black text-violet-600 dark:text-violet-400 uppercase tracking-widest block">Cargos Directivos</span>
-                <span className="text-2xl font-black text-slate-900 dark:text-white block mt-0.5">
+                <span className="text-[9px] sm:text-[10px] font-black text-violet-600 dark:text-violet-400 uppercase tracking-widest block">Cargos Directivos</span>
+                <span className="text-xl sm:text-2xl font-black text-slate-900 dark:text-white block mt-0.5">
                   {members.filter(m => m.roleInGP !== 'Integrante').length} <span className="text-xs text-slate-400 dark:text-slate-400 font-bold">Asignados</span>
                 </span>
-                <span className="text-[10px] text-slate-400 dark:text-slate-400 font-bold uppercase tracking-wider block mt-0.5">Liderazgo Activo</span>
+                <span className="text-[9px] sm:text-[10px] text-slate-400 dark:text-slate-400 font-bold uppercase tracking-wider block mt-0.5">Liderazgo Activo</span>
               </div>
             </div>
           </div>
           
           {/* MEMBERS LIST */}
-          <div className="bg-white dark:bg-slate-900 border-l-4 border-l-indigo-500 border border-slate-200/80 dark:border-slate-800 rounded-3xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300">
-            <div className="p-5 flex justify-between items-center bg-slate-50 dark:bg-slate-800/80 border-b border-indigo-150/40 dark:border-slate-800">
+          <div className="bg-white dark:bg-slate-900 border-l-4 border-l-indigo-500 border border-slate-200/80 dark:border-slate-800 rounded-2xl sm:rounded-3xl overflow-hidden shadow-md hover:shadow-lg transition-all duration-300">
+            <div className="p-4 sm:p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 bg-slate-50 dark:bg-slate-800/80 border-b border-indigo-150/40 dark:border-slate-800">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-xl shadow-lg shadow-indigo-500/25 transform transition duration-300 hover:rotate-3">
+                <div className="p-2.5 bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-xl shadow-lg shadow-indigo-500/25 transform transition duration-300 hover:rotate-3 shrink-0">
                   <UserCheck size={18} />
                 </div>
                 <div>
-                  <h2 className="text-base font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 dark:from-indigo-400 to-purple-600 dark:to-purple-400 uppercase tracking-wide">Lista de Integrantes</h2>
-                  <p className="text-xs text-slate-400 dark:text-slate-400 font-bold">Feligresía registrada oficialmente en el grupo</p>
+                  <h2 className="text-sm sm:text-base font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 dark:from-indigo-400 to-purple-600 dark:to-purple-400 uppercase tracking-wide">Lista de Integrantes</h2>
+                  <p className="text-[11px] sm:text-xs text-slate-400 dark:text-slate-400 font-bold">Feligresía registrada oficialmente en el grupo</p>
                 </div>
               </div>
               <button 
                 onClick={openLinkModal} 
-                className="flex items-center gap-1.5 px-5 py-2.5 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white font-black text-xs uppercase tracking-wider rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-95 cursor-pointer shadow-md shadow-violet-500/25"
+                className="w-full sm:w-auto flex items-center justify-center gap-1.5 px-4 sm:px-5 py-2.5 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white font-black text-xs uppercase tracking-wider rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-95 cursor-pointer shadow-md shadow-violet-500/25"
               >
                 <UserPlus size={13} /> Agregar Integrante
               </button>
@@ -833,24 +835,24 @@ export const SecretariaPage: React.FC = () => {
       )}
 
       {isEditMemberModalOpen && editingMember && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-start justify-center z-50 p-4 pt-10 sm:pt-16 md:pt-20 lg:pt-28 overflow-y-auto animate-fadeIn">
-          <div className="w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden animated-gradient-border animate-scaleUp">
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center z-50 p-3 sm:p-4 overflow-y-auto animate-fadeIn">
+          <div className="w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden animated-gradient-border animate-scaleUp my-auto">
             <div className="animated-gradient-border-content rounded-[22px] overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
               {/* Barra de gradiente superior */}
               <div className="h-1.5 bg-gradient-to-r from-violet-500 via-indigo-500 via-violet-500 via-fuchsia-500 to-orange-400" />
               
               {/* Header del Modal */}
-              <div className="p-6 pb-2 flex justify-between items-center border-b border-slate-100 dark:border-slate-800">
+              <div className="p-4 sm:p-6 pb-2 flex justify-between items-center border-b border-slate-100 dark:border-slate-800">
                 <div className="flex items-center gap-2.5">
-                  <div className="p-2 bg-gradient-to-br from-violet-500 to-fuchsia-600 text-white rounded-xl shadow-md shadow-violet-500/20">
+                  <div className="p-2 bg-gradient-to-br from-violet-500 to-fuchsia-600 text-white rounded-xl shadow-md shadow-violet-500/20 shrink-0">
                     <Sliders size={16} className="stroke-[2.5]" />
                   </div>
-                  <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest">Editar Cargo</h3>
+                  <h3 className="text-xs sm:text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest">Editar Cargo</h3>
                 </div>
                 <button type="button" onClick={() => setIsEditMemberModalOpen(false)} className="text-violet-500 hover:text-violet-700 hover:bg-violet-50 dark:hover:bg-violet-950/40 p-1.5 rounded-xl transition-all duration-200 hover:rotate-90 cursor-pointer"><X size={16} /></button>
               </div>
               
-              <form onSubmit={handleEditMemberSubmit} className="p-6 pt-4 space-y-4 text-xs font-bold text-slate-600 dark:text-slate-300">
+              <form onSubmit={handleEditMemberSubmit} className="p-4 sm:p-6 pt-4 space-y-4 text-xs font-bold text-slate-600 dark:text-slate-300 max-h-[80vh] overflow-y-auto">
                 <div className="space-y-1 bg-indigo-50/60 dark:bg-indigo-950/40 p-3 rounded-xl border border-indigo-100 dark:border-indigo-900/40 shadow-sm">
                   <span className="text-[9px] font-black text-indigo-700 dark:text-indigo-300 uppercase tracking-widest block">Integrante Seleccionado</span>
                   <span className="text-sm font-black text-slate-900 dark:text-white block mt-0.5 capitalize">{editingMember.name}</span>
@@ -900,24 +902,24 @@ export const SecretariaPage: React.FC = () => {
 
       {/* CREATE OR EDIT GROUP MODAL */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-start justify-center z-50 p-4 pt-10 sm:pt-16 md:pt-20 lg:pt-28 overflow-y-auto animate-fadeIn">
-          <div className="w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden animated-gradient-border animate-scaleUp">
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center z-50 p-3 sm:p-4 overflow-y-auto animate-fadeIn">
+          <div className="w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden animated-gradient-border animate-scaleUp my-auto">
             <div className="animated-gradient-border-content rounded-[22px] overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
               {/* Barra de gradiente superior */}
               <div className="h-1.5 bg-gradient-to-r from-violet-500 via-indigo-500 via-violet-500 via-fuchsia-500 to-orange-400" />
               
               {/* Header del Modal */}
-              <div className="p-6 pb-2 flex justify-between items-center border-b border-slate-100 dark:border-slate-800">
+              <div className="p-4 sm:p-6 pb-2 flex justify-between items-center border-b border-slate-100 dark:border-slate-800">
                 <div className="flex items-center gap-2.5">
-                  <div className="p-2 bg-gradient-to-br from-violet-500 to-fuchsia-600 text-white rounded-xl shadow-md shadow-violet-500/20">
+                  <div className="p-2 bg-gradient-to-br from-violet-500 to-fuchsia-600 text-white rounded-xl shadow-md shadow-violet-500/20 shrink-0">
                     <Sliders size={16} className="stroke-[2.5]" />
                   </div>
-                  <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest">{modalMode === 'CREATE' ? 'Nuevo Grupo' : 'Modificar Grupo'}</h3>
+                  <h3 className="text-xs sm:text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest">{modalMode === 'CREATE' ? 'Nuevo Grupo' : 'Modificar Grupo'}</h3>
                 </div>
                 <button type="button" onClick={() => setIsModalOpen(false)} className="text-violet-500 hover:text-violet-700 hover:bg-violet-50 dark:hover:bg-violet-950/30 p-1.5 rounded-xl transition-all duration-200 hover:rotate-90 cursor-pointer"><X size={16} /></button>
               </div>
 
-              <form onSubmit={handleFormSubmit} className="p-6 pt-4 space-y-4 text-xs font-bold text-slate-600 dark:text-slate-300">
+              <form onSubmit={handleFormSubmit} className="p-4 sm:p-6 pt-4 space-y-4 text-xs font-bold text-slate-600 dark:text-slate-300 max-h-[80vh] overflow-y-auto">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <label className="text-[9px] font-black text-violet-600 dark:text-violet-400 uppercase tracking-widest block">Nombre del Grupo *</label>
@@ -954,24 +956,24 @@ export const SecretariaPage: React.FC = () => {
 
       {/* LINK AVAILABLE MEMBER MODAL */}
       {isLinkModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-start justify-center z-50 p-4 pt-10 sm:pt-16 md:pt-20 lg:pt-28 overflow-y-auto animate-fadeIn">
-          <div className="w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden animated-gradient-border animate-scaleUp">
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center z-50 p-3 sm:p-4 overflow-y-auto animate-fadeIn">
+          <div className="w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden animated-gradient-border animate-scaleUp my-auto">
             <div className="animated-gradient-border-content rounded-[22px] overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
               {/* Barra de gradiente superior */}
               <div className="h-1.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600" />
               
               {/* Header del Modal */}
-              <div className="p-6 pb-2 flex justify-between items-center border-b border-slate-100 dark:border-slate-800">
+              <div className="p-4 sm:p-6 pb-2 flex justify-between items-center border-b border-slate-100 dark:border-slate-800">
                 <div className="flex items-center gap-2.5">
-                  <div className="p-2 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 rounded-xl border border-indigo-100 dark:border-indigo-800/60 shadow-3xs">
+                  <div className="p-2 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 rounded-xl border border-indigo-100 dark:border-indigo-800/60 shadow-3xs shrink-0">
                     <UserCheck size={16} className="stroke-[2.5]" />
                   </div>
-                  <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest">Vincular Integrante</h3>
+                  <h3 className="text-xs sm:text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest">Vincular Integrante</h3>
                 </div>
                 <button type="button" onClick={() => setIsLinkModalOpen(false)} className="text-indigo-500 hover:text-indigo-700 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 p-1.5 rounded-xl transition-all duration-200 hover:rotate-90 cursor-pointer"><X size={16} /></button>
               </div>
               
-              <form onSubmit={handleLinkSubmit} className="p-6 pt-4 space-y-4 text-xs font-bold text-slate-600 dark:text-slate-300">
+              <form onSubmit={handleLinkSubmit} className="p-4 sm:p-6 pt-4 space-y-4 text-xs font-bold text-slate-600 dark:text-slate-300 max-h-[80vh] overflow-y-auto">
                 <div className="space-y-2">
                   <label className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest block">Seleccionar Feligrés Disponible</label>
                   
@@ -1060,24 +1062,24 @@ export const SecretariaPage: React.FC = () => {
 
        {/* CREATE NEW MEMBER MODAL */}
       {isCreateMemberModalOpen && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-start justify-center z-50 p-4 pt-10 sm:pt-16 md:pt-20 lg:pt-28 overflow-y-auto animate-fadeIn">
-          <div className="w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden animated-gradient-border animate-scaleUp">
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center z-50 p-3 sm:p-4 overflow-y-auto animate-fadeIn">
+          <div className="w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden animated-gradient-border animate-scaleUp my-auto">
             <div className="animated-gradient-border-content rounded-[22px] overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
               {/* Barra de gradiente superior */}
               <div className="h-1.5 bg-gradient-to-r from-emerald-500 to-teal-500" />
               
               {/* Header del Modal */}
-              <div className="p-6 pb-2 flex justify-between items-center border-b border-slate-100 dark:border-slate-800">
+              <div className="p-4 sm:p-6 pb-2 flex justify-between items-center border-b border-slate-100 dark:border-slate-800">
                 <div className="flex items-center gap-2.5">
-                  <div className="p-2 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 rounded-xl border border-emerald-100 dark:border-emerald-800/60 shadow-3xs">
+                  <div className="p-2 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 rounded-xl border border-emerald-100 dark:border-emerald-800/60 shadow-3xs shrink-0">
                     <UserPlus size={16} className="stroke-[2.5]" />
                   </div>
-                  <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest">Registrar Miembro</h3>
+                  <h3 className="text-xs sm:text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest">Registrar Miembro</h3>
                 </div>
                 <button type="button" onClick={() => setIsCreateMemberModalOpen(false)} className="text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 p-1.5 rounded-xl transition-all duration-200 hover:rotate-90 cursor-pointer"><X size={16} /></button>
               </div>
               
-              <form onSubmit={handleCreateAndLinkSubmit} className="p-6 pt-4 space-y-4 text-xs font-bold text-slate-600 dark:text-slate-300">
+              <form onSubmit={handleCreateAndLinkSubmit} className="p-4 sm:p-6 pt-4 space-y-4 text-xs font-bold text-slate-600 dark:text-slate-300 max-h-[80vh] overflow-y-auto">
                 <div className="space-y-1">
                   <label className="text-[9px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest block">Nombre Completo *</label>
                   <div className="relative">

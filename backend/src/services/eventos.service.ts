@@ -5,7 +5,15 @@ export class EventosService {
     return await (prisma as any).event.findMany({
       include: {
         participations: {
-          include: { groupSmall: true }
+          include: {
+            groupSmall: {
+              include: {
+                members: {
+                  select: { id: true, name: true, groupRole: true }
+                }
+              }
+            }
+          }
         }
       },
       orderBy: { createdAt: 'desc' }
