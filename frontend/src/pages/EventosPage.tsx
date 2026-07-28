@@ -1,9 +1,9 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { eventosService } from '../services/api';
 import { useAuthStore } from '../stores/authStore';
-import { 
+import {
   Calendar, Trophy, Plus, MoreVertical, CheckCircle2, ArrowRight,
-  AlertCircle, X, CalendarDays, MapPin, Clock, Users, Eye, 
+  AlertCircle, X, CalendarDays, MapPin, Clock, Users, Eye,
   Layers, Check, Info, Trash2, Edit2, FileText, Upload,
   ChevronLeft, ChevronRight, Search, Building2, Download
 } from 'lucide-react';
@@ -27,7 +27,7 @@ export const EventosPage: React.FC = () => {
   // Carrusel de Imágenes de Eventos Recreativos
   const [recreativoImgIndex, setRecreativoImgIndex] = useState(0);
   const recreativoImages = [campamentoImg, confraternizacionImg, viajesImg];
-  
+
   useEffect(() => {
     const timer = setInterval(() => {
       setRecreativoImgIndex((prev) => (prev + 1) % 3);
@@ -38,7 +38,7 @@ export const EventosPage: React.FC = () => {
   // Carrusel de Imágenes de Deportes
   const [deporteImgIndex, setDeporteImgIndex] = useState(0);
   const deporteImages = [basquetImg, futbolImg, recreacionImg];
-  
+
   useEffect(() => {
     const timer = setInterval(() => {
       setDeporteImgIndex((prev) => (prev + 1) % 3);
@@ -153,7 +153,7 @@ export const EventosPage: React.FC = () => {
       const res = await eventosService.getMyGroupMembers();
       setGroupMembers(res.data.members || []);
       setGroupName(res.data.groupName || '');
-      
+
       const confirmedStr = participation.confirmedMembers || '';
       const ids = confirmedStr ? confirmedStr.split(',').map(Number).filter((id: number) => !isNaN(id)) : [];
       setCheckedMemberIds(ids);
@@ -166,9 +166,9 @@ export const EventosPage: React.FC = () => {
 
   const handleToggleMember = (memberId: number) => {
     if (!canManageAttendance) return;
-    setCheckedMemberIds(prev => 
-      prev.includes(memberId) 
-        ? prev.filter(id => id !== memberId) 
+    setCheckedMemberIds(prev =>
+      prev.includes(memberId)
+        ? prev.filter(id => id !== memberId)
         : [...prev, memberId]
     );
   };
@@ -193,7 +193,7 @@ export const EventosPage: React.FC = () => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [kpis, setKpis] = useState({ eventosProgramados: 0, gpInscritosMes: 0, eventosProximos: 0, participacionesTotales: 0 });
   const [loading, setLoading] = useState(false);
-  
+
   const [activeTabRecreativos, setActiveTabRecreativos] = useState<'Próximos' | 'En Curso' | 'Finalizados'>('Próximos');
   const [activeTabDeportes, setActiveTabDeportes] = useState<'Próximos' | 'En Curso' | 'Finalizados'>('Próximos');
   const [selectedCategoryView, setSelectedCategoryView] = useState<'ALL' | 'RECREATIVO' | 'DEPORTE'>('ALL');
@@ -440,11 +440,11 @@ export const EventosPage: React.FC = () => {
 
     // Sección 1: GRUPOS PEQUEÑOS INSCRITOS
     const enrolledLabel = enrolled.length === 1 ? '1 GRUPO PEQUEÑO' : `${enrolled.length} GRUPOS PEQUEÑOS`;
-    
+
     // Encabezado de Sección Destacado con Píldora Elegante
     doc.setFillColor(79, 70, 229); // Indigo 600
     doc.roundedRect(14, yPos - 3.5, 3, 5, 1, 1, 'F');
-    
+
     doc.setTextColor(30, 41, 59); // Slate 800
     doc.setFontSize(9.5);
     doc.setFont('helvetica', 'bold');
@@ -533,7 +533,7 @@ export const EventosPage: React.FC = () => {
               const rawVal = String(data.cell.raw || '');
               const isConfirmed = rawVal === 'CONFIRMADO';
               const cell = data.cell;
-              
+
               const paddingX = 3;
               const paddingY = 1.2;
               const pillW = cell.width - (paddingX * 2);
@@ -578,7 +578,7 @@ export const EventosPage: React.FC = () => {
     }
 
     const notEnrolledLabel = notEnrolled.length === 1 ? '1 GRUPO PEQUEÑO' : `${notEnrolled.length} GRUPOS PEQUEÑOS`;
-    
+
     // Encabezado de Sección Destacado con Píldora Elegante
     doc.setFillColor(225, 29, 72); // Rose 600
     doc.roundedRect(14, yPos - 3.5, 3, 5, 1, 1, 'F');
@@ -729,11 +729,11 @@ export const EventosPage: React.FC = () => {
         eventosService.getMyParticipations(),
         eventosService.getKpis().catch(() => ({ data: { stats: null } }))
       ]);
-      
+
       const fetchedEvents = resEvents.data.events || [];
       setEvents(fetchedEvents);
       setMyParticipations(resMy.data.participations || []);
-      
+
       if (resKpi.data?.stats) {
         setKpis({
           eventosProgramados: resKpi.data.stats.eventosProgramados,
@@ -744,7 +744,7 @@ export const EventosPage: React.FC = () => {
       } else {
         setKpis({
           eventosProgramados: fetchedEvents.length,
-          gpInscritosMes: 8, 
+          gpInscritosMes: 8,
           eventosProximos: fetchedEvents.filter((e: any) => e.status === 'Abierto').length,
           participacionesTotales: fetchedEvents.reduce((acc: number, e: any) => acc + (e.participations?.length || 0), 0)
         });
@@ -943,10 +943,10 @@ export const EventosPage: React.FC = () => {
           animation: border-glow-orange 2.5s infinite ease-in-out;
         }
       `}</style>
-      
+
       {/* HEADER PREMIUM */}
       <div className="relative bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl border border-slate-200/80 dark:border-slate-800/80 shadow-lg overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-500 via-indigo-500 via-violet-500 via-fuchsia-500 to-orange-400" style={{backgroundSize: '200% 100%', animation: 'shimmer 4s linear infinite'}} />
+        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-blue-500 via-indigo-500 via-violet-500 via-fuchsia-500 to-orange-400" style={{ backgroundSize: '200% 100%', animation: 'shimmer 4s linear infinite' }} />
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 p-4 sm:p-5 pt-6 sm:pt-7">
           <div className="flex items-center gap-3 min-w-0">
             <div className="relative shrink-0">
@@ -972,11 +972,11 @@ export const EventosPage: React.FC = () => {
           {/* Resumen General Banner Horizontal */}
           <div className="bg-white/80 dark:bg-slate-900/20 backdrop-blur-xl p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-slate-200/80 dark:border-slate-800/50 shadow-xl relative overflow-hidden flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 sm:gap-6">
             {/* Top glowing accent line */}
-            <div className="absolute top-0 left-0 right-0 h-[2.5px] bg-gradient-to-r from-indigo-500 via-orange-500 to-rose-500" style={{backgroundSize: '200% 100%', animation: 'shimmer 4s linear infinite'}} />
+            <div className="absolute top-0 left-0 right-0 h-[2.5px] bg-gradient-to-r from-indigo-500 via-orange-500 to-rose-500" style={{ backgroundSize: '200% 100%', animation: 'shimmer 4s linear infinite' }} />
             {/* Colorful glowing radial orbs behind the glass */}
             <div className="absolute -left-12 -top-12 w-32 h-32 bg-indigo-500/15 rounded-full blur-2xl animate-pulse" />
-            <div className="absolute -right-12 -bottom-12 w-32 h-32 bg-rose-500/15 rounded-full blur-2xl animate-pulse" style={{animationDelay: '1.5s'}} />
-            
+            <div className="absolute -right-12 -bottom-12 w-32 h-32 bg-rose-500/15 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '1.5s' }} />
+
             <div className="flex items-center gap-3.5 relative z-10">
               <div className="p-3 sm:p-3.5 bg-gradient-to-br from-amber-400 via-orange-500 to-rose-500 text-white rounded-2xl shadow-lg shadow-orange-500/20 hover:scale-110 transition duration-300 shrink-0">
                 <Layers size={20} />
@@ -996,7 +996,7 @@ export const EventosPage: React.FC = () => {
 
           {/* Grid de Selección de Categoría */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div 
+            <div
               onClick={() => setSelectedCategoryView('RECREATIVO')}
               className="group cursor-pointer relative overflow-hidden rounded-[2rem] border-2 border-indigo-500/40 animate-glow-indigo shadow-lg hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col items-center justify-between text-center min-h-[380px] p-8 gap-4"
             >
@@ -1005,11 +1005,10 @@ export const EventosPage: React.FC = () => {
                 {recreativoImages.map((img, idx) => (
                   <div
                     key={idx}
-                    className={`absolute inset-0 bg-cover bg-center transition-all duration-[1500ms] ease-in-out transform ${
-                      recreativoImgIndex === idx 
-                        ? 'opacity-80 scale-105 z-10' 
+                    className={`absolute inset-0 bg-cover bg-center transition-all duration-[1500ms] ease-in-out transform ${recreativoImgIndex === idx
+                        ? 'opacity-80 scale-105 z-10'
                         : 'opacity-0 scale-100 z-0'
-                    }`}
+                      }`}
                     style={{ backgroundImage: `url(${img})` }}
                   />
                 ))}
@@ -1026,15 +1025,15 @@ export const EventosPage: React.FC = () => {
                   <h3 className="font-black text-xl text-white uppercase tracking-tight">Eventos Recreativos</h3>
                   <p className="text-xs text-slate-200/90 font-bold leading-normal max-w-xs">Campamentos, confraternizaciones, integraciones y más.</p>
                 </div>
-                <button 
-                  onClick={(e) => { e.stopPropagation(); setSelectedCategoryView('RECREATIVO'); }} 
+                <button
+                  onClick={(e) => { e.stopPropagation(); setSelectedCategoryView('RECREATIVO'); }}
                   className="w-full mt-2 py-3 px-6 bg-white/15 hover:bg-white/25 text-white border border-white/25 text-xs font-black uppercase rounded-2xl shadow-md group-hover:scale-[1.02] active:scale-95 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
                 >
                   Ver Eventos Recreativos <ArrowRight size={14} className="group-hover:translate-x-1 transition duration-200" />
                 </button>
               </div>
             </div>
-            <div 
+            <div
               onClick={() => setSelectedCategoryView('DEPORTE')}
               className="group cursor-pointer relative overflow-hidden rounded-[2rem] border-2 border-orange-500/40 animate-glow-orange shadow-lg hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col items-center justify-between text-center min-h-[380px] p-8 gap-4"
             >
@@ -1043,11 +1042,10 @@ export const EventosPage: React.FC = () => {
                 {deporteImages.map((img, idx) => (
                   <div
                     key={idx}
-                    className={`absolute inset-0 bg-cover bg-center transition-all duration-[1500ms] ease-in-out transform ${
-                      deporteImgIndex === idx 
-                        ? 'opacity-80 scale-105 z-10' 
+                    className={`absolute inset-0 bg-cover bg-center transition-all duration-[1500ms] ease-in-out transform ${deporteImgIndex === idx
+                        ? 'opacity-80 scale-105 z-10'
                         : 'opacity-0 scale-100 z-0'
-                    }`}
+                      }`}
                     style={{ backgroundImage: `url(${img})` }}
                   />
                 ))}
@@ -1064,8 +1062,8 @@ export const EventosPage: React.FC = () => {
                   <h3 className="font-black text-xl text-white uppercase tracking-tight">Deportes</h3>
                   <p className="text-xs text-slate-200/90 font-bold leading-normal max-w-xs">Campeonatos, torneos, competencias deportivas y juegos GP.</p>
                 </div>
-                <button 
-                  onClick={(e) => { e.stopPropagation(); setSelectedCategoryView('DEPORTE'); }} 
+                <button
+                  onClick={(e) => { e.stopPropagation(); setSelectedCategoryView('DEPORTE'); }}
                   className="w-full mt-2 py-3 px-6 bg-white/15 hover:bg-white/25 text-white border border-white/25 text-xs font-black uppercase rounded-2xl shadow-md group-hover:scale-[1.02] active:scale-95 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
                 >
                   Ver Eventos Deportivos <ArrowRight size={14} className="group-hover:translate-x-1 transition duration-200" />
@@ -1090,9 +1088,8 @@ export const EventosPage: React.FC = () => {
               recreativoImages.map((img, idx) => (
                 <div
                   key={idx}
-                  className={`absolute inset-0 bg-cover bg-center transition-all duration-[1500ms] ease-in-out transform ${
-                    recreativoImgIndex === idx ? 'opacity-90 scale-100 z-10' : 'opacity-0 scale-95 z-0'
-                  }`}
+                  className={`absolute inset-0 bg-cover bg-center transition-all duration-[1500ms] ease-in-out transform ${recreativoImgIndex === idx ? 'opacity-90 scale-100 z-10' : 'opacity-0 scale-95 z-0'
+                    }`}
                   style={{ backgroundImage: `url(${img})` }}
                 />
               ))
@@ -1100,16 +1097,15 @@ export const EventosPage: React.FC = () => {
               deporteImages.map((img, idx) => (
                 <div
                   key={idx}
-                  className={`absolute inset-0 bg-cover bg-center transition-all duration-[1500ms] ease-in-out transform ${
-                    deporteImgIndex === idx ? 'opacity-90 scale-100 z-10' : 'opacity-0 scale-95 z-0'
-                  }`}
+                  className={`absolute inset-0 bg-cover bg-center transition-all duration-[1500ms] ease-in-out transform ${deporteImgIndex === idx ? 'opacity-90 scale-100 z-10' : 'opacity-0 scale-95 z-0'
+                    }`}
                   style={{ backgroundImage: `url(${img})` }}
                 />
               ))
             )}
             {/* Lighter Gradient Tint Overlay on Banner */}
             <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-slate-950/20 z-20" />
-            
+
             {/* Content overlay on the banner */}
             <div className="absolute inset-0 z-30 flex flex-col justify-end p-6 text-white">
               <div className="space-y-1">
@@ -1120,8 +1116,8 @@ export const EventosPage: React.FC = () => {
                   {selectedCategoryView === 'RECREATIVO' ? 'Eventos Recreativos' : 'Deportes'}
                 </h2>
                 <p className="text-xs text-slate-200/90 font-bold max-w-md mt-0.5">
-                  {selectedCategoryView === 'RECREATIVO' 
-                    ? 'Convocatorias de integración, campamentos, confraternizaciones y más.' 
+                  {selectedCategoryView === 'RECREATIVO'
+                    ? 'Convocatorias de integración, campamentos, confraternizaciones y más.'
                     : 'Torneos, campeonatos, competencias deportivas y juegos GP.'}
                 </p>
               </div>
@@ -1129,7 +1125,7 @@ export const EventosPage: React.FC = () => {
           </div>
 
           <div className="relative z-30 grid grid-cols-1 lg:grid-cols-12 gap-6">
-            
+
             {/* ==================== RECREATIVO VIEW ==================== */}
             {selectedCategoryView === 'RECREATIVO' && (
               <>
@@ -1146,15 +1142,15 @@ export const EventosPage: React.FC = () => {
                       </div>
                     </div>
                     <div className="flex items-center gap-2 w-full xs:w-auto justify-end shrink-0">
-                      <button 
-                        onClick={() => setSelectedCategoryView('ALL')} 
+                      <button
+                        onClick={() => setSelectedCategoryView('ALL')}
                         className="px-3 sm:px-4 py-2 sm:py-2.5 text-[10px] sm:text-xs font-black text-slate-700 dark:text-slate-200 bg-white/50 dark:bg-slate-800/80 hover:bg-white/80 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl uppercase tracking-wider transition duration-200 flex items-center gap-1 cursor-pointer backdrop-blur-sm shadow-sm"
                       >
                         ← Volver
                       </button>
                       {userCanManageEvents && (
-                        <button 
-                          onClick={() => openCreateModal('RECREATIVO')} 
+                        <button
+                          onClick={() => openCreateModal('RECREATIVO')}
                           className="py-2 sm:py-2.5 px-3.5 sm:px-5 bg-gradient-to-r from-indigo-500 to-violet-600 hover:from-indigo-600 hover:to-violet-700 text-white text-[10px] sm:text-xs font-black rounded-xl shadow-lg shadow-indigo-500/25 hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-1 cursor-pointer shrink-0"
                         >
                           <Plus size={14} /> Convocar
@@ -1163,524 +1159,520 @@ export const EventosPage: React.FC = () => {
                     </div>
                   </div>
 
-                <div className="grid grid-cols-3 gap-1 bg-slate-200/60 dark:bg-slate-800/90 p-1 rounded-2xl border border-slate-300/60 dark:border-slate-700/80 shadow-inner w-full">
-                  {(['Próximos', 'En Curso', 'Finalizados'] as const).map(tab => {
-                    const count = filterEvents('RECREATIVO', tab).length;
-                    const isActive = activeTabRecreativos === tab;
-                    return (
-                      <button 
-                        key={tab} 
-                        onClick={() => setActiveTabRecreativos(tab)} 
-                        className={`w-full text-center text-[10px] sm:text-xs py-2 sm:py-2.5 px-1 rounded-xl font-black uppercase tracking-wider transition-all duration-300 cursor-pointer flex items-center justify-center gap-1 min-w-0 ${
-                          isActive 
-                            ? 'bg-gradient-to-r from-indigo-600 via-purple-600 to-violet-600 text-white shadow-lg shadow-indigo-500/30 scale-[1.02]' 
-                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/80 dark:hover:bg-slate-700/60'
-                        }`}
-                      >
-                        <span className="truncate">{tab}</span>
-                        <span className={`px-1.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-black transition-all shrink-0 ${
-                          isActive 
-                            ? 'bg-white/20 text-white border border-white/30' 
-                            : 'bg-slate-300/80 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
-                        }`}>
-                          ({count})
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
+                  <div className="grid grid-cols-3 gap-1 bg-slate-200/60 dark:bg-slate-800/90 p-1 rounded-2xl border border-slate-300/60 dark:border-slate-700/80 shadow-inner w-full">
+                    {(['Próximos', 'En Curso', 'Finalizados'] as const).map(tab => {
+                      const count = filterEvents('RECREATIVO', tab).length;
+                      const isActive = activeTabRecreativos === tab;
+                      return (
+                        <button
+                          key={tab}
+                          onClick={() => setActiveTabRecreativos(tab)}
+                          className={`w-full text-center text-[10px] sm:text-xs py-2 sm:py-2.5 px-1 rounded-xl font-black uppercase tracking-wider transition-all duration-300 cursor-pointer flex items-center justify-center gap-1 min-w-0 ${isActive
+                              ? 'bg-gradient-to-r from-indigo-600 via-purple-600 to-violet-600 text-white shadow-lg shadow-indigo-500/30 scale-[1.02]'
+                              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/80 dark:hover:bg-slate-700/60'
+                            }`}
+                        >
+                          <span className="truncate">{tab}</span>
+                          <span className={`px-1.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-black transition-all shrink-0 ${isActive
+                              ? 'bg-white/20 text-white border border-white/30'
+                              : 'bg-slate-300/80 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
+                            }`}>
+                            ({count})
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
 
-                <div className="space-y-4 max-h-[500px] overflow-y-auto pr-1">
-                  {filterEvents('RECREATIVO', activeTabRecreativos).map(ev => (
-                    <div key={ev.id} className="border border-slate-200/60 dark:border-slate-800 bg-white/70 dark:bg-slate-900/90 backdrop-blur-xl rounded-2xl p-4 sm:p-5 shadow-sm hover:border-indigo-300 dark:hover:border-indigo-700/60 hover:bg-white/90 dark:hover:bg-slate-900 hover:shadow-indigo-500/10 hover:shadow-lg transition-all duration-300 relative group flex flex-col sm:flex-row gap-4">
-                      <div className="w-full sm:w-32 h-44 sm:h-32 rounded-2xl shrink-0 overflow-hidden relative shadow-md border border-slate-200/60 dark:border-slate-800 bg-indigo-50/50 dark:bg-indigo-950/40">
-                        {ev.imageUrl ? (
-                           <img src={`${backendBase}${ev.imageUrl}`} alt={ev.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                        ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-indigo-600 to-violet-700 flex flex-col items-center justify-center text-white">
-                            <Calendar size={26} />
-                          </div>
-                        )}
-                      </div>
-                      <div className="flex-1 space-y-3 min-w-0 flex flex-col justify-between">
-                        <div>
-                          <div className="flex justify-between items-start mb-2">
-                            <span className="text-[10px] font-black uppercase px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-800/60 rounded-lg">{ev.typeTag || 'Actividad'}</span>
-                            {userCanManageEvents && (
-                              <div className="relative">
-                                <button onClick={() => setActiveMenuId(activeMenuId === ev.id ? null : ev.id)} className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition"><MoreVertical size={16} /></button>
-                                {activeMenuId === ev.id && (
-                                  <div className="absolute right-0 top-7 bg-white dark:bg-slate-900 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl py-1.5 w-28 z-40 font-bold">
-                                    <button type="button" onClick={() => openEditModal(ev)} className="w-full text-left px-3 py-2 text-xs text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white flex items-center gap-2 transition"><Edit2 size={13} /> Editar</button>
-                                    <button type="button" onClick={() => triggerDeleteConfirm(ev.id)} className="w-full text-left px-3 py-2 text-xs text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 flex items-center gap-2 transition"><Trash2 size={13} /> Eliminar</button>
-                                  </div>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                          <h3 className="font-black text-base sm:text-lg text-slate-900 dark:text-white tracking-tight leading-tight">{ev.title}</h3>
-                          <p className="text-xs sm:text-[13px] text-slate-600 dark:text-slate-300 font-medium line-clamp-2 leading-relaxed mt-1.5">{ev.description || 'Sin descripción adicional en la convocatoria.'}</p>
-                        </div>
-                        
-                        <div className="flex flex-wrap items-center gap-1.5 text-[10px] sm:text-xs text-slate-700 dark:text-slate-200 font-bold uppercase tracking-wide">
-                          <span className="whitespace-nowrap inline-flex items-center gap-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2.5 py-1 rounded-xl shadow-2xs">
-                            <CalendarDays size={13} className="text-indigo-500 shrink-0" />
-                            <span>{ev.startDate}</span>
-                          </span>
-                          <span className="whitespace-nowrap inline-flex items-center gap-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2.5 py-1 rounded-xl shadow-2xs max-w-full truncate">
-                            <MapPin size={13} className="text-indigo-500 shrink-0" />
-                            <span className="truncate">{ev.location}</span>
-                          </span>
-                          {ev.pdfUrl && (
-                            <a href={`${backendBase}${ev.pdfUrl}`} target="_blank" rel="noopener noreferrer" className="whitespace-nowrap inline-flex items-center gap-1.5 text-white bg-gradient-to-r from-rose-500 to-red-600 border border-rose-400/30 shadow-md shadow-rose-500/20 px-2.5 py-1 rounded-xl font-black text-[10px] sm:text-xs hover:scale-105 active:scale-95 transition-all duration-200">
-                              <FileText size={13} className="shrink-0" /> PDF Adjunto
-                            </a>
+                  <div className="space-y-4 max-h-[500px] overflow-y-auto pr-1">
+                    {filterEvents('RECREATIVO', activeTabRecreativos).map(ev => (
+                      <div key={ev.id} className="border border-slate-200/60 dark:border-slate-800 bg-white/70 dark:bg-slate-900/90 backdrop-blur-xl rounded-2xl p-4 sm:p-5 shadow-sm hover:border-indigo-300 dark:hover:border-indigo-700/60 hover:bg-white/90 dark:hover:bg-slate-900 hover:shadow-indigo-500/10 hover:shadow-lg transition-all duration-300 relative group flex flex-col sm:flex-row gap-4">
+                        <div className="w-full sm:w-32 h-44 sm:h-32 rounded-2xl shrink-0 overflow-hidden relative shadow-md border border-slate-200/60 dark:border-slate-800 bg-indigo-50/50 dark:bg-indigo-950/40">
+                          {ev.imageUrl ? (
+                            <img src={`${backendBase}${ev.imageUrl}`} alt={ev.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                          ) : (
+                            <div className="w-full h-full bg-gradient-to-br from-indigo-600 to-violet-700 flex flex-col items-center justify-center text-white">
+                              <Calendar size={26} />
+                            </div>
                           )}
                         </div>
-
-                        <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center pt-3 border-t border-slate-200 dark:border-slate-800 gap-2">
-                          <button
-                            type="button"
-                            onClick={() => openAdminDetailModal(ev)}
-                            title="Ver información del evento y lista de grupos inscritos / no inscritos con sus integrantes"
-                            className="w-full sm:w-auto text-[10px] sm:text-xs text-indigo-700 dark:text-indigo-300 font-black uppercase bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/80 border border-indigo-200 dark:border-indigo-800 px-3 py-2 rounded-xl flex items-center justify-center gap-1.5 transition-all duration-200 hover:scale-[1.02] active:scale-95 cursor-pointer shadow-sm"
-                          >
-                            <Users size={14} className="text-indigo-500" /> Inscritos: {ev.participations?.length || 0} / {ev.maxSpots} GP
-                            <Eye size={12} className="ml-0.5 text-indigo-400" />
-                          </button>
-                          {(() => {
-                            const groupParticipation = myParticipations.find((p: any) => p.eventId === ev.id);
-                            if (groupParticipation) {
-                              return (
-                                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 w-full sm:w-auto">
-                                  <button onClick={() => openEventInfoModal(ev)} className="flex-1 min-w-[70px] sm:flex-initial py-2 px-2.5 sm:px-3 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-[10px] sm:text-xs font-black rounded-xl transition-all duration-200 flex items-center justify-center gap-1 cursor-pointer">
-                                    <Info size={13} className="text-indigo-500" /> Info
-                                  </button>
-                                  <span className="flex-1 min-w-[75px] sm:flex-initial text-[10px] sm:text-xs font-black text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-100 dark:border-emerald-800/60 px-2 py-2 rounded-xl flex items-center justify-center gap-1"><CheckCircle2 size={13} /> INSCRITO</span>
-                                  {canManageAttendance && (
-                                    <button onClick={() => openAttendanceModal(ev, groupParticipation)} className="flex-1 min-w-[80px] sm:flex-initial py-2 px-2.5 bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 hover:from-amber-600 hover:to-rose-600 text-white text-[10px] sm:text-xs font-black rounded-xl hover:shadow-lg hover:shadow-orange-500/30 hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center gap-1 cursor-pointer shadow-md">
-                                      <Check size={13} /> Asistencia
-                                    </button>
+                        <div className="flex-1 space-y-3 min-w-0 flex flex-col justify-between">
+                          <div>
+                            <div className="flex justify-between items-start mb-2">
+                              <span className="text-[10px] font-black uppercase px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-800/60 rounded-lg">{ev.typeTag || 'Actividad'}</span>
+                              {userCanManageEvents && (
+                                <div className="relative">
+                                  <button onClick={() => setActiveMenuId(activeMenuId === ev.id ? null : ev.id)} className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition"><MoreVertical size={16} /></button>
+                                  {activeMenuId === ev.id && (
+                                    <div className="absolute right-0 top-7 bg-white dark:bg-slate-900 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl py-1.5 w-28 z-40 font-bold">
+                                      <button type="button" onClick={() => openEditModal(ev)} className="w-full text-left px-3 py-2 text-xs text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white flex items-center gap-2 transition"><Edit2 size={13} /> Editar</button>
+                                      <button type="button" onClick={() => triggerDeleteConfirm(ev.id)} className="w-full text-left px-3 py-2 text-xs text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 flex items-center gap-2 transition"><Trash2 size={13} /> Eliminar</button>
+                                    </div>
                                   )}
-                                  {canCancelParticipation && (
-                                    <button onClick={() => handleLeave(ev.id)} className="flex-1 min-w-[70px] sm:flex-initial py-2 px-2.5 sm:px-3 bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-800/60 text-[10px] sm:text-xs font-black rounded-xl hover:bg-rose-600 dark:hover:bg-rose-600 hover:text-white transition-all duration-200 flex items-center justify-center gap-1 cursor-pointer"><X size={13} /> Cancelar</button>
+                                </div>
+                              )}
+                            </div>
+                            <h3 className="font-black text-base sm:text-lg text-slate-900 dark:text-white tracking-tight leading-tight">{ev.title}</h3>
+                            <p className="text-xs sm:text-[13px] text-slate-600 dark:text-slate-300 font-medium line-clamp-2 leading-relaxed mt-1.5">{ev.description || 'Sin descripción adicional en la convocatoria.'}</p>
+                          </div>
+
+                          <div className="flex flex-wrap items-center gap-1.5 text-[10px] sm:text-xs text-slate-700 dark:text-slate-200 font-bold uppercase tracking-wide">
+                            <span className="whitespace-nowrap inline-flex items-center gap-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2.5 py-1 rounded-xl shadow-2xs">
+                              <CalendarDays size={13} className="text-indigo-500 shrink-0" />
+                              <span>{ev.startDate}</span>
+                            </span>
+                            <span className="whitespace-nowrap inline-flex items-center gap-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2.5 py-1 rounded-xl shadow-2xs max-w-full truncate">
+                              <MapPin size={13} className="text-indigo-500 shrink-0" />
+                              <span className="truncate">{ev.location}</span>
+                            </span>
+                            {ev.pdfUrl && (
+                              <a href={`${backendBase}${ev.pdfUrl}`} target="_blank" rel="noopener noreferrer" className="whitespace-nowrap inline-flex items-center gap-1.5 text-white bg-gradient-to-r from-rose-500 to-red-600 border border-rose-400/30 shadow-md shadow-rose-500/20 px-2.5 py-1 rounded-xl font-black text-[10px] sm:text-xs hover:scale-105 active:scale-95 transition-all duration-200">
+                                <FileText size={13} className="shrink-0" /> PDF Adjunto
+                              </a>
+                            )}
+                          </div>
+
+                          <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center pt-3 border-t border-slate-200 dark:border-slate-800 gap-2">
+                            <button
+                              type="button"
+                              onClick={() => openAdminDetailModal(ev)}
+                              title="Ver información del evento y lista de grupos inscritos / no inscritos con sus integrantes"
+                              className="w-full sm:w-auto text-[10px] sm:text-xs text-indigo-700 dark:text-indigo-300 font-black uppercase bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/80 border border-indigo-200 dark:border-indigo-800 px-3 py-2 rounded-xl flex items-center justify-center gap-1.5 transition-all duration-200 hover:scale-[1.02] active:scale-95 cursor-pointer shadow-sm"
+                            >
+                              <Users size={14} className="text-indigo-500" /> Inscritos: {ev.participations?.length || 0} / {ev.maxSpots} GP
+                              <Eye size={12} className="ml-0.5 text-indigo-400" />
+                            </button>
+                            {(() => {
+                              const groupParticipation = myParticipations.find((p: any) => p.eventId === ev.id);
+                              if (groupParticipation) {
+                                return (
+                                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 w-full sm:w-auto">
+                                    <button onClick={() => openEventInfoModal(ev)} className="flex-1 min-w-[70px] sm:flex-initial py-2 px-2.5 sm:px-3 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-[10px] sm:text-xs font-black rounded-xl transition-all duration-200 flex items-center justify-center gap-1 cursor-pointer">
+                                      <Info size={13} className="text-indigo-500" /> Info
+                                    </button>
+                                    <span className="flex-1 min-w-[75px] sm:flex-initial text-[10px] sm:text-xs font-black text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-100 dark:border-emerald-800/60 px-2 py-2 rounded-xl flex items-center justify-center gap-1"><CheckCircle2 size={13} /> INSCRITO</span>
+                                    {canManageAttendance && (
+                                      <button onClick={() => openAttendanceModal(ev, groupParticipation)} className="flex-1 min-w-[80px] sm:flex-initial py-2 px-2.5 bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 hover:from-amber-600 hover:to-rose-600 text-white text-[10px] sm:text-xs font-black rounded-xl hover:shadow-lg hover:shadow-orange-500/30 hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center gap-1 cursor-pointer shadow-md">
+                                        <Check size={13} /> Asistencia
+                                      </button>
+                                    )}
+                                    {canCancelParticipation && (
+                                      <button onClick={() => handleLeave(ev.id)} className="flex-1 min-w-[70px] sm:flex-initial py-2 px-2.5 sm:px-3 bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-800/60 text-[10px] sm:text-xs font-black rounded-xl hover:bg-rose-600 dark:hover:bg-rose-600 hover:text-white transition-all duration-200 flex items-center justify-center gap-1 cursor-pointer"><X size={13} /> Cancelar</button>
+                                    )}
+                                  </div>
+                                );
+                              }
+                              return (
+                                <div className="flex items-center gap-2 w-full sm:w-auto">
+                                  <button onClick={() => openEventInfoModal(ev)} className="flex-1 sm:flex-initial py-2 px-3.5 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/80 border border-indigo-200 dark:border-indigo-800 text-[10px] sm:text-xs font-black rounded-xl transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer">
+                                    <Info size={14} className="text-indigo-500" /> Ver Información
+                                  </button>
+                                  {ev.status === 'Abierto' && canRegisterGroup && (
+                                    <button onClick={() => handleJoin(ev)} className="flex-1 sm:flex-initial py-2 px-4 bg-gradient-to-r from-indigo-500 to-violet-600 text-white text-[10px] sm:text-xs font-black uppercase tracking-wider rounded-xl hover:shadow-lg hover:shadow-indigo-500/25 hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer"><Plus size={15} /> Participar</button>
                                   )}
                                 </div>
                               );
-                            }
-                            return (
-                              <div className="flex items-center gap-2 w-full sm:w-auto">
-                                <button onClick={() => openEventInfoModal(ev)} className="flex-1 sm:flex-initial py-2 px-3.5 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/80 border border-indigo-200 dark:border-indigo-800 text-[10px] sm:text-xs font-black rounded-xl transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer">
-                                  <Info size={14} className="text-indigo-500" /> Ver Información
-                                </button>
-                                {ev.status === 'Abierto' && canRegisterGroup && (
-                                  <button onClick={() => handleJoin(ev)} className="flex-1 sm:flex-initial py-2 px-4 bg-gradient-to-r from-indigo-500 to-violet-600 text-white text-[10px] sm:text-xs font-black uppercase tracking-wider rounded-xl hover:shadow-lg hover:shadow-indigo-500/25 hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer"><Plus size={15} /> Participar</button>
-                                )}
-                              </div>
-                            );
-                          })()}
-                        </div>
+                            })()}
+                          </div>
 
-                        {/* Admin View: Preview chips of registered GP names */}
-                        {userCanManageEvents && ev.participations && ev.participations.length > 0 && (
-                          <div className="flex items-center gap-1.5 flex-wrap pt-2 mt-2 border-t border-slate-100 dark:border-slate-800">
-                            <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1">
-                              <Building2 size={11} className="text-indigo-500" /> GP Inscritos:
-                            </span>
-                            {ev.participations.map((p: any) => (
-                              <span key={p.id} className="text-[10px] font-black px-2 py-0.5 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-800/60 rounded-md">
-                                {p.groupSmall?.name || 'GP Registrado'}
+                          {/* Admin View: Preview chips of registered GP names */}
+                          {userCanManageEvents && ev.participations && ev.participations.length > 0 && (
+                            <div className="flex items-center gap-1.5 flex-wrap pt-2 mt-2 border-t border-slate-100 dark:border-slate-800">
+                              <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1">
+                                <Building2 size={11} className="text-indigo-500" /> GP Inscritos:
                               </span>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                  {filterEvents('RECREATIVO', activeTabRecreativos).length === 0 && (
-                    <div className="text-center py-16 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest bg-white/60 dark:bg-slate-900/60 rounded-2xl border border-dashed border-slate-300 dark:border-slate-800">No hay convocatorias vigentes.</div>
-                  )}
-                </div>
-              </div>
-
-              {/* Right Column: Active Registrations */}
-              <div className="lg:col-span-4 bg-gradient-to-br from-white/90 via-slate-50/80 to-violet-50/15 dark:from-slate-900/90 dark:via-slate-900/95 dark:to-violet-950/40 backdrop-blur-2xl p-6 rounded-3xl border border-violet-200/80 dark:border-slate-800 shadow-xl shadow-violet-500/5 flex flex-col gap-5 relative overflow-hidden">
-                {/* Top accent bar */}
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-violet-500 via-purple-500 to-fuchsia-500 rounded-t-3xl" />
-                <div className="flex items-center gap-3 pt-1">
-                  <div className="w-11 h-11 bg-indigo-600 text-white rounded-2xl flex items-center justify-center shadow-md shadow-indigo-600/20 shrink-0"><CheckCircle2 size={20} /></div>
-                  <div>
-                    <h3 className="font-black text-base text-slate-900 dark:text-white uppercase tracking-wide">
-                      Mi Participación
-                    </h3>
-                    <p className="text-[10px] text-violet-600/90 dark:text-violet-400 font-bold uppercase tracking-wider mt-0.5">Eventos recreativos de tu grupo pequeño</p>
-                  </div>
-                </div>
-                
-                <div className="space-y-3 overflow-y-auto max-h-[500px] pr-1">
-                  {userIsAdmin ? (
-                    <div className="p-6 bg-slate-50/80 dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-700/80 text-center space-y-3 shadow-sm">
-                      <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mx-auto border border-indigo-400/20">
-                        <Building2 size={24} />
-                      </div>
-                      <h4 className="font-black text-sm text-slate-900 dark:text-white uppercase tracking-wider">
-                        Modo Administrador
-                      </h4>
-                    </div>
-                  ) : (
-                    <>
-                      {myParticipations.filter(p => p.event?.category === 'RECREATIVO').map(part => (
-                        <div key={part.id} className="p-4 bg-white/70 dark:bg-slate-900/90 rounded-2xl border border-slate-200/60 dark:border-slate-800 flex flex-col gap-3 hover:border-violet-300 dark:hover:border-violet-700 hover:bg-white dark:hover:bg-slate-900 shadow-sm transition-all duration-300">
-                          <div>
-                            <div className="flex justify-between items-start mb-1.5">
-                              <span className="inline-block text-[10px] font-black uppercase px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-800/60 rounded-lg tracking-wider">{part.event?.typeTag || 'Actividad'}</span>
-                              <span className="text-[10px] font-black uppercase px-2 py-1 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-800/60 rounded-lg flex items-center gap-1 shrink-0"><CheckCircle2 size={12}/> {part.status}</span>
+                              {ev.participations.map((p: any) => (
+                                <span key={p.id} className="text-[10px] font-black px-2 py-0.5 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-800/60 rounded-md">
+                                  {p.groupSmall?.name || 'GP Registrado'}
+                                </span>
+                              ))}
                             </div>
-                            <h4 className="font-black text-base text-slate-900 dark:text-white uppercase tracking-tight leading-snug">{part.event?.title}</h4>
-                          </div>
-                          <div className="flex items-center gap-1.5 text-[10px] font-black text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/80 dark:border-emerald-800/60 px-3 py-1.5 rounded-xl">
-                            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
-                            ¡Tu Grupo Pequeño está participando en esta convocatoria!
-                          </div>
-                          <div className="flex flex-wrap gap-2 text-xs text-slate-700 dark:text-slate-200 font-bold border-t border-slate-200 dark:border-slate-800 pt-3">
-                            <span className="flex items-center gap-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2 py-1 rounded-lg"><CalendarDays size={12} className="text-violet-500" /> {part.event?.startDate}</span>
-                            <span className="flex items-center gap-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2 py-1 rounded-lg"><MapPin size={12} className="text-violet-500" /> {part.event?.location}</span>
-                          </div>
-                          <div className="flex justify-end items-center pt-3 border-t border-slate-200 dark:border-slate-800 gap-2">
-                            <button 
-                              onClick={() => openDetailsModal(part)}
-                              className="px-4 py-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-600 text-indigo-600 dark:text-indigo-300 hover:text-white transition-all border border-indigo-100 dark:border-indigo-800/60 flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95 duration-200 font-black text-[10px] uppercase tracking-wide"
-                              title="Ver Ficha"
-                            >
-                              <Eye size={14} /> Ver Ficha
-                            </button>
-                            {canCancelParticipation && (
-                              <button 
-                                onClick={() => handleLeave(part.eventId)}
-                                className="px-4 py-2 rounded-xl bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-600 text-rose-600 dark:text-rose-400 hover:text-white transition-all border border-rose-100 dark:border-rose-800/60 flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95 duration-200 font-black text-[10px] uppercase tracking-wide"
-                                title="Cancelar Inscripción"
-                              >
-                                <X size={14} /> Cancelar
-                              </button>
-                            )}
-                          </div>
+                          )}
                         </div>
-                      ))}
-                      {myParticipations.filter(p => p.event?.category === 'RECREATIVO').length === 0 && (
-                        <div className="p-6 bg-gradient-to-br from-indigo-50/80 via-white to-violet-50/50 dark:from-slate-900/90 dark:via-slate-900 dark:to-indigo-950/40 rounded-2xl border-2 border-dashed border-indigo-200/80 dark:border-slate-800 text-center space-y-3 shadow-sm">
-                          <div className="w-12 h-12 rounded-2xl bg-indigo-100 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mx-auto shadow-inner">
-                            <Layers size={24} />
-                          </div>
-                          <div>
-                            <h4 className="font-black text-xs text-slate-900 dark:text-white uppercase tracking-wide">
-                              No estás participando en esta categoría
-                            </h4>
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium mt-1 leading-relaxed">
-                              Tu Grupo Pequeño aún no se ha inscrito en ninguna convocatoria de eventos recreativos.
-                            </p>
-                          </div>
-                          <div className="p-3 bg-white/90 dark:bg-slate-800/90 rounded-xl border border-indigo-100 dark:border-slate-700 text-[10px] text-indigo-700 dark:text-indigo-300 font-bold leading-normal text-left">
-                            {canRegisterGroup ? (
-                              <span>👉 <strong>Líder / Secretario:</strong> Puedes inscribir a tu equipo haciendo clic en el botón <strong>"+ Participar"</strong> en las convocatorias de la izquierda.</span>
-                            ) : (
-                              <span>👉 <strong>Integrante:</strong> Coordina con el Líder o Secretario de tu GP para que registren la participación de tu grupo.</span>
-                            )}
-                          </div>
-                        </div>
-                      )}
-                    </>
-                  )}
-                </div>
-              </div>
-            </>
-          )}
-
-      {/* ==================== DEPORTE VIEW ==================== */}
-      {selectedCategoryView === 'DEPORTE' && (
-        <>
-          {/* Left Column: Events List */}
-          <div className="lg:col-span-8 bg-gradient-to-br from-white/90 via-slate-50/80 to-amber-50/15 dark:from-slate-900/90 dark:via-slate-900/95 dark:to-amber-950/40 backdrop-blur-2xl p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-amber-200/80 dark:border-slate-800 shadow-xl shadow-amber-500/5 flex flex-col gap-4 sm:gap-5 relative overflow-hidden">
-            {/* Top accent bar */}
-            <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500 rounded-t-3xl" />
-            <div className="flex flex-col xs:flex-row justify-between items-start xs:items-center gap-2.5 pb-3 sm:pb-4 pt-1 border-b border-orange-100/50 dark:border-slate-800">
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <div className="w-10 h-10 sm:w-11 sm:h-11 bg-orange-600 text-white rounded-2xl flex items-center justify-center shadow-md shadow-orange-600/20 shrink-0"><Trophy size={18} className="sm:w-5 sm:h-5" /></div>
-                    <div className="min-w-0">
-                      <h2 className="font-black text-sm sm:text-base text-slate-900 dark:text-white uppercase tracking-wide truncate">Convocatorias</h2>
-                      <p className="text-[9px] sm:text-[10px] text-orange-600/90 dark:text-orange-400 font-bold uppercase tracking-wider mt-0.5 truncate">Lista de eventos registrados</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 w-full xs:w-auto justify-end shrink-0">
-                    <button 
-                      onClick={() => setSelectedCategoryView('ALL')} 
-                      className="px-3 sm:px-4 py-2 sm:py-2.5 text-[10px] sm:text-xs font-black text-slate-700 dark:text-slate-200 bg-white/50 dark:bg-slate-800/80 hover:bg-white/80 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl uppercase tracking-wider transition duration-200 flex items-center gap-1 cursor-pointer backdrop-blur-sm shadow-sm"
-                    >
-                      ← Volver
-                    </button>
-                    {userCanManageEvents && (
-                      <button 
-                        onClick={() => openCreateModal('DEPORTE')} 
-                        className="py-2 sm:py-2.5 px-3.5 sm:px-5 bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500 hover:from-amber-500 hover:via-orange-600 hover:to-rose-600 text-white text-[10px] sm:text-xs font-black rounded-xl shadow-lg shadow-orange-500/25 hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-1 cursor-pointer shrink-0"
-                      >
-                        <Plus size={14} /> Convocar
-                      </button>
+                      </div>
+                    ))}
+                    {filterEvents('RECREATIVO', activeTabRecreativos).length === 0 && (
+                      <div className="text-center py-16 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest bg-white/60 dark:bg-slate-900/60 rounded-2xl border border-dashed border-slate-300 dark:border-slate-800">No hay convocatorias vigentes.</div>
                     )}
                   </div>
                 </div>
 
-                <div className="grid grid-cols-3 gap-1 bg-slate-200/60 dark:bg-slate-800/90 p-1 rounded-2xl border border-slate-300/60 dark:border-slate-700/80 shadow-inner w-full">
-                  {(['Próximos', 'En Curso', 'Finalizados'] as const).map(tab => {
-                    const count = filterEvents('DEPORTE', tab).length;
-                    const isActive = activeTabDeportes === tab;
-                    return (
-                      <button 
-                        key={tab} 
-                        onClick={() => setActiveTabDeportes(tab)} 
-                        className={`w-full text-center text-[10px] sm:text-xs py-2 sm:py-2.5 px-1 rounded-xl font-black uppercase tracking-wider transition-all duration-300 cursor-pointer flex items-center justify-center gap-1 min-w-0 ${
-                          isActive 
-                            ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-white shadow-lg shadow-orange-500/30 scale-[1.02]' 
-                            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/80 dark:hover:bg-slate-700/60'
-                        }`}
-                      >
-                        <span className="truncate">{tab}</span>
-                        <span className={`px-1.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-black transition-all shrink-0 ${
-                          isActive 
-                            ? 'bg-white/20 text-white border border-white/30' 
-                            : 'bg-slate-300/80 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
-                        }`}>
-                          ({count})
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
+                {/* Right Column: Active Registrations */}
+                <div className="lg:col-span-4 bg-gradient-to-br from-white/90 via-slate-50/80 to-violet-50/15 dark:from-slate-900/90 dark:via-slate-900/95 dark:to-violet-950/40 backdrop-blur-2xl p-6 rounded-3xl border border-violet-200/80 dark:border-slate-800 shadow-xl shadow-violet-500/5 flex flex-col gap-5 relative overflow-hidden">
+                  {/* Top accent bar */}
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-violet-500 via-purple-500 to-fuchsia-500 rounded-t-3xl" />
+                  <div className="flex items-center gap-3 pt-1">
+                    <div className="w-11 h-11 bg-indigo-600 text-white rounded-2xl flex items-center justify-center shadow-md shadow-indigo-600/20 shrink-0"><CheckCircle2 size={20} /></div>
+                    <div>
+                      <h3 className="font-black text-base text-slate-900 dark:text-white uppercase tracking-wide">
+                        Mi Participación
+                      </h3>
+                      <p className="text-[10px] text-violet-600/90 dark:text-violet-400 font-bold uppercase tracking-wider mt-0.5">Eventos recreativos de tu grupo pequeño</p>
+                    </div>
+                  </div>
 
-                <div className="space-y-4 max-h-[500px] overflow-y-auto pr-1">
-                  {filterEvents('DEPORTE', activeTabDeportes).map(ev => (
-                    <div key={ev.id} className="border border-slate-200/60 dark:border-slate-800 bg-white/70 dark:bg-slate-900/90 backdrop-blur-xl rounded-2xl p-4 sm:p-5 shadow-sm hover:border-orange-300 dark:hover:border-orange-700/60 hover:bg-white/90 dark:hover:bg-slate-900 hover:shadow-orange-500/10 hover:shadow-lg transition-all duration-300 relative group flex flex-col sm:flex-row gap-4">
-                      <div className="w-full sm:w-32 h-44 sm:h-32 rounded-2xl flex items-center justify-center shrink-0 overflow-hidden relative shadow-md border border-slate-200/60 dark:border-slate-800 bg-orange-50/50 dark:bg-orange-950/40">
-                        {ev.imageUrl ? (
-                          <img src={`${backendBase}${ev.imageUrl}`} alt={ev.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                        ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-amber-400 via-orange-500 to-rose-500 flex flex-col items-center justify-center text-white">
-                            <Trophy size={28} className="opacity-95" />
-                            <span className="text-[10px] font-black uppercase tracking-widest mt-1.5 text-white/90">JA MATCH</span>
+                  <div className="space-y-3 overflow-y-auto max-h-[500px] pr-1">
+                    {userIsAdmin ? (
+                      <div className="p-6 bg-slate-50/80 dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-700/80 text-center space-y-3 shadow-sm">
+                        <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mx-auto border border-indigo-400/20">
+                          <Building2 size={24} />
+                        </div>
+                        <h4 className="font-black text-sm text-slate-900 dark:text-white uppercase tracking-wider">
+                          Modo Administrador
+                        </h4>
+                      </div>
+                    ) : (
+                      <>
+                        {myParticipations.filter(p => p.event?.category === 'RECREATIVO').map(part => (
+                          <div key={part.id} className="p-4 bg-white/70 dark:bg-slate-900/90 rounded-2xl border border-slate-200/60 dark:border-slate-800 flex flex-col gap-3 hover:border-violet-300 dark:hover:border-violet-700 hover:bg-white dark:hover:bg-slate-900 shadow-sm transition-all duration-300">
+                            <div>
+                              <div className="flex justify-between items-start mb-1.5">
+                                <span className="inline-block text-[10px] font-black uppercase px-2.5 py-1 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-800/60 rounded-lg tracking-wider">{part.event?.typeTag || 'Actividad'}</span>
+                                <span className="text-[10px] font-black uppercase px-2 py-1 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-800/60 rounded-lg flex items-center gap-1 shrink-0"><CheckCircle2 size={12} /> {part.status}</span>
+                              </div>
+                              <h4 className="font-black text-base text-slate-900 dark:text-white uppercase tracking-tight leading-snug">{part.event?.title}</h4>
+                            </div>
+                            <div className="flex items-center gap-1.5 text-[10px] font-black text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/80 dark:border-emerald-800/60 px-3 py-1.5 rounded-xl">
+                              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                              ¡Tu Grupo Pequeño está participando en esta convocatoria!
+                            </div>
+                            <div className="flex flex-wrap gap-2 text-xs text-slate-700 dark:text-slate-200 font-bold border-t border-slate-200 dark:border-slate-800 pt-3">
+                              <span className="flex items-center gap-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2 py-1 rounded-lg"><CalendarDays size={12} className="text-violet-500" /> {part.event?.startDate}</span>
+                              <span className="flex items-center gap-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2 py-1 rounded-lg"><MapPin size={12} className="text-violet-500" /> {part.event?.location}</span>
+                            </div>
+                            <div className="flex justify-end items-center pt-3 border-t border-slate-200 dark:border-slate-800 gap-2">
+                              <button
+                                onClick={() => openDetailsModal(part)}
+                                className="px-4 py-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-600 text-indigo-600 dark:text-indigo-300 hover:text-white transition-all border border-indigo-100 dark:border-indigo-800/60 flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95 duration-200 font-black text-[10px] uppercase tracking-wide"
+                                title="Ver Ficha"
+                              >
+                                <Eye size={14} /> Ver Ficha
+                              </button>
+                              {canCancelParticipation && (
+                                <button
+                                  onClick={() => handleLeave(part.eventId)}
+                                  className="px-4 py-2 rounded-xl bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-600 text-rose-600 dark:text-rose-400 hover:text-white transition-all border border-rose-100 dark:border-rose-800/60 flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95 duration-200 font-black text-[10px] uppercase tracking-wide"
+                                  title="Cancelar Inscripción"
+                                >
+                                  <X size={14} /> Cancelar
+                                </button>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                        {myParticipations.filter(p => p.event?.category === 'RECREATIVO').length === 0 && (
+                          <div className="p-6 bg-gradient-to-br from-indigo-50/80 via-white to-violet-50/50 dark:from-slate-900/90 dark:via-slate-900 dark:to-indigo-950/40 rounded-2xl border-2 border-dashed border-indigo-200/80 dark:border-slate-800 text-center space-y-3 shadow-sm">
+                            <div className="w-12 h-12 rounded-2xl bg-indigo-100 dark:bg-indigo-950/80 text-indigo-600 dark:text-indigo-400 flex items-center justify-center mx-auto shadow-inner">
+                              <Layers size={24} />
+                            </div>
+                            <div>
+                              <h4 className="font-black text-xs text-slate-900 dark:text-white uppercase tracking-wide">
+                                No estás participando en esta categoría
+                              </h4>
+                              <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium mt-1 leading-relaxed">
+                                Tu Grupo Pequeño aún no se ha inscrito en ninguna convocatoria de eventos recreativos.
+                              </p>
+                            </div>
+                            <div className="p-3 bg-white/90 dark:bg-slate-800/90 rounded-xl border border-indigo-100 dark:border-slate-700 text-[10px] text-indigo-700 dark:text-indigo-300 font-bold leading-normal text-left">
+                              {canRegisterGroup ? (
+                                <span>👉 <strong>Líder / Secretario:</strong> Puedes inscribir a tu equipo haciendo clic en el botón <strong>"+ Participar"</strong> en las convocatorias de la izquierda.</span>
+                              ) : (
+                                <span>👉 <strong>Integrante:</strong> Coordina con el Líder o Secretario de tu GP para que registren la participación de tu grupo.</span>
+                              )}
+                            </div>
                           </div>
                         )}
+                      </>
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
+
+            {/* ==================== DEPORTE VIEW ==================== */}
+            {selectedCategoryView === 'DEPORTE' && (
+              <>
+                {/* Left Column: Events List */}
+                <div className="lg:col-span-8 bg-gradient-to-br from-white/90 via-slate-50/80 to-amber-50/15 dark:from-slate-900/90 dark:via-slate-900/95 dark:to-amber-950/40 backdrop-blur-2xl p-4 sm:p-6 rounded-2xl sm:rounded-3xl border border-amber-200/80 dark:border-slate-800 shadow-xl shadow-amber-500/5 flex flex-col gap-4 sm:gap-5 relative overflow-hidden">
+                  {/* Top accent bar */}
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500 rounded-t-3xl" />
+                  <div className="flex flex-col xs:flex-row justify-between items-start xs:items-center gap-2.5 pb-3 sm:pb-4 pt-1 border-b border-orange-100/50 dark:border-slate-800">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-10 h-10 sm:w-11 sm:h-11 bg-orange-600 text-white rounded-2xl flex items-center justify-center shadow-md shadow-orange-600/20 shrink-0"><Trophy size={18} className="sm:w-5 sm:h-5" /></div>
+                      <div className="min-w-0">
+                        <h2 className="font-black text-sm sm:text-base text-slate-900 dark:text-white uppercase tracking-wide truncate">Convocatorias</h2>
+                        <p className="text-[9px] sm:text-[10px] text-orange-600/90 dark:text-orange-400 font-bold uppercase tracking-wider mt-0.5 truncate">Lista de eventos registrados</p>
                       </div>
-                      <div className="flex-1 space-y-3 min-w-0 flex flex-col justify-between">
-                        <div>
-                          <div className="flex justify-between items-start mb-2">
-                            <span className="text-[10px] font-black uppercase px-2.5 py-1 bg-orange-50 dark:bg-orange-950/60 text-orange-700 dark:text-orange-300 border border-orange-100 dark:border-orange-800/60 rounded-lg truncate">{ev.typeTag || 'Torneo'}</span>
-                            {userCanManageEvents && (
-                              <div className="relative">
-                                <button onClick={() => setActiveMenuId(activeMenuId === ev.id ? null : ev.id)} className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition"><MoreVertical size={16} /></button>
-                                {activeMenuId === ev.id && (
-                                  <div className="absolute right-0 top-7 bg-white dark:bg-slate-900 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl py-1.5 w-28 z-40 font-bold">
-                                    <button type="button" onClick={() => openEditModal(ev)} className="w-full text-left px-3.5 py-2 text-xs text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white flex items-center gap-1.5 transition"><Edit2 size={13} /> Editar</button>
-                                    <button type="button" onClick={() => triggerDeleteConfirm(ev.id)} className="w-full text-left px-3.5 py-2 text-xs text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 flex items-center gap-1.5 transition"><Trash2 size={13} /> Eliminar</button>
-                                  </div>
-                                )}
-                              </div>
-                            )}
-                          </div>
-                          <h3 className="font-black text-base sm:text-lg text-slate-900 dark:text-white tracking-tight truncate leading-tight">{ev.title}</h3>
-                          <p className="text-xs sm:text-[13px] text-slate-600 dark:text-slate-300 font-medium line-clamp-2 leading-relaxed mt-1.5">{ev.description || 'Sin descripción adicional en la convocatoria.'}</p>
-                        </div>
-                        
-                        <div className="flex flex-wrap items-center gap-1.5 text-[10px] sm:text-xs text-slate-700 dark:text-slate-200 font-bold uppercase tracking-wide">
-                          <span className="whitespace-nowrap inline-flex items-center gap-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2.5 py-1 rounded-xl shadow-2xs">
-                            <CalendarDays size={13} className="text-orange-500 shrink-0" />
-                            <span>{ev.startDate}</span>
+                    </div>
+                    <div className="flex items-center gap-2 w-full xs:w-auto justify-end shrink-0">
+                      <button
+                        onClick={() => setSelectedCategoryView('ALL')}
+                        className="px-3 sm:px-4 py-2 sm:py-2.5 text-[10px] sm:text-xs font-black text-slate-700 dark:text-slate-200 bg-white/50 dark:bg-slate-800/80 hover:bg-white/80 dark:hover:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl uppercase tracking-wider transition duration-200 flex items-center gap-1 cursor-pointer backdrop-blur-sm shadow-sm"
+                      >
+                        ← Volver
+                      </button>
+                      {userCanManageEvents && (
+                        <button
+                          onClick={() => openCreateModal('DEPORTE')}
+                          className="py-2 sm:py-2.5 px-3.5 sm:px-5 bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500 hover:from-amber-500 hover:via-orange-600 hover:to-rose-600 text-white text-[10px] sm:text-xs font-black rounded-xl shadow-lg shadow-orange-500/25 hover:scale-[1.02] active:scale-95 transition-all flex items-center gap-1 cursor-pointer shrink-0"
+                        >
+                          <Plus size={14} /> Convocar
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-1 bg-slate-200/60 dark:bg-slate-800/90 p-1 rounded-2xl border border-slate-300/60 dark:border-slate-700/80 shadow-inner w-full">
+                    {(['Próximos', 'En Curso', 'Finalizados'] as const).map(tab => {
+                      const count = filterEvents('DEPORTE', tab).length;
+                      const isActive = activeTabDeportes === tab;
+                      return (
+                        <button
+                          key={tab}
+                          onClick={() => setActiveTabDeportes(tab)}
+                          className={`w-full text-center text-[10px] sm:text-xs py-2 sm:py-2.5 px-1 rounded-xl font-black uppercase tracking-wider transition-all duration-300 cursor-pointer flex items-center justify-center gap-1 min-w-0 ${isActive
+                              ? 'bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 text-white shadow-lg shadow-orange-500/30 scale-[1.02]'
+                              : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-white/80 dark:hover:bg-slate-700/60'
+                            }`}
+                        >
+                          <span className="truncate">{tab}</span>
+                          <span className={`px-1.5 py-0.5 rounded-full text-[9px] sm:text-[10px] font-black transition-all shrink-0 ${isActive
+                              ? 'bg-white/20 text-white border border-white/30'
+                              : 'bg-slate-300/80 dark:bg-slate-700 text-slate-700 dark:text-slate-300'
+                            }`}>
+                            ({count})
                           </span>
-                          <span className="whitespace-nowrap inline-flex items-center gap-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2.5 py-1 rounded-xl shadow-2xs max-w-full truncate">
-                            <MapPin size={13} className="text-orange-500 shrink-0" />
-                            <span className="truncate">{ev.location}</span>
-                          </span>
-                          {ev.pdfUrl && (
-                            <a 
-                              href={`${backendBase}${ev.pdfUrl}`} 
-                              target="_blank" 
-                              rel="noopener noreferrer" 
-                              className="whitespace-nowrap inline-flex items-center gap-1.5 text-white bg-gradient-to-r from-rose-500 to-red-600 border border-rose-400/30 shadow-md shadow-rose-500/20 px-2.5 py-1 rounded-xl font-black text-[10px] sm:text-xs hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer"
-                            >
-                              <FileText size={13} className="shrink-0" /> PDF Adjunto
-                            </a>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  <div className="space-y-4 max-h-[500px] overflow-y-auto pr-1">
+                    {filterEvents('DEPORTE', activeTabDeportes).map(ev => (
+                      <div key={ev.id} className="border border-slate-200/60 dark:border-slate-800 bg-white/70 dark:bg-slate-900/90 backdrop-blur-xl rounded-2xl p-4 sm:p-5 shadow-sm hover:border-orange-300 dark:hover:border-orange-700/60 hover:bg-white/90 dark:hover:bg-slate-900 hover:shadow-orange-500/10 hover:shadow-lg transition-all duration-300 relative group flex flex-col sm:flex-row gap-4">
+                        <div className="w-full sm:w-32 h-44 sm:h-32 rounded-2xl flex items-center justify-center shrink-0 overflow-hidden relative shadow-md border border-slate-200/60 dark:border-slate-800 bg-orange-50/50 dark:bg-orange-950/40">
+                          {ev.imageUrl ? (
+                            <img src={`${backendBase}${ev.imageUrl}`} alt={ev.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                          ) : (
+                            <div className="w-full h-full bg-gradient-to-br from-amber-400 via-orange-500 to-rose-500 flex flex-col items-center justify-center text-white">
+                              <Trophy size={28} className="opacity-95" />
+                              <span className="text-[10px] font-black uppercase tracking-widest mt-1.5 text-white/90">JA MATCH</span>
+                            </div>
                           )}
                         </div>
-
-                        <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center pt-3 border-t border-slate-200 dark:border-slate-800 gap-2.5">
-                          <button
-                            type="button"
-                            onClick={() => openAdminDetailModal(ev)}
-                            title="Ver información del evento y lista de grupos inscritos / no inscritos con sus integrantes"
-                            className="w-full sm:w-auto text-[10px] sm:text-xs text-orange-700 dark:text-orange-300 font-black uppercase bg-orange-50 dark:bg-orange-950/60 hover:bg-orange-100 dark:hover:bg-orange-900/80 border border-orange-200 dark:border-orange-800 px-3 py-2 rounded-xl flex items-center justify-center gap-1.5 transition-all duration-200 hover:scale-[1.02] active:scale-95 cursor-pointer shadow-sm"
-                          >
-                            <Users size={14} className="text-orange-500" /> Equipos: {ev.participations?.length || 0} / {ev.maxSpots} GP
-                            <Eye size={12} className="ml-0.5 text-orange-400" />
-                          </button>
-                          {(() => {
-                            const groupParticipation = myParticipations.find((p: any) => p.eventId === ev.id);
-                            if (groupParticipation) {
-                              return (
-                                <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 w-full sm:w-auto">
-                                  <button onClick={() => openEventInfoModal(ev)} className="flex-1 sm:flex-initial py-2 px-2.5 sm:px-3 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-[10px] sm:text-xs font-black rounded-xl transition-all duration-200 flex items-center justify-center gap-1 cursor-pointer">
-                                    <Info size={13} className="text-orange-500" /> Info
-                                  </button>
-                                  <span className="flex-1 sm:flex-initial text-[10px] sm:text-xs font-black text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-100 dark:border-emerald-800/60 px-2.5 py-2 rounded-xl flex items-center justify-center gap-1"><CheckCircle2 size={13} /> INSCRITO</span>
-                                  {canManageAttendance && (
-                                    <button
-                                      onClick={() => openAttendanceModal(ev, groupParticipation)}
-                                      className="flex-1 sm:flex-initial py-2 px-3 bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 hover:from-amber-600 hover:to-rose-600 text-white text-[10px] sm:text-xs font-black rounded-xl hover:shadow-lg hover:shadow-orange-500/30 hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center gap-1 cursor-pointer shadow-md"
-                                    >
-                                      <Check size={13} /> Asistencia
-                                    </button>
+                        <div className="flex-1 space-y-3 min-w-0 flex flex-col justify-between">
+                          <div>
+                            <div className="flex justify-between items-start mb-2">
+                              <span className="text-[10px] font-black uppercase px-2.5 py-1 bg-orange-50 dark:bg-orange-950/60 text-orange-700 dark:text-orange-300 border border-orange-100 dark:border-orange-800/60 rounded-lg truncate">{ev.typeTag || 'Torneo'}</span>
+                              {userCanManageEvents && (
+                                <div className="relative">
+                                  <button onClick={() => setActiveMenuId(activeMenuId === ev.id ? null : ev.id)} className="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition"><MoreVertical size={16} /></button>
+                                  {activeMenuId === ev.id && (
+                                    <div className="absolute right-0 top-7 bg-white dark:bg-slate-900 backdrop-blur-xl border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl py-1.5 w-28 z-40 font-bold">
+                                      <button type="button" onClick={() => openEditModal(ev)} className="w-full text-left px-3.5 py-2 text-xs text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white flex items-center gap-1.5 transition"><Edit2 size={13} /> Editar</button>
+                                      <button type="button" onClick={() => triggerDeleteConfirm(ev.id)} className="w-full text-left px-3.5 py-2 text-xs text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 flex items-center gap-1.5 transition"><Trash2 size={13} /> Eliminar</button>
+                                    </div>
                                   )}
-                                  {canCancelParticipation && (
+                                </div>
+                              )}
+                            </div>
+                            <h3 className="font-black text-base sm:text-lg text-slate-900 dark:text-white tracking-tight truncate leading-tight">{ev.title}</h3>
+                            <p className="text-xs sm:text-[13px] text-slate-600 dark:text-slate-300 font-medium line-clamp-2 leading-relaxed mt-1.5">{ev.description || 'Sin descripción adicional en la convocatoria.'}</p>
+                          </div>
+
+                          <div className="flex flex-wrap items-center gap-1.5 text-[10px] sm:text-xs text-slate-700 dark:text-slate-200 font-bold uppercase tracking-wide">
+                            <span className="whitespace-nowrap inline-flex items-center gap-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2.5 py-1 rounded-xl shadow-2xs">
+                              <CalendarDays size={13} className="text-orange-500 shrink-0" />
+                              <span>{ev.startDate}</span>
+                            </span>
+                            <span className="whitespace-nowrap inline-flex items-center gap-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2.5 py-1 rounded-xl shadow-2xs max-w-full truncate">
+                              <MapPin size={13} className="text-orange-500 shrink-0" />
+                              <span className="truncate">{ev.location}</span>
+                            </span>
+                            {ev.pdfUrl && (
+                              <a
+                                href={`${backendBase}${ev.pdfUrl}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="whitespace-nowrap inline-flex items-center gap-1.5 text-white bg-gradient-to-r from-rose-500 to-red-600 border border-rose-400/30 shadow-md shadow-rose-500/20 px-2.5 py-1 rounded-xl font-black text-[10px] sm:text-xs hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer"
+                              >
+                                <FileText size={13} className="shrink-0" /> PDF Adjunto
+                              </a>
+                            )}
+                          </div>
+
+                          <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center pt-3 border-t border-slate-200 dark:border-slate-800 gap-2.5">
+                            <button
+                              type="button"
+                              onClick={() => openAdminDetailModal(ev)}
+                              title="Ver información del evento y lista de grupos inscritos / no inscritos con sus integrantes"
+                              className="w-full sm:w-auto text-[10px] sm:text-xs text-orange-700 dark:text-orange-300 font-black uppercase bg-orange-50 dark:bg-orange-950/60 hover:bg-orange-100 dark:hover:bg-orange-900/80 border border-orange-200 dark:border-orange-800 px-3 py-2 rounded-xl flex items-center justify-center gap-1.5 transition-all duration-200 hover:scale-[1.02] active:scale-95 cursor-pointer shadow-sm"
+                            >
+                              <Users size={14} className="text-orange-500" /> Equipos: {ev.participations?.length || 0} / {ev.maxSpots} GP
+                              <Eye size={12} className="ml-0.5 text-orange-400" />
+                            </button>
+                            {(() => {
+                              const groupParticipation = myParticipations.find((p: any) => p.eventId === ev.id);
+                              if (groupParticipation) {
+                                return (
+                                  <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 w-full sm:w-auto">
+                                    <button onClick={() => openEventInfoModal(ev)} className="flex-1 sm:flex-initial py-2 px-2.5 sm:px-3 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-[10px] sm:text-xs font-black rounded-xl transition-all duration-200 flex items-center justify-center gap-1 cursor-pointer">
+                                      <Info size={13} className="text-orange-500" /> Info
+                                    </button>
+                                    <span className="flex-1 sm:flex-initial text-[10px] sm:text-xs font-black text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-100 dark:border-emerald-800/60 px-2.5 py-2 rounded-xl flex items-center justify-center gap-1"><CheckCircle2 size={13} /> INSCRITO</span>
+                                    {canManageAttendance && (
+                                      <button
+                                        onClick={() => openAttendanceModal(ev, groupParticipation)}
+                                        className="flex-1 sm:flex-initial py-2 px-3 bg-gradient-to-r from-amber-500 via-orange-500 to-rose-500 hover:from-amber-600 hover:to-rose-600 text-white text-[10px] sm:text-xs font-black rounded-xl hover:shadow-lg hover:shadow-orange-500/30 hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center gap-1 cursor-pointer shadow-md"
+                                      >
+                                        <Check size={13} /> Asistencia
+                                      </button>
+                                    )}
+                                    {canCancelParticipation && (
+                                      <button
+                                        onClick={() => handleLeave(ev.id)}
+                                        className="flex-1 sm:flex-initial py-2 px-2.5 sm:px-3 bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-800/60 text-[10px] sm:text-xs font-black rounded-xl hover:bg-rose-600 dark:hover:bg-rose-600 hover:text-white transition-all duration-200 flex items-center justify-center gap-1 cursor-pointer"
+                                      >
+                                        <X size={13} /> Cancelar
+                                      </button>
+                                    )}
+                                  </div>
+                                );
+                              }
+                              return (
+                                <div className="flex items-center gap-2 w-full sm:w-auto">
+                                  <button onClick={() => openEventInfoModal(ev)} className="flex-1 sm:flex-initial py-2 px-3.5 bg-orange-50 dark:bg-orange-950/60 text-orange-700 dark:text-orange-300 hover:bg-orange-100 dark:hover:bg-orange-900/80 border border-orange-200 dark:border-orange-800 text-[10px] sm:text-xs font-black rounded-xl transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer">
+                                    <Info size={14} className="text-orange-500" /> Ver Información
+                                  </button>
+                                  {ev.status === 'Abierto' && canRegisterGroup && (
                                     <button
-                                      onClick={() => handleLeave(ev.id)}
-                                      className="flex-1 sm:flex-initial py-2 px-2.5 sm:px-3 bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-100 dark:border-rose-800/60 text-[10px] sm:text-xs font-black rounded-xl hover:bg-rose-600 dark:hover:bg-rose-600 hover:text-white transition-all duration-200 flex items-center justify-center gap-1 cursor-pointer"
+                                      onClick={() => handleJoin(ev)}
+                                      className="py-2 px-5 bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500 text-white text-xs font-black uppercase tracking-wider rounded-xl hover:shadow-lg hover:shadow-orange-500/25 hover:scale-105 active:scale-95 transition-all duration-200 flex items-center gap-1.5 cursor-pointer"
                                     >
-                                      <X size={13} /> Cancelar
+                                      <Plus size={16} /> Participar
                                     </button>
                                   )}
                                 </div>
                               );
-                            }
-                            return (
-                              <div className="flex items-center gap-2 w-full sm:w-auto">
-                                <button onClick={() => openEventInfoModal(ev)} className="flex-1 sm:flex-initial py-2 px-3.5 bg-orange-50 dark:bg-orange-950/60 text-orange-700 dark:text-orange-300 hover:bg-orange-100 dark:hover:bg-orange-900/80 border border-orange-200 dark:border-orange-800 text-[10px] sm:text-xs font-black rounded-xl transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer">
-                                  <Info size={14} className="text-orange-500" /> Ver Información
-                                </button>
-                                {ev.status === 'Abierto' && canRegisterGroup && (
-                                  <button 
-                                    onClick={() => handleJoin(ev)} 
-                                    className="py-2 px-5 bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500 text-white text-xs font-black uppercase tracking-wider rounded-xl hover:shadow-lg hover:shadow-orange-500/25 hover:scale-105 active:scale-95 transition-all duration-200 flex items-center gap-1.5 cursor-pointer"
-                                  >
-                                    <Plus size={16} /> Participar
-                                  </button>
-                                )}
-                              </div>
-                            );
-                          })()}
-                        </div>
-
-                        {/* Admin View: Preview chips of registered GP names */}
-                        {userCanManageEvents && ev.participations && ev.participations.length > 0 && (
-                          <div className="flex items-center gap-1.5 flex-wrap pt-2 mt-2 border-t border-slate-100 dark:border-slate-800">
-                            <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1">
-                              <Building2 size={11} className="text-orange-500" /> GP Inscritos:
-                            </span>
-                            {ev.participations.map((p: any) => (
-                              <span key={p.id} className="text-[10px] font-black px-2 py-0.5 bg-orange-50 dark:bg-orange-950/60 text-orange-700 dark:text-orange-300 border border-orange-100 dark:border-orange-800/60 rounded-md">
-                                {p.groupSmall?.name || 'GP Registrado'}
-                              </span>
-                            ))}
+                            })()}
                           </div>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                  {filterEvents('DEPORTE', activeTabDeportes).length === 0 && (
-                    <div className="text-center py-16 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest bg-white/60 dark:bg-slate-900/60 rounded-2xl border border-dashed border-slate-300 dark:border-slate-800">No hay convocatorias vigentes.</div>
-                  )}
-                </div>
-              </div>
 
-              {/* Right Column: Active Registrations */}
-              <div className="lg:col-span-4 bg-gradient-to-br from-white/90 via-slate-50/80 to-rose-50/15 dark:from-slate-900/90 dark:via-slate-900/95 dark:to-rose-950/40 backdrop-blur-2xl p-6 rounded-3xl border border-rose-200/80 dark:border-slate-800 shadow-xl shadow-rose-500/5 flex flex-col gap-5 relative overflow-hidden">
-                {/* Top accent bar */}
-                <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-400 via-rose-500 to-fuchsia-500 rounded-t-3xl" />
-                <div className="flex items-center gap-3 pt-1">
-                  <div className="w-11 h-11 bg-orange-600 text-white rounded-2xl flex items-center justify-center shadow-md shadow-orange-600/20 shrink-0"><Trophy size={20} /></div>
-                  <div>
-                    <h3 className="font-black text-base text-slate-900 dark:text-white uppercase tracking-wide">
-                      Mi Participación
-                    </h3>
-                    <p className="text-[10px] text-orange-600/90 dark:text-orange-400 font-bold uppercase tracking-wider mt-0.5">Competencias de tu grupo pequeño</p>
+                          {/* Admin View: Preview chips of registered GP names */}
+                          {userCanManageEvents && ev.participations && ev.participations.length > 0 && (
+                            <div className="flex items-center gap-1.5 flex-wrap pt-2 mt-2 border-t border-slate-100 dark:border-slate-800">
+                              <span className="text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-wider flex items-center gap-1">
+                                <Building2 size={11} className="text-orange-500" /> GP Inscritos:
+                              </span>
+                              {ev.participations.map((p: any) => (
+                                <span key={p.id} className="text-[10px] font-black px-2 py-0.5 bg-orange-50 dark:bg-orange-950/60 text-orange-700 dark:text-orange-300 border border-orange-100 dark:border-orange-800/60 rounded-md">
+                                  {p.groupSmall?.name || 'GP Registrado'}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                    {filterEvents('DEPORTE', activeTabDeportes).length === 0 && (
+                      <div className="text-center py-16 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest bg-white/60 dark:bg-slate-900/60 rounded-2xl border border-dashed border-slate-300 dark:border-slate-800">No hay convocatorias vigentes.</div>
+                    )}
                   </div>
                 </div>
-                
-                <div className="space-y-3 overflow-y-auto max-h-[500px] pr-1">
-                  {userIsAdmin ? (
-                    <div className="p-6 bg-slate-50/80 dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-700/80 text-center space-y-3 shadow-sm">
-                      <div className="w-12 h-12 rounded-2xl bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center mx-auto border border-amber-400/20">
-                        <Building2 size={24} />
-                      </div>
-                      <h4 className="font-black text-sm text-slate-900 dark:text-white uppercase tracking-wider">
-                        Modo Administrador
-                      </h4>
+
+                {/* Right Column: Active Registrations */}
+                <div className="lg:col-span-4 bg-gradient-to-br from-white/90 via-slate-50/80 to-rose-50/15 dark:from-slate-900/90 dark:via-slate-900/95 dark:to-rose-950/40 backdrop-blur-2xl p-6 rounded-3xl border border-rose-200/80 dark:border-slate-800 shadow-xl shadow-rose-500/5 flex flex-col gap-5 relative overflow-hidden">
+                  {/* Top accent bar */}
+                  <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-amber-400 via-rose-500 to-fuchsia-500 rounded-t-3xl" />
+                  <div className="flex items-center gap-3 pt-1">
+                    <div className="w-11 h-11 bg-orange-600 text-white rounded-2xl flex items-center justify-center shadow-md shadow-orange-600/20 shrink-0"><Trophy size={20} /></div>
+                    <div>
+                      <h3 className="font-black text-base text-slate-900 dark:text-white uppercase tracking-wide">
+                        Mi Participación
+                      </h3>
+                      <p className="text-[10px] text-orange-600/90 dark:text-orange-400 font-bold uppercase tracking-wider mt-0.5">Competencias de tu grupo pequeño</p>
                     </div>
-                  ) : (
-                    <>
-                      {myParticipations.filter(p => p.event?.category === 'DEPORTE').map(part => (
-                        <div key={part.id} className="p-4 bg-white/70 dark:bg-slate-900/90 rounded-2xl border border-slate-200/60 dark:border-slate-800 flex flex-col gap-3 hover:border-orange-300 dark:hover:border-orange-700 hover:bg-white dark:hover:bg-slate-900 shadow-sm transition-all duration-300">
-                          <div>
-                            <div className="flex justify-between items-start mb-1.5">
-                              <span className="inline-block text-[10px] font-black uppercase px-2.5 py-1 bg-orange-50 dark:bg-orange-950/60 text-orange-700 dark:text-orange-300 border border-orange-100 dark:border-orange-800/60 rounded-lg tracking-wider">{part.event?.typeTag || 'Torneo'}</span>
-                              <span className="text-[10px] font-black uppercase px-2 py-1 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-800/60 rounded-lg flex items-center gap-1 shrink-0"><CheckCircle2 size={12}/> {part.status}</span>
+                  </div>
+
+                  <div className="space-y-3 overflow-y-auto max-h-[500px] pr-1">
+                    {userIsAdmin ? (
+                      <div className="p-6 bg-slate-50/80 dark:bg-slate-800/50 rounded-2xl border border-slate-200 dark:border-slate-700/80 text-center space-y-3 shadow-sm">
+                        <div className="w-12 h-12 rounded-2xl bg-amber-500/10 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400 flex items-center justify-center mx-auto border border-amber-400/20">
+                          <Building2 size={24} />
+                        </div>
+                        <h4 className="font-black text-sm text-slate-900 dark:text-white uppercase tracking-wider">
+                          Modo Administrador
+                        </h4>
+                      </div>
+                    ) : (
+                      <>
+                        {myParticipations.filter(p => p.event?.category === 'DEPORTE').map(part => (
+                          <div key={part.id} className="p-4 bg-white/70 dark:bg-slate-900/90 rounded-2xl border border-slate-200/60 dark:border-slate-800 flex flex-col gap-3 hover:border-orange-300 dark:hover:border-orange-700 hover:bg-white dark:hover:bg-slate-900 shadow-sm transition-all duration-300">
+                            <div>
+                              <div className="flex justify-between items-start mb-1.5">
+                                <span className="inline-block text-[10px] font-black uppercase px-2.5 py-1 bg-orange-50 dark:bg-orange-950/60 text-orange-700 dark:text-orange-300 border border-orange-100 dark:border-orange-800/60 rounded-lg tracking-wider">{part.event?.typeTag || 'Torneo'}</span>
+                                <span className="text-[10px] font-black uppercase px-2 py-1 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-100 dark:border-emerald-800/60 rounded-lg flex items-center gap-1 shrink-0"><CheckCircle2 size={12} /> {part.status}</span>
+                              </div>
+                              <h4 className="font-black text-base text-slate-900 dark:text-white uppercase tracking-tight leading-snug">{part.event?.title}</h4>
                             </div>
-                            <h4 className="font-black text-base text-slate-900 dark:text-white uppercase tracking-tight leading-snug">{part.event?.title}</h4>
-                          </div>
-                          <div className="flex items-center gap-1.5 text-[10px] font-black text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/80 dark:border-emerald-800/60 px-3 py-1.5 rounded-xl">
-                            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
-                            ¡Tu Grupo Pequeño está participando en este torneo!
-                          </div>
-                          <div className="flex flex-wrap gap-2 text-xs text-slate-700 dark:text-slate-200 font-bold border-t border-slate-200 dark:border-slate-800 pt-3">
-                            <span className="flex items-center gap-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2 py-1 rounded-lg"><CalendarDays size={12} className="text-orange-500" /> {part.event?.startDate}</span>
-                            <span className="flex items-center gap-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2 py-1 rounded-lg"><MapPin size={12} className="text-orange-500" /> {part.event?.location}</span>
-                          </div>
-                          <div className="flex justify-end items-center pt-3 border-t border-slate-200 dark:border-slate-800 gap-2">
-                            <button 
-                              onClick={() => openDetailsModal(part)}
-                              className="px-4 py-2 rounded-xl bg-orange-50 dark:bg-orange-950/60 hover:bg-orange-500 text-orange-600 dark:text-orange-300 hover:text-white transition-all border border-orange-100 dark:border-orange-800/60 flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95 duration-200 font-black text-[10px] uppercase tracking-wide"
-                              title="Ver Ficha"
-                            >
-                              <Eye size={14} /> Ver Ficha
-                            </button>
-                            {canCancelParticipation && (
-                              <button 
-                                onClick={() => handleLeave(part.eventId)}
-                                className="px-4 py-2 rounded-xl bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-600 text-rose-600 dark:text-rose-400 hover:text-white transition-all border border-rose-100 dark:border-rose-800/60 flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95 duration-200 font-black text-[10px] uppercase tracking-wide"
-                                title="Cancelar Inscripción"
+                            <div className="flex items-center gap-1.5 text-[10px] font-black text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/80 dark:border-emerald-800/60 px-3 py-1.5 rounded-xl">
+                              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+                              ¡Tu Grupo Pequeño está participando en este torneo!
+                            </div>
+                            <div className="flex flex-wrap gap-2 text-xs text-slate-700 dark:text-slate-200 font-bold border-t border-slate-200 dark:border-slate-800 pt-3">
+                              <span className="flex items-center gap-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2 py-1 rounded-lg"><CalendarDays size={12} className="text-orange-500" /> {part.event?.startDate}</span>
+                              <span className="flex items-center gap-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-2 py-1 rounded-lg"><MapPin size={12} className="text-orange-500" /> {part.event?.location}</span>
+                            </div>
+                            <div className="flex justify-end items-center pt-3 border-t border-slate-200 dark:border-slate-800 gap-2">
+                              <button
+                                onClick={() => openDetailsModal(part)}
+                                className="px-4 py-2 rounded-xl bg-orange-50 dark:bg-orange-950/60 hover:bg-orange-500 text-orange-600 dark:text-orange-300 hover:text-white transition-all border border-orange-100 dark:border-orange-800/60 flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95 duration-200 font-black text-[10px] uppercase tracking-wide"
+                                title="Ver Ficha"
                               >
-                                <X size={14} /> Cancelar
+                                <Eye size={14} /> Ver Ficha
                               </button>
-                            )}
+                              {canCancelParticipation && (
+                                <button
+                                  onClick={() => handleLeave(part.eventId)}
+                                  className="px-4 py-2 rounded-xl bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-600 text-rose-600 dark:text-rose-400 hover:text-white transition-all border border-rose-100 dark:border-rose-800/60 flex items-center gap-1.5 cursor-pointer shadow-sm active:scale-95 duration-200 font-black text-[10px] uppercase tracking-wide"
+                                  title="Cancelar Inscripción"
+                                >
+                                  <X size={14} /> Cancelar
+                                </button>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                      ))}
-                      {myParticipations.filter(p => p.event?.category === 'DEPORTE').length === 0 && (
-                        <div className="p-6 bg-gradient-to-br from-amber-50/80 via-white to-orange-50/50 dark:from-slate-900/90 dark:via-slate-900 dark:to-orange-950/40 rounded-2xl border-2 border-dashed border-orange-200/80 dark:border-slate-800 text-center space-y-3 shadow-sm">
-                          <div className="w-12 h-12 rounded-2xl bg-orange-100 dark:bg-orange-950/80 text-orange-600 dark:text-orange-400 flex items-center justify-center mx-auto shadow-inner">
-                            <Trophy size={24} />
+                        ))}
+                        {myParticipations.filter(p => p.event?.category === 'DEPORTE').length === 0 && (
+                          <div className="p-6 bg-gradient-to-br from-amber-50/80 via-white to-orange-50/50 dark:from-slate-900/90 dark:via-slate-900 dark:to-orange-950/40 rounded-2xl border-2 border-dashed border-orange-200/80 dark:border-slate-800 text-center space-y-3 shadow-sm">
+                            <div className="w-12 h-12 rounded-2xl bg-orange-100 dark:bg-orange-950/80 text-orange-600 dark:text-orange-400 flex items-center justify-center mx-auto shadow-inner">
+                              <Trophy size={24} />
+                            </div>
+                            <div>
+                              <h4 className="font-black text-xs text-slate-900 dark:text-white uppercase tracking-wide">
+                                No estás participando en esta categoría
+                              </h4>
+                              <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium mt-1 leading-relaxed">
+                                Tu Grupo Pequeño aún no se ha inscrito en ninguna convocatoria de eventos deportivos.
+                              </p>
+                            </div>
+                            <div className="p-3 bg-white/90 dark:bg-slate-800/90 rounded-xl border border-orange-100 dark:border-slate-700 text-[10px] text-orange-700 dark:text-orange-300 font-bold leading-normal text-left">
+                              {canRegisterGroup ? (
+                                <span>👉 <strong>Líder / Secretario:</strong> Puedes inscribir a tu equipo haciendo clic en el botón <strong>"+ Participar"</strong> en las convocatorias de la izquierda.</span>
+                              ) : (
+                                <span>👉 <strong>Integrante:</strong> Coordina con el Líder o Secretario de tu GP para que registren la participación de tu grupo.</span>
+                              )}
+                            </div>
                           </div>
-                          <div>
-                            <h4 className="font-black text-xs text-slate-900 dark:text-white uppercase tracking-wide">
-                              No estás participando en esta categoría
-                            </h4>
-                            <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium mt-1 leading-relaxed">
-                              Tu Grupo Pequeño aún no se ha inscrito en ninguna convocatoria de eventos deportivos.
-                            </p>
-                          </div>
-                          <div className="p-3 bg-white/90 dark:bg-slate-800/90 rounded-xl border border-orange-100 dark:border-slate-700 text-[10px] text-orange-700 dark:text-orange-300 font-bold leading-normal text-left">
-                            {canRegisterGroup ? (
-                              <span>👉 <strong>Líder / Secretario:</strong> Puedes inscribir a tu equipo haciendo clic en el botón <strong>"+ Participar"</strong> en las convocatorias de la izquierda.</span>
-                            ) : (
-                              <span>👉 <strong>Integrante:</strong> Coordina con el Líder o Secretario de tu GP para que registren la participación de tu grupo.</span>
-                            )}
-                          </div>
-                        </div>
-                      )}
-                    </>
-                  )}
+                        )}
+                      </>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </>
-          )}
+              </>
+            )}
+          </div>
         </div>
-      </div>
-    )}
+      )}
 
       {/* MODALS AREA */}
 
@@ -1854,7 +1846,7 @@ export const EventosPage: React.FC = () => {
                     <label className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 tracking-wider flex items-center gap-1">
                       <CalendarDays size={12} className="text-indigo-500" /> Fecha del Evento
                     </label>
-                    <button 
+                    <button
                       type="button"
                       onClick={() => setIsDatePickerOpen(!isDatePickerOpen)}
                       className="w-full border border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-800 px-3.5 py-2.5 rounded-xl font-bold text-slate-900 dark:text-white flex items-center justify-between text-left cursor-pointer transition-all duration-200 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 shadow-sm"
@@ -1923,13 +1915,12 @@ export const EventosPage: React.FC = () => {
                                   setFormFields(prev => ({ ...prev, startDate: dateStr }));
                                   setIsDatePickerOpen(false);
                                 }}
-                                className={`w-8 h-8 rounded-xl font-bold text-xs flex items-center justify-center transition-all duration-200 ${
-                                  isSelected
+                                className={`w-8 h-8 rounded-xl font-bold text-xs flex items-center justify-center transition-all duration-200 ${isSelected
                                     ? 'bg-gradient-to-r from-indigo-500 via-purple-600 to-violet-600 text-white shadow-md shadow-purple-500/30 scale-105 font-black'
                                     : isToday
-                                    ? 'border-2 border-indigo-500 text-indigo-600 dark:text-indigo-400 font-black'
-                                    : 'text-slate-700 dark:text-slate-200 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 hover:text-indigo-600'
-                                }`}
+                                      ? 'border-2 border-indigo-500 text-indigo-600 dark:text-indigo-400 font-black'
+                                      : 'text-slate-700 dark:text-slate-200 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 hover:text-indigo-600'
+                                  }`}
                               >
                                 {dayNum}
                               </button>
@@ -2018,11 +2009,10 @@ export const EventosPage: React.FC = () => {
                                   setFormFields(prev => ({ ...prev, timeSlot: timePreset }));
                                   setIsTimePickerOpen(false);
                                 }}
-                                className={`px-2 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all ${
-                                  formFields.timeSlot === timePreset
+                                className={`px-2 py-1.5 rounded-lg text-[10px] font-black uppercase transition-all ${formFields.timeSlot === timePreset
                                     ? 'bg-indigo-600 text-white shadow-sm'
                                     : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/60 hover:text-indigo-600'
-                                }`}
+                                  }`}
                               >
                                 {timePreset}
                               </button>
@@ -2044,7 +2034,7 @@ export const EventosPage: React.FC = () => {
                             >
                               {Array.from({ length: 24 }, (_, i) => {
                                 const h = String(i).padStart(2, '0');
-                                return <option key={h} value={h}>{h}:00 h ({i > 12 ? `${i-12} PM` : i === 12 ? '12 PM' : i === 0 ? '12 AM' : `${i} AM`})</option>;
+                                return <option key={h} value={h}>{h}:00 h ({i > 12 ? `${i - 12} PM` : i === 12 ? '12 PM' : i === 0 ? '12 AM' : `${i} AM`})</option>;
                               })}
                             </select>
 
@@ -2105,21 +2095,20 @@ export const EventosPage: React.FC = () => {
                     <label className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 tracking-wider flex items-center gap-1">
                       <Info size={12} className="text-indigo-500" /> Estado Operativo
                     </label>
-                    <button 
+                    <button
                       type="button"
                       onClick={() => setIsStatusDropdownOpen(!isStatusDropdownOpen)}
                       className="w-full border border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-800 px-3.5 py-2.5 rounded-xl font-bold text-slate-900 dark:text-white flex items-center justify-between text-left cursor-pointer transition-all duration-200 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 shadow-sm"
                     >
                       <span className="flex items-center gap-1.5">
-                        <span className={`w-2 h-2 rounded-full ${
-                          formFields.status === 'Abierto' ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]' :
-                          formFields.status === 'En Curso' ? 'bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]' : 'bg-rose-400 shadow-[0_0_8px_rgba(251,113,133,0.8)]'
-                        }`} />
+                        <span className={`w-2 h-2 rounded-full ${formFields.status === 'Abierto' ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]' :
+                            formFields.status === 'En Curso' ? 'bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.8)]' : 'bg-rose-400 shadow-[0_0_8px_rgba(251,113,133,0.8)]'
+                          }`} />
                         {formFields.status}
                       </span>
                       <span className="text-slate-500 dark:text-slate-400 text-[9px]">▼</span>
                     </button>
-                    
+
                     {isStatusDropdownOpen && (
                       <div className="absolute left-0 right-0 top-full mt-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-2xl py-1 z-50 animate-fadeIn font-bold backdrop-blur-xl">
                         {(['Abierto', 'En Curso', 'Finalizado'] as const).map((opt) => (
@@ -2132,10 +2121,9 @@ export const EventosPage: React.FC = () => {
                             }}
                             className="w-full text-left px-3.5 py-2 text-xs hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 cursor-pointer text-slate-700 dark:text-slate-200 transition-colors"
                           >
-                            <span className={`w-2 h-2 rounded-full ${
-                              opt === 'Abierto' ? 'bg-emerald-400' :
-                              opt === 'En Curso' ? 'bg-amber-400' : 'bg-rose-400'
-                            }`} />
+                            <span className={`w-2 h-2 rounded-full ${opt === 'Abierto' ? 'bg-emerald-400' :
+                                opt === 'En Curso' ? 'bg-amber-400' : 'bg-rose-400'
+                              }`} />
                             {opt}
                           </button>
                         ))}
@@ -2144,81 +2132,81 @@ export const EventosPage: React.FC = () => {
                   </div>
                 </div>
 
-              {/* ARCHIVOS Y DOCUMENTOS PRE-CARGADOS */}
-              <div className="grid grid-cols-2 gap-3 border-t border-slate-200 dark:border-slate-800 pt-4 mt-2">
-                <div className="space-y-1 flex flex-col justify-between">
-                  <label className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 tracking-wider flex items-center gap-1">
-                    <Upload size={12} className="text-indigo-500" /> Imagen Cover
-                  </label>
-                  {formFields.imageUrl ? (
-                    <div className="relative w-full h-28 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-lg shadow-slate-200/50 dark:shadow-none group">
-                      <img src={`${backendBase}${formFields.imageUrl}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" alt="Vista previa" />
-                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <button 
-                          type="button" 
-                          onClick={() => setFormFields(prev => ({ ...prev, imageUrl: '' }))}
-                          className="p-1.5 bg-rose-600 text-white rounded-lg hover:bg-rose-500 cursor-pointer shadow-lg transform hover:scale-110 transition-all"
-                          title="Quitar imagen"
-                        >
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <label className="w-full h-28 border border-dashed border-slate-300 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800/80 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 hover:border-indigo-400 rounded-xl flex flex-col items-center justify-center gap-2 text-[10px] font-bold text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-300 transition-all cursor-pointer group">
-                      <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-950 flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <Upload size={14} className="text-indigo-500" />
-                      </div>
-                      Subir Imagen
-                      <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                {/* ARCHIVOS Y DOCUMENTOS PRE-CARGADOS */}
+                <div className="grid grid-cols-2 gap-3 border-t border-slate-200 dark:border-slate-800 pt-4 mt-2">
+                  <div className="space-y-1 flex flex-col justify-between">
+                    <label className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 tracking-wider flex items-center gap-1">
+                      <Upload size={12} className="text-indigo-500" /> Imagen Cover
                     </label>
-                  )}
+                    {formFields.imageUrl ? (
+                      <div className="relative w-full h-28 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-lg shadow-slate-200/50 dark:shadow-none group">
+                        <img src={`${backendBase}${formFields.imageUrl}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" alt="Vista previa" />
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <button
+                            type="button"
+                            onClick={() => setFormFields(prev => ({ ...prev, imageUrl: '' }))}
+                            className="p-1.5 bg-rose-600 text-white rounded-lg hover:bg-rose-500 cursor-pointer shadow-lg transform hover:scale-110 transition-all"
+                            title="Quitar imagen"
+                          >
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <label className="w-full h-28 border border-dashed border-slate-300 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800/80 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 hover:border-indigo-400 rounded-xl flex flex-col items-center justify-center gap-2 text-[10px] font-bold text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-300 transition-all cursor-pointer group">
+                        <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-950 flex items-center justify-center group-hover:scale-110 transition-transform">
+                          <Upload size={14} className="text-indigo-500" />
+                        </div>
+                        Subir Imagen
+                        <input type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                      </label>
+                    )}
+                  </div>
+
+                  <div className="space-y-1 flex flex-col justify-between">
+                    <label className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 tracking-wider flex items-center gap-1">
+                      <FileText size={12} className="text-indigo-500" /> PDF Informativo
+                    </label>
+                    {formFields.pdfUrl ? (
+                      <div className="relative w-full h-28 rounded-2xl border border-rose-200 dark:border-rose-900 bg-gradient-to-br from-rose-50 to-white dark:from-rose-950/40 dark:to-slate-900 flex flex-col items-center justify-center p-3 text-center shadow-lg shadow-rose-100/50 dark:shadow-none group overflow-hidden">
+                        <div className="w-10 h-10 rounded-full bg-rose-100 dark:bg-rose-950 flex items-center justify-center mb-2">
+                          <FileText size={18} className="text-rose-500" />
+                        </div>
+                        <span className="text-[10px] font-black text-rose-600 dark:text-rose-400 uppercase tracking-widest w-full truncate">PDF Listo</span>
+                        <div className="absolute inset-0 bg-white/80 dark:bg-slate-900/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
+                          <button
+                            type="button"
+                            onClick={() => setFormFields(prev => ({ ...prev, pdfUrl: '' }))}
+                            className="p-1.5 bg-rose-600 text-white rounded-lg hover:bg-rose-500 cursor-pointer shadow-lg transform hover:scale-110 transition-all flex items-center gap-1 text-[10px] font-bold"
+                            title="Quitar PDF"
+                          >
+                            <Trash2 size={12} /> Quitar
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <label className="w-full h-28 border border-dashed border-slate-300 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800/80 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 hover:border-indigo-400 rounded-xl flex flex-col items-center justify-center gap-2 text-[10px] font-bold text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-300 transition-all cursor-pointer group">
+                        <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-950 flex items-center justify-center group-hover:scale-110 transition-transform">
+                          <FileText size={14} className="text-indigo-500" />
+                        </div>
+                        Subir PDF
+                        <input type="file" accept="application/pdf" onChange={handlePdfUpload} className="hidden" />
+                      </label>
+                    )}
+                  </div>
                 </div>
 
-                <div className="space-y-1 flex flex-col justify-between">
-                  <label className="text-[10px] font-black uppercase text-slate-500 dark:text-slate-400 tracking-wider flex items-center gap-1">
-                    <FileText size={12} className="text-indigo-500" /> PDF Informativo
-                  </label>
-                  {formFields.pdfUrl ? (
-                    <div className="relative w-full h-28 rounded-2xl border border-rose-200 dark:border-rose-900 bg-gradient-to-br from-rose-50 to-white dark:from-rose-950/40 dark:to-slate-900 flex flex-col items-center justify-center p-3 text-center shadow-lg shadow-rose-100/50 dark:shadow-none group overflow-hidden">
-                      <div className="w-10 h-10 rounded-full bg-rose-100 dark:bg-rose-950 flex items-center justify-center mb-2">
-                        <FileText size={18} className="text-rose-500" />
-                      </div>
-                      <span className="text-[10px] font-black text-rose-600 dark:text-rose-400 uppercase tracking-widest w-full truncate">PDF Listo</span>
-                      <div className="absolute inset-0 bg-white/80 dark:bg-slate-900/80 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
-                        <button 
-                          type="button" 
-                          onClick={() => setFormFields(prev => ({ ...prev, pdfUrl: '' }))}
-                          className="p-1.5 bg-rose-600 text-white rounded-lg hover:bg-rose-500 cursor-pointer shadow-lg transform hover:scale-110 transition-all flex items-center gap-1 text-[10px] font-bold"
-                          title="Quitar PDF"
-                        >
-                          <Trash2 size={12} /> Quitar
-                        </button>
-                      </div>
-                    </div>
-                  ) : (
-                    <label className="w-full h-28 border border-dashed border-slate-300 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-800/80 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 hover:border-indigo-400 rounded-xl flex flex-col items-center justify-center gap-2 text-[10px] font-bold text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-300 transition-all cursor-pointer group">
-                      <div className="w-8 h-8 rounded-full bg-indigo-100 dark:bg-indigo-950 flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <FileText size={14} className="text-indigo-500" />
-                      </div>
-                      Subir PDF
-                      <input type="file" accept="application/pdf" onChange={handlePdfUpload} className="hidden" />
-                    </label>
-                  )}
+                <div className="flex items-center justify-end gap-2 pt-4 border-t border-slate-200 dark:border-slate-800 mt-4">
+                  <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-650 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700 rounded-xl font-black uppercase tracking-wider hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer animate-press">Cancelar</button>
+                  <button type="submit" className="px-5 py-2.5 bg-gradient-to-r from-indigo-500 to-violet-600 text-white rounded-xl font-black uppercase tracking-wider hover:shadow-lg hover:shadow-indigo-500/25 hover:scale-[1.02] active:scale-95 transition-all duration-200 flex items-center gap-2 cursor-pointer animate-press">
+                    <Check size={16} /> {editingEvent ? 'Guardar Cambios' : 'Crear Convocatoria'}
+                  </button>
                 </div>
-              </div>
-
-              <div className="flex items-center justify-end gap-2 pt-4 border-t border-slate-200 dark:border-slate-800 mt-4">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2.5 bg-slate-100 dark:bg-slate-800 text-slate-650 dark:text-slate-300 border border-slate-200/60 dark:border-slate-700 rounded-xl font-black uppercase tracking-wider hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer animate-press">Cancelar</button>
-                <button type="submit" className="px-5 py-2.5 bg-gradient-to-r from-indigo-500 to-violet-600 text-white rounded-xl font-black uppercase tracking-wider hover:shadow-lg hover:shadow-indigo-500/25 hover:scale-[1.02] active:scale-95 transition-all duration-200 flex items-center gap-2 cursor-pointer animate-press">
-                  <Check size={16} /> {editingEvent ? 'Guardar Cambios' : 'Crear Convocatoria'}
-                </button>
-              </div>
-            </form>
+              </form>
+            </div>
           </div>
         </div>
-      </div>
-    )}
+      )}
 
       {isAttendanceModalOpen && selectedAttendanceEvent && (
         <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
@@ -2319,20 +2307,19 @@ export const EventosPage: React.FC = () => {
                           key={member.id}
                           onClick={() => canManageAttendance && handleToggleMember(member.id)}
                           style={{ animationDelay: `${idx * 30}ms` }}
-                          className={`flex items-center justify-between p-3.5 rounded-2xl border-2 transition-all duration-200 ${
-                            isChecked
+                          className={`flex items-center justify-between p-3.5 rounded-2xl border-2 transition-all duration-200 ${isChecked
                               ? 'border-emerald-400/80 bg-gradient-to-r from-emerald-50/90 via-teal-50/60 to-emerald-50/30 dark:from-emerald-950/50 dark:via-teal-950/40 dark:to-emerald-950/30 shadow-sm'
                               : isCurrentUser
-                              ? 'border-indigo-300 dark:border-indigo-700 bg-indigo-50/30 dark:bg-indigo-950/20'
-                              : 'border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900/80 hover:border-indigo-200 dark:hover:border-indigo-700'
-                          } ${canManageAttendance ? 'cursor-pointer hover:scale-[1.01]' : 'cursor-default'}`}
+                                ? 'border-indigo-300 dark:border-indigo-700 bg-indigo-50/30 dark:bg-indigo-950/20'
+                                : 'border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900/80 hover:border-indigo-200 dark:hover:border-indigo-700'
+                            } ${canManageAttendance ? 'cursor-pointer hover:scale-[1.01]' : 'cursor-default'}`}
                         >
                           <div className="flex items-center gap-3.5 min-w-0">
                             {/* Role Avatar */}
                             <div className={`w-10 h-10 rounded-2xl flex items-center justify-center font-black text-sm shrink-0 bg-gradient-to-br ${isChecked ? 'from-emerald-400 to-teal-500' : avatarGradient} text-white shadow-md`}>
                               {member.name.charAt(0).toUpperCase()}
                             </div>
-                            
+
                             {/* Member info & Role */}
                             <div className="min-w-0 space-y-1">
                               <div className="flex items-center gap-2 flex-wrap">
@@ -2343,7 +2330,7 @@ export const EventosPage: React.FC = () => {
                                   </span>
                                 )}
                               </div>
-                              
+
                               <div className="flex items-center gap-1.5">
                                 <span className={`px-2 py-0.5 text-[9px] font-black uppercase tracking-wider rounded-md border ${roleBadgeStyle} flex items-center gap-1 shrink-0`}>
                                   <span>{roleIcon}</span> {roleLabel}
@@ -2355,11 +2342,10 @@ export const EventosPage: React.FC = () => {
                           {/* Checkbox / status indicator */}
                           <div className="shrink-0 ml-2">
                             {canManageAttendance ? (
-                              <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all duration-200 ${
-                                isChecked
+                              <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all duration-200 ${isChecked
                                   ? 'bg-emerald-500 border-emerald-500 shadow-md shadow-emerald-500/30'
                                   : 'border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800'
-                              }`}>
+                                }`}>
                                 {isChecked && <Check size={13} className="text-white stroke-[3]" />}
                               </div>
                             ) : (
@@ -2487,7 +2473,7 @@ export const EventosPage: React.FC = () => {
                               </p>
                             </div>
                           </div>
-                          
+
                           <div className="flex items-center gap-2 justify-end">
                             <button
                               onClick={() => {
@@ -2535,7 +2521,7 @@ export const EventosPage: React.FC = () => {
         <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center z-50 p-4 animate-fadeIn">
           <div className="p-[2px] bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-[28px] max-w-lg w-full shadow-2xl shadow-indigo-950/30 overflow-hidden transform transition-all duration-300">
             <div className="bg-white dark:bg-slate-900 rounded-[26px] overflow-hidden">
-              
+
               {/* Cover Header Banner */}
               <div className="relative h-44 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 overflow-hidden flex flex-col justify-between p-5 text-white">
                 {selectedInfoEvent.imageUrl && (
@@ -2546,7 +2532,7 @@ export const EventosPage: React.FC = () => {
                   />
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent" />
-                
+
                 {/* Top Badges */}
                 <div className="relative z-10 flex justify-between items-center">
                   <div className="flex gap-2 items-center">
@@ -2569,10 +2555,9 @@ export const EventosPage: React.FC = () => {
 
                 {/* Event Title */}
                 <div className="relative z-10">
-                  <span className={`inline-block text-[9px] font-black uppercase px-2 py-0.5 rounded-md mb-1.5 ${
-                    selectedInfoEvent.status === 'Abierto' ? 'bg-emerald-500 text-white' :
-                    selectedInfoEvent.status === 'En Curso' ? 'bg-amber-500 text-white' : 'bg-rose-500 text-white'
-                  }`}>
+                  <span className={`inline-block text-[9px] font-black uppercase px-2 py-0.5 rounded-md mb-1.5 ${selectedInfoEvent.status === 'Abierto' ? 'bg-emerald-500 text-white' :
+                      selectedInfoEvent.status === 'En Curso' ? 'bg-amber-500 text-white' : 'bg-rose-500 text-white'
+                    }`}>
                     Convocatoria {selectedInfoEvent.status}
                   </span>
                   <h2 className="text-xl font-black text-white leading-tight drop-shadow-md">
@@ -2678,7 +2663,7 @@ export const EventosPage: React.FC = () => {
         <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-md flex items-center justify-center z-50 p-4 animate-fadeIn">
           <div className="p-[1px] bg-gradient-to-b from-indigo-500/30 via-slate-700/50 to-slate-800/80 rounded-[32px] max-w-5xl w-full shadow-2xl shadow-slate-950/80 overflow-hidden transform transition-all duration-300 max-h-[92vh] flex flex-col">
             <div className="bg-white dark:bg-slate-900 rounded-[30px] overflow-hidden flex flex-col flex-1 min-h-0">
-              
+
               {/* Header Ejecutivo Profesional */}
               <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 p-6 text-white relative overflow-hidden border-b border-indigo-500/20 shadow-xl shrink-0">
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(99,102,241,0.18),transparent_65%)]" />
@@ -2727,7 +2712,7 @@ export const EventosPage: React.FC = () => {
                 </div>
               ) : adminDetailData ? (
                 <div className="p-6 space-y-5 overflow-y-auto flex-1 custom-scrollbar">
-                  
+
                   {/* Event Description Card */}
                   {adminDetailData.event.description && (
                     <div className="p-4 bg-gradient-to-br from-indigo-50/90 via-slate-50 to-purple-50/70 dark:from-slate-800/90 dark:via-slate-800/70 dark:to-indigo-950/50 border border-indigo-200/80 dark:border-slate-700/80 rounded-2xl text-xs text-slate-800 dark:text-slate-200 shadow-sm overflow-hidden flex items-stretch gap-3.5">
@@ -2747,21 +2732,19 @@ export const EventosPage: React.FC = () => {
                     <div className="flex p-1.5 bg-slate-100 dark:bg-slate-800/90 rounded-2xl border border-slate-200 dark:border-slate-700/80 shrink-0 shadow-inner">
                       <button
                         onClick={() => { setActiveAdminTab('ENROLLED'); setExpandedGroupId(null); }}
-                        className={`px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-300 cursor-pointer flex items-center gap-2 ${
-                          activeAdminTab === 'ENROLLED'
+                        className={`px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-300 cursor-pointer flex items-center gap-2 ${activeAdminTab === 'ENROLLED'
                             ? 'bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-600 text-white shadow-lg shadow-emerald-500/30 scale-105'
                             : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                        }`}
+                          }`}
                       >
                         <CheckCircle2 size={16} /> Inscritos ({adminDetailData.enrolledGroups.length})
                       </button>
                       <button
                         onClick={() => { setActiveAdminTab('NOT_ENROLLED'); setExpandedGroupId(null); }}
-                        className={`px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-300 cursor-pointer flex items-center gap-2 ${
-                          activeAdminTab === 'NOT_ENROLLED'
+                        className={`px-4 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-300 cursor-pointer flex items-center gap-2 ${activeAdminTab === 'NOT_ENROLLED'
                             ? 'bg-gradient-to-r from-rose-500 via-orange-500 to-amber-500 text-white shadow-lg shadow-rose-500/30 scale-105'
                             : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                        }`}
+                          }`}
                       >
                         <AlertCircle size={16} /> No Inscritos ({adminDetailData.notEnrolledGroups.length})
                       </button>
@@ -2844,35 +2827,35 @@ export const EventosPage: React.FC = () => {
                                         return aConfirmed ? -1 : 1;
                                       })
                                       .map((member: any) => {
-                                      const { roleLabel, roleBadgeStyle, roleIcon, avatarGradient } = getGroupRoleBadge(member.groupRole);
+                                        const { roleLabel, roleBadgeStyle, roleIcon, avatarGradient } = getGroupRoleBadge(member.groupRole);
 
-                                      return (
-                                        <div key={member.id} className="p-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700/80 flex flex-col xs:flex-row xs:items-center justify-between gap-2 shadow-sm hover:border-indigo-400 dark:hover:border-indigo-500 transition">
-                                          <div className="flex items-center gap-2.5 min-w-0">
-                                            <div className={`w-8 h-8 rounded-xl bg-gradient-to-br ${avatarGradient || 'from-indigo-500 to-purple-600'} text-white font-black text-xs flex items-center justify-center shrink-0 shadow-md`}>
-                                              {member.name.charAt(0).toUpperCase()}
+                                        return (
+                                          <div key={member.id} className="p-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700/80 flex flex-col xs:flex-row xs:items-center justify-between gap-2 shadow-sm hover:border-indigo-400 dark:hover:border-indigo-500 transition">
+                                            <div className="flex items-center gap-2.5 min-w-0">
+                                              <div className={`w-8 h-8 rounded-xl bg-gradient-to-br ${avatarGradient || 'from-indigo-500 to-purple-600'} text-white font-black text-xs flex items-center justify-center shrink-0 shadow-md`}>
+                                                {member.name.charAt(0).toUpperCase()}
+                                              </div>
+                                              <div className="min-w-0 space-y-0.5">
+                                                <p className="font-black text-xs text-slate-900 dark:text-white truncate">{member.name}</p>
+                                                <span className={`whitespace-nowrap inline-flex items-center gap-1 px-2 py-0.5 text-[8px] sm:text-[9px] font-black uppercase tracking-wider rounded-md ${roleBadgeStyle}`}>
+                                                  <span>{roleIcon}</span> <span>{roleLabel}</span>
+                                                </span>
+                                              </div>
                                             </div>
-                                            <div className="min-w-0 space-y-0.5">
-                                              <p className="font-black text-xs text-slate-900 dark:text-white truncate">{member.name}</p>
-                                              <span className={`whitespace-nowrap inline-flex items-center gap-1 px-2 py-0.5 text-[8px] sm:text-[9px] font-black uppercase tracking-wider rounded-md ${roleBadgeStyle}`}>
-                                                <span>{roleIcon}</span> <span>{roleLabel}</span>
-                                              </span>
+                                            <div className="shrink-0 self-end xs:self-center">
+                                              {member.isConfirmed ? (
+                                                <span className="whitespace-nowrap inline-flex items-center justify-center px-2.5 py-1 bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-500/25 rounded-lg text-[8px] sm:text-[9px] font-black uppercase tracking-wider">
+                                                  ✓ CONFIRMADO
+                                                </span>
+                                              ) : (
+                                                <span className="whitespace-nowrap inline-flex items-center justify-center px-2 py-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md shadow-amber-500/25 rounded-lg text-[8px] sm:text-[9px] font-black uppercase tracking-wider">
+                                                  — SIN CONFIRMAR PARTICIPACIÓN
+                                                </span>
+                                              )}
                                             </div>
                                           </div>
-                                          <div className="shrink-0 self-end xs:self-center">
-                                            {member.isConfirmed ? (
-                                              <span className="whitespace-nowrap inline-flex items-center justify-center px-2.5 py-1 bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-md shadow-emerald-500/25 rounded-lg text-[8px] sm:text-[9px] font-black uppercase tracking-wider">
-                                                ✓ CONFIRMADO
-                                              </span>
-                                            ) : (
-                                              <span className="whitespace-nowrap inline-flex items-center justify-center px-2 py-1 bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md shadow-amber-500/25 rounded-lg text-[8px] sm:text-[9px] font-black uppercase tracking-wider">
-                                                — SIN CONFIRMAR PARTICIPACIÓN
-                                              </span>
-                                            )}
-                                          </div>
-                                        </div>
-                                      );
-                                    })}
+                                        );
+                                      })}
                                   </div>
                                 </div>
                               )}
@@ -2997,7 +2980,7 @@ export const EventosPage: React.FC = () => {
         <div className="fixed inset-0 bg-slate-950/50 backdrop-blur-sm flex items-center justify-center z-[100] p-3 sm:p-5 overflow-hidden animate-fadeIn">
           <div className="p-[1px] bg-gradient-to-b from-indigo-500/30 via-slate-700/50 to-slate-800/80 rounded-[28px] max-w-5xl w-full h-[88vh] max-h-[820px] shadow-2xl shadow-slate-950/80 overflow-hidden transform transition-all duration-300 flex flex-col my-auto">
             <div className="bg-white dark:bg-slate-900 rounded-[26px] overflow-hidden flex flex-col flex-1 h-full min-h-0">
-              
+
               {/* Header Previsualización Ejecutivo */}
               <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 px-4 sm:px-6 py-3.5 sm:py-4 text-white flex justify-between items-center border-b border-indigo-500/20 shadow-md shrink-0 relative overflow-hidden">
                 <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(99,102,241,0.18),transparent_65%)] pointer-events-none" />
@@ -3010,7 +2993,7 @@ export const EventosPage: React.FC = () => {
                     <p className="text-[10px] sm:text-xs text-slate-300 font-bold truncate">Verifique la estructura e información oficial antes de descargar</p>
                   </div>
                 </div>
-                
+
                 <button
                   onClick={() => setIsPdfPreviewModalOpen(false)}
                   className="text-slate-400 hover:text-white p-1.5 sm:p-2 rounded-2xl hover:bg-white/10 backdrop-blur-sm transition-all cursor-pointer relative z-10 shrink-0"
