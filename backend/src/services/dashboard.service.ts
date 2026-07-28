@@ -67,7 +67,7 @@ export class DashboardService {
       _sum: { totalPoints: true }
     });
 
-    let myGroupSmall = null;
+    let myGroupSmall: any = null;
     if (userId) {
       const user = await prisma.user.findUnique({
         where: { id: userId },

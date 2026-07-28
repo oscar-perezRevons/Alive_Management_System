@@ -31,7 +31,7 @@ async function verificarPermisosAdmin(req: any): Promise<boolean> {
       }
     }
 
-    let dbUser = null;
+    let dbUser: any = null;
     if (userId && !isNaN(Number(userId))) {
       dbUser = await (prisma as any).user.findUnique({ where: { id: Number(userId) } });
     }

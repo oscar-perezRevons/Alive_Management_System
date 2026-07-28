@@ -345,8 +345,8 @@ export class EventosController {
         enrolledMap.set(p.groupId, p);
       });
 
-      const enrolledGroups = [];
-      const notEnrolledGroups = [];
+      const enrolledGroups: any[] = [];
+      const notEnrolledGroups: any[] = [];
 
       for (const group of allGroups) {
         const leaderMember = group.members.find((m: any) => {
