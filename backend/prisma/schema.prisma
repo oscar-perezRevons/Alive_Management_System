@@ -23,6 +23,7 @@ model User {
   groupSmall         GroupSmall?  @relation("GroupMembers", fields: [groupSmallId], references: [id], onDelete: SetNull)
   scores             Score[]
   createdActivities  Activity[]   @relation("UserCreatedActivities")
+  extraParticipantScores ExtraParticipantScore[]
 }
 
 model GroupSmall {
@@ -43,6 +44,8 @@ model GroupSmall {
   penalties       Penalty[]
   createdAt       DateTime   @default(now())
   eventParticipations EventParticipation[]
+  extraGroupScores       ExtraGroupScore[]
+  extraParticipantScores ExtraParticipantScore[]
 }
 
 enum UserRole {
@@ -154,4 +157,62 @@ model MaterialCategory {
   id        Int      @id @default(autoincrement())
   name      String   @unique
   createdAt DateTime @default(now())
+}
+
+model ExtraScoreboard {
+  id                Int                     @id @default(autoincrement())
+  title             String
+  description       String?
+  eventType         String                  @default("Campamento") // 'Campamento', 'Rally', 'Olimpiada', 'Concurso'
+  status            String                  @default("ACTIVO")     // 'ACTIVO', 'FINALIZADO'
+  imageUrl          String?                 @default("")
+  pdfUrl            String?                 @default("")
+  createdAt         DateTime                @default(now())
+  updatedAt         DateTime                @updatedAt
+  challenges        ScoreChallenge[]
+  groupScores       ExtraGroupScore[]
+  participantScores ExtraParticipantScore[]
+}
+
+model ScoreChallenge {
+  id                Int                     @id @default(autoincrement())
+  scoreboardId      Int
+  scoreboard        ExtraScoreboard         @relation(fields: [scoreboardId], references: [id], onDelete: Cascade)
+  title             String
+  description       String?
+  category          String                  @default("Desafío General")
+  maxPoints         Int                     @default(100)
+  createdAt         DateTime                @default(now())
+  groupScores       ExtraGroupScore[]
+  participantScores ExtraParticipantScore[]
+}
+
+model ExtraGroupScore {
+  id            Int             @id @default(autoincrement())
+  scoreboardId  Int
+  scoreboard    ExtraScoreboard @relation(fields: [scoreboardId], references: [id], onDelete: Cascade)
+  groupId       Int
+  groupSmall    GroupSmall      @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  challengeId   Int?
+  challenge     ScoreChallenge? @relation(fields: [challengeId], references: [id], onDelete: SetNull)
+  points        Int
+  reason        String
+  awardedByName String?         @default("Administración")
+  createdAt     DateTime        @default(now())
+}
+
+model ExtraParticipantScore {
+  id            Int             @id @default(autoincrement())
+  scoreboardId  Int
+  scoreboard    ExtraScoreboard @relation(fields: [scoreboardId], references: [id], onDelete: Cascade)
+  userId        Int
+  user          User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  groupId       Int?
+  groupSmall    GroupSmall?     @relation(fields: [groupId], references: [id], onDelete: SetNull)
+  challengeId   Int?
+  challenge     ScoreChallenge? @relation(fields: [challengeId], references: [id], onDelete: SetNull)
+  points        Int
+  reason        String
+  awardedByName String?         @default("Administración")
+  createdAt     DateTime        @default(now())
 }

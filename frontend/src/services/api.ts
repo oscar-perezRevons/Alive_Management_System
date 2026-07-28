@@ -214,4 +214,30 @@ export const materialsService = {
   createCategory: (name: string) => apiClient.post('/materials/categories', { name })
 };
 
+export const scoreboardsService = {
+  getAll: () => apiClient.get('/scoreboards'),
+  getById: (id: number) => apiClient.get(`/scoreboards/${id}`),
+  create: (data: { title: string; description?: string; eventType: string; imageUrl?: string; pdfUrl?: string }) => apiClient.post('/scoreboards', data),
+  update: (id: number, data: { title?: string; description?: string; eventType?: string; status?: string; imageUrl?: string; pdfUrl?: string }) => apiClient.put(`/scoreboards/${id}`, data),
+  delete: (id: number) => apiClient.delete(`/scoreboards/${id}`),
+  uploadFile: (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return apiClient.post('/scoreboards/upload', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' }
+    });
+  },
+  
+  addChallenge: (id: number, data: { title: string; description?: string; category?: string; maxPoints?: number }) => apiClient.post(`/scoreboards/${id}/challenges`, data),
+  updateChallenge: (challengeId: number, data: { title?: string; description?: string; category?: string; maxPoints?: number }) => apiClient.put(`/scoreboards/challenges/${challengeId}`, data),
+  deleteChallenge: (challengeId: number) => apiClient.delete(`/scoreboards/challenges/${challengeId}`),
+  
+  awardGroupScore: (id: number, data: { groupId: number; points: number; reason: string; challengeId?: number }) => apiClient.post(`/scoreboards/${id}/scores/group`, data),
+  awardParticipantScore: (id: number, data: { userId: number; points: number; reason: string; challengeId?: number }) => apiClient.post(`/scoreboards/${id}/scores/participant`, data),
+  deleteGroupScore: (scoreId: number) => apiClient.delete(`/scoreboards/scores/group/${scoreId}`),
+  deleteParticipantScore: (scoreId: number) => apiClient.delete(`/scoreboards/scores/participant/${scoreId}`),
+  updateGroupScore: (scoreId: number, data: { points: number; reason: string }) => apiClient.put(`/scoreboards/scores/group/${scoreId}`, data),
+  updateParticipantScore: (scoreId: number, data: { points: number; reason: string }) => apiClient.put(`/scoreboards/scores/participant/${scoreId}`, data)
+};
+
 export default apiClient;

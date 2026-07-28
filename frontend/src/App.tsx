@@ -12,6 +12,7 @@ import { GroupsPage } from './pages/GroupsPage';
 import { ActivitiesPage } from './pages/ActivitiesPage';
 import { SecretariaPage } from './pages/SecretariaPage';
 import { PuntuacionesPage } from './pages/PuntuacionesPage';
+import { ScoreboardPage } from './pages/ScoreboardPage';
 import { ProgramaPage } from './pages/ProgramaPage';
 import { EventosPage } from './pages/EventosPage';
 import { MaterialesPage } from './pages/MaterialesPage';
@@ -136,6 +137,16 @@ function App() {
             <ProtectedRoute>
               <DashboardLayout>
                 <RankingPage />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/scoreboards"
+          element={
+            <ProtectedRoute allowedAccessRoles={['ADMIN']}>
+              <DashboardLayout>
+                <ScoreboardPage />
               </DashboardLayout>
             </ProtectedRoute>
           }

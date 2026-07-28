@@ -58,6 +58,65 @@ async function runStartupMigrations() {
       INSERT INTO "MaterialCategory" ("name") VALUES ('Diseño') ON CONFLICT ("name") DO NOTHING;
     `);
 
+    // Tabla ExtraScoreboard
+    await (prisma as any).$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS "ExtraScoreboard" (
+        "id" SERIAL PRIMARY KEY,
+        "title" TEXT NOT NULL,
+        "description" TEXT,
+        "eventType" TEXT NOT NULL DEFAULT 'Campamento',
+        "status" TEXT NOT NULL DEFAULT 'ACTIVO',
+        "imageUrl" TEXT DEFAULT '',
+        "pdfUrl" TEXT DEFAULT '',
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+    await (prisma as any).$executeRawUnsafe('ALTER TABLE "ExtraScoreboard" ADD COLUMN IF NOT EXISTS "imageUrl" TEXT DEFAULT \'\';');
+    await (prisma as any).$executeRawUnsafe('ALTER TABLE "ExtraScoreboard" ADD COLUMN IF NOT EXISTS "pdfUrl" TEXT DEFAULT \'\';');
+
+    // Tabla ScoreChallenge
+    await (prisma as any).$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS "ScoreChallenge" (
+        "id" SERIAL PRIMARY KEY,
+        "scoreboardId" INTEGER NOT NULL REFERENCES "ExtraScoreboard"("id") ON DELETE CASCADE,
+        "title" TEXT NOT NULL,
+        "description" TEXT,
+        "category" TEXT NOT NULL DEFAULT 'Desafío General',
+        "maxPoints" INTEGER NOT NULL DEFAULT 100,
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    // Tabla ExtraGroupScore
+    await (prisma as any).$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS "ExtraGroupScore" (
+        "id" SERIAL PRIMARY KEY,
+        "scoreboardId" INTEGER NOT NULL REFERENCES "ExtraScoreboard"("id") ON DELETE CASCADE,
+        "groupId" INTEGER NOT NULL REFERENCES "GroupSmall"("id") ON DELETE CASCADE,
+        "challengeId" INTEGER REFERENCES "ScoreChallenge"("id") ON DELETE SET NULL,
+        "points" INTEGER NOT NULL,
+        "reason" TEXT NOT NULL,
+        "awardedByName" TEXT DEFAULT 'Administración',
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
+    // Tabla ExtraParticipantScore
+    await (prisma as any).$executeRawUnsafe(`
+      CREATE TABLE IF NOT EXISTS "ExtraParticipantScore" (
+        "id" SERIAL PRIMARY KEY,
+        "scoreboardId" INTEGER NOT NULL REFERENCES "ExtraScoreboard"("id") ON DELETE CASCADE,
+        "userId" INTEGER NOT NULL REFERENCES "User"("id") ON DELETE CASCADE,
+        "groupId" INTEGER REFERENCES "GroupSmall"("id") ON DELETE SET NULL,
+        "challengeId" INTEGER REFERENCES "ScoreChallenge"("id") ON DELETE SET NULL,
+        "points" INTEGER NOT NULL,
+        "reason" TEXT NOT NULL,
+        "awardedByName" TEXT DEFAULT 'Administración',
+        "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+    `);
+
     console.log('Migración de inicio completada.');
     
     // Diagnóstico
@@ -88,6 +147,7 @@ import matinalesRoutes from './routes/matinales.routes';
 import eventosRoutes from './routes/eventos.routes';
 import rankingRoutes from './routes/ranking.routes';
 import materialsRoutes from './routes/materials.routes';
+import scoreboardsRoutes from './routes/scoreboards.routes';
 
 const app = express();
 
@@ -113,6 +173,7 @@ app.use('/api/matinales', matinalesRoutes);
 app.use('/api/eventos', eventosRoutes);
 app.use('/api/ranking', rankingRoutes);
 app.use('/api/materials', materialsRoutes);
+app.use('/api/scoreboards', scoreboardsRoutes);
 
 app.get('/api/health', (req, res) => {
   res.json({ status: 'Backend running', timestamp: new Date().toISOString() });
