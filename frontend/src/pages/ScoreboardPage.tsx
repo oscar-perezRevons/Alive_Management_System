@@ -4,8 +4,8 @@ import { scoreboardsService, adminUserExtensions, groupsService } from '../servi
 import {
   Trophy, Plus, Trash2,
   Printer, CheckCircle2, AlertCircle, Users, User,
-  Flame, Target, Medal, Sparkles, Filter, ChevronRight, X,
-  FileText, Check, Star, Layers, Activity, Edit2, Upload, Eye, ExternalLink, Image as ImageIcon, AlertTriangle, Zap, Tag, ChevronDown, Search
+  Target, Sparkles, Filter, ChevronsRight, X,
+  FileText, Check, Activity, Edit2, Eye, Image as ImageIcon, AlertTriangle, Zap, Tag, ChevronDown, Search
 } from 'lucide-react';
 import { Loader } from '../components/Loader';
 import logoImage from '../assets/logo.png';
@@ -725,7 +725,6 @@ export const ScoreboardPage: React.FC = () => {
   const [allUsers, setAllUsers] = useState<{ id: number; name: string; groupSmallId?: number; groupRole?: string }[]>([]);
 
   const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
@@ -1267,7 +1266,6 @@ export const ScoreboardPage: React.FC = () => {
   // Load scoreboards & detail
   const fetchScoreboards = useCallback(async () => {
     try {
-      setRefreshing(true);
       const res = await scoreboardsService.getAll();
       if (res.data?.success) {
         const list: Scoreboard[] = res.data.scoreboards || [];
@@ -1291,13 +1289,11 @@ export const ScoreboardPage: React.FC = () => {
       setError('Error al sincronizar tableros de puntuación.');
     } finally {
       setLoading(false);
-      setRefreshing(false);
     }
   }, [selectedScoreboardId]);
 
   const fetchScoreboardDetail = useCallback(async (id: number) => {
     try {
-      setRefreshing(true);
       const res = await scoreboardsService.getById(id);
       if (res.data?.success) {
         setCurrentScoreboard(res.data.scoreboard);
@@ -1306,14 +1302,12 @@ export const ScoreboardPage: React.FC = () => {
       }
     } catch (err) {
       console.error('Error al obtener detalle:', err);
-    } finally {
-      setRefreshing(false);
     }
   }, []);
 
   useEffect(() => {
     fetchScoreboards();
-  }, []);
+  }, [fetchScoreboards]);
 
   useEffect(() => {
     if (selectedScoreboardId) {
@@ -1722,16 +1716,16 @@ export const ScoreboardPage: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2.5 w-full md:w-auto justify-start md:justify-end pt-2 md:pt-0">
+          <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 sm:gap-2.5 w-full md:w-auto justify-start md:justify-end pt-2 md:pt-0">
             {/* Convocatoria PDF Button */}
             {currentScoreboard?.pdfUrl && (
               <a
                 href={resolveFileUrl(currentScoreboard.pdfUrl)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-gradient-to-r from-rose-500 via-pink-500 to-rose-600 hover:from-rose-600 hover:to-pink-700 text-white text-xs font-black uppercase tracking-wider transition-all duration-200 active:scale-95 hover:-translate-y-0.5 shadow-lg shadow-rose-500/25 cursor-pointer flex-1 md:flex-initial whitespace-nowrap"
+                className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 sm:py-3 rounded-2xl bg-gradient-to-r from-rose-500 via-pink-500 to-rose-600 hover:from-rose-600 hover:to-pink-700 text-white text-[11px] sm:text-xs font-black uppercase tracking-wider transition-all duration-200 active:scale-95 hover:-translate-y-0.5 shadow-lg shadow-rose-500/25 cursor-pointer col-span-2 sm:col-auto whitespace-nowrap"
               >
-                <FileText size={16} /> Convocatoria PDF
+                <FileText size={15} className="shrink-0" /> Convocatoria PDF
               </a>
             )}
 
@@ -1739,19 +1733,19 @@ export const ScoreboardPage: React.FC = () => {
               <>
                 <button
                   onClick={() => setIsNewScoreboardModalOpen(true)}
-                  className="flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white text-xs font-black uppercase tracking-wider transition-all duration-200 active:scale-95 hover:-translate-y-0.5 shadow-xl shadow-indigo-600/30 cursor-pointer flex-1 md:flex-initial whitespace-nowrap"
+                  className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2.5 sm:py-3 rounded-2xl bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white text-[11px] sm:text-xs font-black uppercase tracking-wider transition-all duration-200 active:scale-95 hover:-translate-y-0.5 shadow-xl shadow-indigo-600/30 cursor-pointer col-span-2 sm:col-auto whitespace-nowrap"
                 >
-                  <Plus size={16} /> Nueva Competencia
+                  <Plus size={15} className="shrink-0" /> Nueva Competencia
                 </button>
 
                 {currentScoreboard && (
                   <>
                     <button
                       onClick={openEditModal}
-                      className="flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-black uppercase tracking-wider transition-all duration-200 active:scale-95 border-2 border-slate-200 dark:border-white/10 cursor-pointer flex-1 md:flex-initial whitespace-nowrap"
+                      className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 sm:py-3 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-[11px] sm:text-xs font-black uppercase tracking-wider transition-all duration-200 active:scale-95 border-2 border-slate-200 dark:border-white/10 cursor-pointer col-span-1 sm:col-auto whitespace-nowrap"
                       title="Editar evento"
                     >
-                      <Edit2 size={15} /> Editar
+                      <Edit2 size={14} className="shrink-0" /> Editar
                     </button>
                     <button
                       onClick={() => {
@@ -1768,21 +1762,21 @@ export const ScoreboardPage: React.FC = () => {
                         setAssignSearch('');
                         setIsAssignChallengeModalOpen(true);
                       }}
-                      className="flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-700 hover:to-cyan-700 text-white text-xs font-black uppercase tracking-wider transition-all duration-200 active:scale-95 hover:-translate-y-0.5 shadow-xl shadow-emerald-600/30 cursor-pointer flex-1 md:flex-initial whitespace-nowrap"
+                      className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2.5 sm:py-3 rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-700 hover:to-cyan-700 text-white text-[11px] sm:text-xs font-black uppercase tracking-wider transition-all duration-200 active:scale-95 hover:-translate-y-0.5 shadow-xl shadow-emerald-600/30 cursor-pointer col-span-1 sm:col-auto whitespace-nowrap"
                     >
-                      <Target size={16} /> Asignar Desafío
+                      <Target size={15} className="shrink-0" /> Asignar Desafío
                     </button>
                     <button
                       onClick={openAwardModalGeneral}
-                      className="flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white text-xs font-black uppercase tracking-wider transition-all duration-200 active:scale-95 hover:-translate-y-0.5 shadow-xl shadow-violet-600/30 cursor-pointer flex-1 md:flex-initial whitespace-nowrap"
+                      className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2.5 sm:py-3 rounded-2xl bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white text-[11px] sm:text-xs font-black uppercase tracking-wider transition-all duration-200 active:scale-95 hover:-translate-y-0.5 shadow-xl shadow-violet-600/30 cursor-pointer col-span-1 sm:col-auto whitespace-nowrap"
                     >
-                      <Zap size={16} /> Puntos Libres
+                      <Zap size={15} className="shrink-0" /> Puntos Libres
                     </button>
                     <button
                       onClick={openBulkAwardModal}
-                      className="flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-fuchsia-600 via-pink-600 to-rose-600 hover:from-fuchsia-700 hover:to-rose-700 text-white text-xs font-black uppercase tracking-wider transition-all duration-200 active:scale-95 hover:-translate-y-0.5 shadow-xl shadow-fuchsia-600/30 cursor-pointer flex-1 md:flex-initial whitespace-nowrap"
+                      className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-5 py-2.5 sm:py-3 rounded-2xl bg-gradient-to-r from-fuchsia-600 via-pink-600 to-rose-600 hover:from-fuchsia-700 hover:to-rose-700 text-white text-[11px] sm:text-xs font-black uppercase tracking-wider transition-all duration-200 active:scale-95 hover:-translate-y-0.5 shadow-xl shadow-fuchsia-600/30 cursor-pointer col-span-1 sm:col-auto whitespace-nowrap"
                     >
-                      <Sparkles size={16} /> Asignación Múltiple
+                      <Sparkles size={15} className="shrink-0" /> Asignación Múltiple
                     </button>
                   </>
                 )}
@@ -1790,20 +1784,20 @@ export const ScoreboardPage: React.FC = () => {
             )}
 
             {currentScoreboard && (
-              <div className="flex gap-2 w-full md:w-auto">
+              <div className="col-span-2 sm:col-auto flex gap-2 w-full sm:w-auto">
                 <button
                   onClick={handlePreviewPDF}
-                  className="flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-xs font-black uppercase tracking-wider transition-all duration-200 active:scale-95 hover:-translate-y-0.5 cursor-pointer shadow-sm border border-indigo-200 dark:border-indigo-800 flex-1 md:flex-initial whitespace-nowrap"
+                  className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 sm:py-3 rounded-2xl bg-indigo-50 dark:bg-indigo-900/40 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 text-[11px] sm:text-xs font-black uppercase tracking-wider transition-all duration-200 active:scale-95 hover:-translate-y-0.5 cursor-pointer shadow-sm border border-indigo-200 dark:border-indigo-800 flex-1 whitespace-nowrap"
                   title="Previsualizar reporte PDF"
                 >
-                  <Eye size={15} /> Previsualizar
+                  <Eye size={14} className="shrink-0" /> Previsualizar
                 </button>
                 <button
                   onClick={handleExportPDF}
-                  className="flex items-center justify-center gap-2 px-4 py-3 rounded-2xl bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white text-xs font-black uppercase tracking-wider transition-all duration-200 active:scale-95 hover:-translate-y-0.5 cursor-pointer shadow-lg border border-white/10 flex-1 md:flex-initial whitespace-nowrap"
+                  className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-2.5 sm:py-3 rounded-2xl bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white text-[11px] sm:text-xs font-black uppercase tracking-wider transition-all duration-200 active:scale-95 hover:-translate-y-0.5 cursor-pointer shadow-lg border border-white/10 flex-1 whitespace-nowrap"
                   title="Exportar reporte PDF profesional"
                 >
-                  <Printer size={15} /> Exportar PDF
+                  <Printer size={14} className="shrink-0" /> Exportar PDF
                 </button>
               </div>
             )}
@@ -1868,32 +1862,40 @@ export const ScoreboardPage: React.FC = () => {
 
           {/* BARRA NAVEGACIÓN CATEGORÍAS AMPLIADA (RANKING GRUPOS, PARTICIPANTES, DESAFÍOS, LOGS) */}
           <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 bg-white/95 dark:bg-slate-900/90 backdrop-blur-2xl p-3 sm:p-4 rounded-3xl border-2 border-slate-200/90 dark:border-white/10 shadow-xl">
-            <div className="flex items-center gap-2 overflow-x-auto no-scrollbar w-full md:w-auto p-2 -m-2">
-              {[
-                { key: 'GROUPS' as const, label: 'Ranking Grupos GP', icon: Trophy, count: groupLeaderboard.length, activeColor: 'bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white shadow-lg shadow-amber-500/35 ring-2 ring-amber-400/40' },
-                { key: 'PARTICIPANTS' as const, label: 'Ranking Participantes', icon: User, count: participantLeaderboard.length, activeColor: 'bg-gradient-to-r from-fuchsia-600 via-pink-600 to-purple-600 text-white shadow-lg shadow-fuchsia-600/35 ring-2 ring-fuchsia-400/40' },
-                { key: 'CHALLENGES' as const, label: 'Desafíos / Pruebas', icon: Target, count: currentScoreboard.challenges.length, activeColor: 'bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 text-white shadow-lg shadow-indigo-600/35 ring-2 ring-indigo-400/40' },
-                { key: 'LOGS' as const, label: 'Historial Puntos', icon: Activity, count: currentScoreboard.groupScores.length + currentScoreboard.participantScores.length, activeColor: 'bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-600 text-white shadow-lg shadow-emerald-500/35 ring-2 ring-emerald-400/40' }
-              ].map((tab) => {
-                const isActive = activeTab === tab.key;
+            <div className="relative flex items-center justify-between gap-2 overflow-x-auto custom-visible-scrollbar w-full md:w-auto p-1.5 -m-1.5">
+              <div className="flex items-center gap-2 shrink-0">
+                {[
+                  { key: 'GROUPS' as const, label: 'Ranking Grupos GP', icon: Trophy, count: groupLeaderboard.length, activeColor: 'bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white shadow-lg shadow-amber-500/35 ring-2 ring-amber-400/40' },
+                  { key: 'PARTICIPANTS' as const, label: 'Ranking Participantes', icon: User, count: participantLeaderboard.length, activeColor: 'bg-gradient-to-r from-fuchsia-600 via-pink-600 to-purple-600 text-white shadow-lg shadow-fuchsia-600/35 ring-2 ring-fuchsia-400/40' },
+                  { key: 'CHALLENGES' as const, label: 'Desafíos / Pruebas', icon: Target, count: currentScoreboard.challenges.length, activeColor: 'bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 text-white shadow-lg shadow-indigo-600/35 ring-2 ring-indigo-400/40' },
+                  { key: 'LOGS' as const, label: 'Historial Puntos', icon: Activity, count: currentScoreboard.groupScores.length + currentScoreboard.participantScores.length, activeColor: 'bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-600 text-white shadow-lg shadow-emerald-500/35 ring-2 ring-emerald-400/40' }
+                ].map((tab) => {
+                  const isActive = activeTab === tab.key;
 
-                return (
-                  <button
-                    key={tab.key}
-                    onClick={() => setActiveTab(tab.key)}
-                    className={`flex-1 md:flex-initial flex items-center justify-center gap-2.5 px-5 py-3 rounded-2xl text-xs sm:text-sm font-black uppercase tracking-wider transition-all duration-300 cursor-pointer whitespace-nowrap ${isActive
-                        ? `${tab.activeColor} scale-[1.03]`
-                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white hover:-translate-y-0.5'
-                      }`}
-                  >
-                    <tab.icon size={17} className={`shrink-0 ${isActive ? 'animate-bounce' : ''}`} />
-                    <span>{tab.label}</span>
-                    <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black ${isActive ? 'bg-white/25 text-white shadow-inner' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'}`}>
-                      {tab.count}
-                    </span>
-                  </button>
-                );
-              })}
+                  return (
+                    <button
+                      key={tab.key}
+                      onClick={() => setActiveTab(tab.key)}
+                      className={`shrink-0 flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 rounded-2xl text-xs sm:text-sm font-black uppercase tracking-wider transition-all duration-300 cursor-pointer whitespace-nowrap ${isActive
+                          ? `${tab.activeColor} scale-[1.02]`
+                          : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-white/5 hover:text-slate-900 dark:hover:text-white hover:-translate-y-0.5'
+                        }`}
+                    >
+                      <tab.icon size={17} className={`shrink-0 ${isActive ? 'animate-bounce' : ''}`} />
+                      <span>{tab.label}</span>
+                      <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black ${isActive ? 'bg-white/25 text-white shadow-inner' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'}`}>
+                        {tab.count}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* INDICADOR VISUAL DESLIZAR PARA MÓVIL */}
+              <div className="md:hidden flex items-center gap-1.5 px-3 py-1.5 rounded-2xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 text-[10px] font-black uppercase tracking-wider shrink-0 animate-pulse select-none" title="Desliza horizontalmente para ver más pestañas">
+                <span>Desliza</span>
+                <ChevronsRight size={15} />
+              </div>
             </div>
 
             {isAdmin && (
@@ -2322,7 +2324,7 @@ export const ScoreboardPage: React.FC = () => {
       {isEditScoreModalOpen && editScoreLogData && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fadeIn">
           <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-md" onClick={() => setIsEditScoreModalOpen(false)} />
-          <div className="bg-white dark:bg-slate-900 rounded-3xl p-7 sm:p-8 max-w-lg w-full relative z-10 border-2 border-indigo-500/30 shadow-2xl space-y-6">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-7 max-w-lg w-full relative z-10 border-2 border-indigo-500/30 shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto no-scrollbar">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/5 pb-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-violet-600 text-white flex items-center justify-center shadow-md">
@@ -2468,16 +2470,27 @@ export const ScoreboardPage: React.FC = () => {
           <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 max-w-2xl w-full relative z-10 border-2 border-slate-200 dark:border-white/10 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto no-scrollbar">
 
             {/* Header del Modal */}
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/5 pb-4">
-              <div>
-                <h3 className="text-base sm:text-lg font-black uppercase bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 dark:from-indigo-400 dark:to-violet-400 tracking-wider">
-                  Nueva Competencia / Evento
-                </h3>
-                <p className="text-[10px] text-slate-400 uppercase font-bold tracking-widest mt-0.5">
-                  Recreativo, Social, Educativo o Espiritual con puntuaciones en vivo
-                </p>
+            <div className="flex items-start sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-white/5 pb-4">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 via-violet-600 to-purple-600 text-white flex items-center justify-center shadow-lg shadow-indigo-600/30 shrink-0">
+                  <Trophy size={20} />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-sm sm:text-lg font-black uppercase bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 dark:from-indigo-400 dark:to-violet-400 tracking-wider truncate">
+                    Nueva Competencia / Evento
+                  </h3>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider truncate">
+                    Recreativo, Social, Educativo o Espiritual
+                  </p>
+                </div>
               </div>
-              <button onClick={() => setIsNewScoreboardModalOpen(false)} className="p-2 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-white transition cursor-pointer"><X size={18} /></button>
+              <button
+                type="button"
+                onClick={() => setIsNewScoreboardModalOpen(false)}
+                className="w-9 h-9 flex items-center justify-center rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer shrink-0"
+              >
+                <X size={18} />
+              </button>
             </div>
 
             <form onSubmit={handleCreateScoreboardSubmit} className="space-y-5 text-xs font-semibold text-slate-600 dark:text-slate-300">
@@ -2639,7 +2652,7 @@ export const ScoreboardPage: React.FC = () => {
               </div>
 
               <div className="flex gap-3 justify-end pt-4 border-t border-slate-100 dark:border-white/5">
-                <button type="button" onClick={() => setIsNewScoreboardModalOpen(false)} className="px-5 py-3 rounded-2xl border-2 text-xs font-bold uppercase cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800">Cancelar</button>
+                <button type="button" onClick={() => setIsNewScoreboardModalOpen(false)} className="px-5 py-3 rounded-2xl border-2 border-slate-200 dark:border-white/10 text-xs font-bold uppercase cursor-pointer text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">Cancelar</button>
                 <button type="submit" className="px-6 py-3 rounded-2xl bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white text-xs font-black uppercase tracking-wider cursor-pointer shadow-lg shadow-indigo-600/30">Crear Competencia</button>
               </div>
             </form>
@@ -2653,23 +2666,34 @@ export const ScoreboardPage: React.FC = () => {
           <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-md" onClick={() => setIsEditScoreboardModalOpen(false)} />
           <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 max-w-2xl w-full relative z-10 border-2 border-slate-200 dark:border-white/10 shadow-2xl space-y-6 max-h-[90vh] overflow-y-auto no-scrollbar">
 
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/5 pb-4">
-              <div>
-                <h3 className="text-base sm:text-lg font-black uppercase bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 dark:from-indigo-400 dark:to-violet-400 tracking-wider">
-                  Editar Evento / Competencia
-                </h3>
-                <p className="text-[10px] text-slate-400 uppercase font-bold tracking-widest mt-0.5">
-                  Actualiza los datos, tipo, imágenes o convocatoria en PDF
-                </p>
+            <div className="flex items-start sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-white/5 pb-4">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 via-violet-600 to-purple-600 text-white flex items-center justify-center shadow-lg shadow-indigo-600/30 shrink-0">
+                  <Edit2 size={20} />
+                </div>
+                <div className="min-w-0">
+                  <h3 className="text-sm sm:text-lg font-black uppercase bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-violet-600 to-purple-600 dark:from-indigo-400 dark:to-violet-400 tracking-wider truncate">
+                    Editar Evento / Competencia
+                  </h3>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider truncate">
+                    Actualiza los datos, tipo, imágenes o PDF
+                  </p>
+                </div>
               </div>
-              <button onClick={() => setIsEditScoreboardModalOpen(false)} className="p-2 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-white transition cursor-pointer"><X size={18} /></button>
+              <button
+                type="button"
+                onClick={() => setIsEditScoreboardModalOpen(false)}
+                className="w-9 h-9 flex items-center justify-center rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer shrink-0"
+              >
+                <X size={18} />
+              </button>
             </div>
 
             <form onSubmit={handleEditScoreboardSubmit} className="space-y-5 text-xs font-semibold text-slate-600 dark:text-slate-300">
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-black uppercase text-indigo-600 tracking-wider">Título del Evento</label>
+                  <label className="text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 tracking-wider">Título del Evento</label>
                   <input
                     type="text"
                     required
@@ -2682,7 +2706,7 @@ export const ScoreboardPage: React.FC = () => {
                 {/* TIPO CON COMBOBOX PERSONALIZADO */}
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between">
-                    <label className="text-[10px] font-black uppercase text-indigo-600 tracking-wider">Tipo de Evento</label>
+                    <label className="text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 tracking-wider">Tipo de Evento</label>
                   </div>
                   {isCreatingCustomTypeEdit ? (
                     <div className="flex gap-2">
@@ -2724,11 +2748,11 @@ export const ScoreboardPage: React.FC = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-black uppercase text-indigo-600 tracking-wider">Estado del Evento</label>
+                  <label className="text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 tracking-wider">Estado del Evento</label>
                   <select
                     value={editStatus}
                     onChange={(e) => setEditStatus(e.target.value)}
-                    className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-slate-200 dark:border-white/10 p-3.5 rounded-2xl font-bold text-xs text-slate-800 dark:text-white"
+                    className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-slate-200 dark:border-white/10 p-3.5 rounded-2xl font-bold text-xs text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition cursor-pointer appearance-none"
                   >
                     <option value="ACTIVO">ACTIVO</option>
                     <option value="FINALIZADO">FINALIZADO</option>
@@ -2736,7 +2760,7 @@ export const ScoreboardPage: React.FC = () => {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-black uppercase text-indigo-600 tracking-wider">Descripción</label>
+                  <label className="text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 tracking-wider">Descripción</label>
                   <input
                     type="text"
                     value={editDescription}
@@ -2750,7 +2774,7 @@ export const ScoreboardPage: React.FC = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
                 {/* EDIT LOGO / IMAGE */}
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-black uppercase text-indigo-600 tracking-wider block">Logo / Imagen del Evento</label>
+                  <label className="text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 tracking-wider block">Logo / Imagen del Evento</label>
                   {editImageUrl ? (
                     <div className="rounded-2xl border-2 border-indigo-500 overflow-hidden shadow-lg bg-slate-50 dark:bg-slate-800 p-2.5 space-y-2">
                       <div className="relative h-32 w-full rounded-xl overflow-hidden bg-slate-200 dark:bg-slate-900 flex items-center justify-center p-1">
@@ -2802,7 +2826,7 @@ export const ScoreboardPage: React.FC = () => {
 
                 {/* EDIT CONVOCATORIA PDF */}
                 <div className="space-y-1.5">
-                  <label className="text-[10px] font-black uppercase text-indigo-600 tracking-wider block">Convocatoria PDF</label>
+                  <label className="text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 tracking-wider block">Convocatoria PDF</label>
                   <label className="flex flex-col items-center justify-center p-5 rounded-2xl border-2 border-dashed border-rose-500/50 bg-rose-500/5 hover:bg-rose-500/10 text-rose-600 dark:text-rose-400 text-xs font-black uppercase tracking-wider text-center cursor-pointer transition-all active:scale-95 shadow-sm space-y-2 h-44">
                     <div className="w-10 h-10 rounded-2xl bg-rose-500/10 flex items-center justify-center text-rose-500">
                       <FileText size={22} />
@@ -2815,8 +2839,8 @@ export const ScoreboardPage: React.FC = () => {
               </div>
 
               <div className="flex gap-3 justify-end pt-4 border-t border-slate-100 dark:border-white/5">
-                <button type="button" onClick={() => setIsEditScoreboardModalOpen(false)} className="px-5 py-3 rounded-2xl border-2 text-xs font-bold uppercase cursor-pointer">Cancelar</button>
-                <button type="submit" className="px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black uppercase tracking-wider cursor-pointer shadow-md">Guardar Cambios</button>
+                <button type="button" onClick={() => setIsEditScoreboardModalOpen(false)} className="px-5 py-3 rounded-2xl border-2 border-slate-200 dark:border-white/10 text-xs font-bold uppercase cursor-pointer text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition">Cancelar</button>
+                <button type="submit" className="px-6 py-3 rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white text-xs font-black uppercase tracking-wider cursor-pointer shadow-md shadow-indigo-500/25 transition">Guardar Cambios</button>
               </div>
             </form>
           </div>
@@ -2827,7 +2851,7 @@ export const ScoreboardPage: React.FC = () => {
       {isNewChallengeModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fadeIn">
           <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-md" onClick={() => setIsNewChallengeModalOpen(false)} />
-          <div className="bg-white dark:bg-slate-900 rounded-3xl p-7 sm:p-8 max-w-2xl w-full sm:w-[620px] max-h-[90vh] overflow-visible my-auto relative z-10 border-2 border-indigo-500/30 shadow-2xl space-y-6">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-7 max-w-2xl w-full sm:w-[620px] max-h-[90vh] overflow-y-auto no-scrollbar my-auto relative z-10 border-2 border-indigo-500/30 shadow-2xl space-y-5">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/5 pb-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-600 text-white flex items-center justify-center shadow-md">
@@ -2911,7 +2935,7 @@ export const ScoreboardPage: React.FC = () => {
       {isEditChallengeModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fadeIn">
           <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-md" onClick={() => setIsEditChallengeModalOpen(false)} />
-          <div className="bg-white dark:bg-slate-900 rounded-3xl p-7 sm:p-8 max-w-2xl w-full sm:w-[620px] max-h-[90vh] overflow-visible my-auto relative z-10 border-2 border-indigo-500/30 shadow-2xl space-y-6">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-7 max-w-2xl w-full sm:w-[620px] max-h-[90vh] overflow-y-auto no-scrollbar my-auto relative z-10 border-2 border-indigo-500/30 shadow-2xl space-y-5">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/5 pb-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 via-violet-600 to-purple-600 text-white flex items-center justify-center shadow-md">
@@ -3007,7 +3031,7 @@ export const ScoreboardPage: React.FC = () => {
       {isCategoryManagerOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fadeIn">
           <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-md" onClick={() => setIsCategoryManagerOpen(false)} />
-          <div className="bg-white dark:bg-slate-900 rounded-3xl p-7 sm:p-8 max-w-2xl w-full sm:w-[620px] relative z-10 border-2 border-indigo-500/30 shadow-2xl space-y-6">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-7 max-w-2xl w-full sm:w-[620px] max-h-[90vh] overflow-y-auto no-scrollbar relative z-10 border-2 border-indigo-500/30 shadow-2xl space-y-5">
             <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/5 pb-4">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-violet-600 text-white flex items-center justify-center shadow-md">
@@ -3079,7 +3103,7 @@ export const ScoreboardPage: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => setEditingCategoryOldName(null)}
-                          className="px-3 py-2 rounded-xl border border-slate-200 dark:border-white/10 text-[11px] font-bold cursor-pointer"
+                          className="px-3 py-2 rounded-xl border border-slate-200 dark:border-white/10 text-[11px] font-bold cursor-pointer text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
                         >
                           Cancelar
                         </button>
@@ -3141,20 +3165,21 @@ export const ScoreboardPage: React.FC = () => {
       {isAwardModalOpen && currentScoreboard && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fadeIn">
           <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-md" onClick={() => setIsAwardModalOpen(false)} />
-          <div className="bg-white dark:bg-slate-900 rounded-3xl p-7 sm:p-8 max-w-2xl w-full sm:w-[620px] relative z-10 border-2 border-violet-500/30 shadow-2xl space-y-6">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/5 pb-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-violet-600 via-purple-600 to-indigo-600 text-white flex items-center justify-center shadow-md">
+          <div className="bg-white dark:bg-slate-900 rounded-3xl p-5 sm:p-7 max-w-2xl w-full sm:w-[620px] max-h-[90vh] overflow-y-auto no-scrollbar relative z-10 border-2 border-violet-500/30 shadow-2xl space-y-5">
+            <div className="flex items-start sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-white/5 pb-4">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-violet-600 via-purple-600 to-indigo-600 text-white flex items-center justify-center shadow-md shrink-0">
                   <Zap size={20} />
                 </div>
-                <div>
-                  <h3 className="text-base font-black uppercase text-slate-900 dark:text-white tracking-wider">Asignar Puntos en Tiempo Real</h3>
-                  <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Otorga puntos instantáneos a grupos o integrantes</p>
+                <div className="min-w-0">
+                  <h3 className="text-base font-black uppercase text-slate-900 dark:text-white tracking-wider truncate">Asignar Puntos en Tiempo Real</h3>
+                  <p className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 truncate">Otorga puntos instantáneos a grupos o integrantes</p>
                 </div>
               </div>
               <button
+                type="button"
                 onClick={() => setIsAwardModalOpen(false)}
-                className="p-2 rounded-2xl text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                className="w-9 h-9 flex items-center justify-center rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer shrink-0"
               >
                 <X size={18} />
               </button>
@@ -3163,19 +3188,20 @@ export const ScoreboardPage: React.FC = () => {
             <form onSubmit={handleAwardSubmit} className="space-y-5 text-xs font-semibold text-slate-600 dark:text-slate-300">
               {/* Type Switcher - Hidden if a specific group context was passed (Quick Points from Card) */}
               {!awardContextGroup && (
-                <div className="flex rounded-2xl bg-slate-100 dark:bg-slate-800/80 p-1.5 border-2 border-slate-200 dark:border-white/5">
+                <div className="flex rounded-2xl bg-slate-100 dark:bg-slate-800/80 p-1.5 border-2 border-slate-200 dark:border-white/5 gap-1 min-w-0">
                   <button
                     type="button"
                     onClick={() => {
                       setAwardTargetType('GROUP');
                       setAwardTargetId('');
                     }}
-                    className={`flex-1 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer ${awardTargetType === 'GROUP'
+                    className={`flex-1 py-2.5 px-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer min-w-0 ${awardTargetType === 'GROUP'
                         ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md'
                         : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
                       }`}
                   >
-                    <Users size={14} /> Grupo Pequeño (GP)
+                    <Users size={14} className="shrink-0" />
+                    <span className="truncate">Grupo Pequeño (GP)</span>
                   </button>
                   <button
                     type="button"
@@ -3183,12 +3209,13 @@ export const ScoreboardPage: React.FC = () => {
                       setAwardTargetType('PARTICIPANT');
                       setAwardTargetId('');
                     }}
-                    className={`flex-1 py-2.5 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer ${awardTargetType === 'PARTICIPANT'
+                    className={`flex-1 py-2.5 px-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer min-w-0 ${awardTargetType === 'PARTICIPANT'
                         ? 'bg-gradient-to-r from-fuchsia-600 to-purple-600 text-white shadow-md'
                         : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
                       }`}
                   >
-                    <User size={14} /> Participante / Integrante
+                    <User size={14} className="shrink-0" />
+                    <span className="truncate">Participante / Integrante</span>
                   </button>
                 </div>
               )}
@@ -3245,8 +3272,8 @@ export const ScoreboardPage: React.FC = () => {
                       type="button"
                       onClick={() => setAwardPoints(p)}
                       className={`py-2.5 rounded-xl font-black text-xs border-2 transition cursor-pointer ${awardPoints === p
-                          ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white border-amber-500 shadow-md scale-105'
-                          : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-white/10 hover:border-amber-500/50'
+                          ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white border-amber-500 shadow-md ring-2 ring-amber-500/30'
+                          : 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-white/10 hover:border-amber-500/50 hover:text-amber-600 dark:hover:text-amber-400'
                         }`}
                     >
                       +{p} PTS
@@ -3270,26 +3297,26 @@ export const ScoreboardPage: React.FC = () => {
                 <input
                   type="text"
                   required
-                  placeholder="Ej. 1er lugar en rally de velocidad / Asistencia completa / Puntualidad"
+                  placeholder="Ej. 1er lugar en rally / Asistencia completa / Puntualidad"
                   value={awardReason}
                   onChange={(e) => setAwardReason(e.target.value)}
                   className="w-full bg-slate-50 dark:bg-slate-800/90 border-2 border-slate-200 dark:border-white/10 p-3.5 rounded-2xl font-bold text-xs text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/20 transition"
                 />
               </div>
 
-              <div className="flex gap-3 justify-end pt-4 border-t border-slate-100 dark:border-white/5">
+              <div className="flex flex-col-reverse sm:flex-row items-center justify-end gap-2.5 pt-4 border-t border-slate-100 dark:border-white/5">
                 <button
                   type="button"
                   onClick={() => setIsAwardModalOpen(false)}
-                  className="px-5 py-3 rounded-2xl border-2 border-slate-200 dark:border-white/10 text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
+                  className="w-full sm:w-auto px-6 py-3 rounded-2xl border-2 border-slate-200 dark:border-white/10 text-xs font-black uppercase tracking-wider text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition cursor-pointer"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-3 rounded-2xl bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white text-xs font-black uppercase tracking-wider cursor-pointer shadow-lg shadow-violet-500/25 hover:scale-[1.02] active:scale-95 transition-all"
+                  className="w-full sm:w-auto px-7 py-3 rounded-2xl bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700 text-white text-xs font-black uppercase tracking-wider cursor-pointer shadow-lg shadow-violet-500/25 active:scale-95 transition-all flex items-center justify-center gap-2"
                 >
-                  ⚡ Otorgar Puntos
+                  <Zap size={15} /> Otorgar Puntos
                 </button>
               </div>
             </form>
@@ -3301,22 +3328,28 @@ export const ScoreboardPage: React.FC = () => {
       {isAssignChallengeModalOpen && currentScoreboard && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-fadeIn">
           <div className="fixed inset-0 bg-slate-950/70 backdrop-blur-md" onClick={() => setIsAssignChallengeModalOpen(false)} />
-          <div className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-7 max-w-2xl w-full relative z-10 border-2 border-indigo-500/30 shadow-2xl space-y-5">
-            <div className="flex items-center justify-between border-b border-slate-100 dark:border-white/5 pb-3">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-600 flex items-center justify-center text-white shadow-md">
-                  <Target size={18} />
+          <div className="bg-white dark:bg-slate-900 rounded-3xl p-4 sm:p-6 max-w-2xl w-full relative z-10 border-2 border-indigo-500/30 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto no-scrollbar">
+            <div className="flex items-start sm:items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-white/5 shrink-0">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-600 flex items-center justify-center text-white shadow-lg shadow-emerald-600/30 shrink-0">
+                  <Target size={20} />
                 </div>
-                <div>
-                  <h3 className="text-sm font-black uppercase text-slate-800 dark:text-white tracking-wider">
+                <div className="min-w-0">
+                  <h3 className="text-sm font-black uppercase text-slate-800 dark:text-white tracking-wider truncate">
                     Asignar Desafío Completado
                   </h3>
-                  <p className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest">
+                  <p className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest truncate">
                     Sincronización en Tiempo Real con Puntuaciones
                   </p>
                 </div>
               </div>
-              <button onClick={() => setIsAssignChallengeModalOpen(false)} className="text-slate-400 hover:text-slate-600 dark:hover:text-white cursor-pointer"><X size={16} /></button>
+              <button
+                type="button"
+                onClick={() => setIsAssignChallengeModalOpen(false)}
+                className="w-9 h-9 flex items-center justify-center rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer shrink-0"
+              >
+                <X size={18} />
+              </button>
             </div>
 
             <form onSubmit={handleAssignChallengeSubmit} className="space-y-4 text-xs font-semibold text-slate-600 dark:text-slate-300">
@@ -3356,20 +3389,22 @@ export const ScoreboardPage: React.FC = () => {
                 <label className="text-[10px] font-black uppercase text-indigo-600 dark:text-indigo-400 tracking-wider">
                   Asignar A (Destinatario)
                 </label>
-                <div className="flex rounded-2xl bg-slate-100 dark:bg-slate-800 p-1 border-2 border-slate-200 dark:border-white/5">
+                <div className="flex rounded-2xl bg-slate-100 dark:bg-slate-800 p-1.5 border-2 border-slate-200 dark:border-white/5 gap-1 min-w-0">
                   <button
                     type="button"
                     onClick={() => { setAssignTargetType('GROUP'); setAssignGroupIds([]); setAssignUserIds([]); setAssignSearch(''); }}
-                    className={`flex-1 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition ${assignTargetType === 'GROUP' ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                    className={`flex-1 py-2.5 px-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer min-w-0 ${assignTargetType === 'GROUP' ? 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-md' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
                   >
-                    👥 Grupo Pequeño (GP)
+                    <Users size={14} className="shrink-0" />
+                    <span className="truncate">Grupo Pequeño (GP)</span>
                   </button>
                   <button
                     type="button"
                     onClick={() => { setAssignTargetType('PARTICIPANT'); setAssignGroupIds([]); setAssignUserIds([]); setAssignSearch(''); }}
-                    className={`flex-1 py-2 rounded-xl text-xs font-black uppercase tracking-wider transition ${assignTargetType === 'PARTICIPANT' ? 'bg-gradient-to-r from-fuchsia-600 to-purple-600 text-white shadow-md' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
+                    className={`flex-1 py-2.5 px-2 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-150 flex items-center justify-center gap-2 cursor-pointer min-w-0 ${assignTargetType === 'PARTICIPANT' ? 'bg-gradient-to-r from-fuchsia-600 to-purple-600 text-white shadow-md' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
                   >
-                    👤 Participante
+                    <User size={14} className="shrink-0" />
+                    <span className="truncate">Participante</span>
                   </button>
                 </div>
               </div>
@@ -3383,7 +3418,7 @@ export const ScoreboardPage: React.FC = () => {
                     placeholder="Buscar por nombre o rol..."
                     value={assignSearch}
                     onChange={(e) => setAssignSearch(e.target.value)}
-                    className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-slate-200 dark:border-white/10 pl-9 pr-8 py-2 rounded-xl text-xs font-bold text-slate-800 dark:text-white"
+                    className="w-full bg-slate-50 dark:bg-slate-800 border-2 border-slate-200 dark:border-white/10 pl-9 pr-8 py-2 rounded-xl text-xs font-bold text-slate-800 dark:text-white focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition"
                   />
                   {assignSearch && (
                     <button
@@ -3415,9 +3450,9 @@ export const ScoreboardPage: React.FC = () => {
                         setAssignUserIds(Array.from(new Set([...assignUserIds, ...visibleUserIds])));
                       }
                     }}
-                    className="px-3 py-2 rounded-xl bg-violet-500/10 text-violet-600 dark:text-violet-400 hover:bg-violet-500/20 border border-violet-500/20 text-[11px] font-black uppercase tracking-wider cursor-pointer transition"
+                    className="px-3 py-2 rounded-xl bg-violet-500/10 text-violet-600 dark:text-violet-400 hover:bg-violet-500/20 border border-violet-500/20 text-[11px] font-black uppercase tracking-wider cursor-pointer transition flex items-center gap-1.5"
                   >
-                    ☑️ Todos
+                    <CheckCircle2 size={13} className="shrink-0" /> Todos
                   </button>
                   <button
                     type="button"
@@ -3428,9 +3463,9 @@ export const ScoreboardPage: React.FC = () => {
                         setAssignUserIds([]);
                       }
                     }}
-                    className="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-white/10 text-[11px] font-black uppercase tracking-wider cursor-pointer transition"
+                    className="px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-white/10 text-[11px] font-black uppercase tracking-wider cursor-pointer transition flex items-center gap-1.5"
                   >
-                    Ninguno
+                    <X size={13} className="shrink-0" /> Ninguno
                   </button>
                 </div>
               </div>
@@ -3561,7 +3596,7 @@ export const ScoreboardPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsAssignChallengeModalOpen(false)}
-                  className="flex-1 py-3 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-black uppercase tracking-wider hover:bg-slate-200 cursor-pointer"
+                  className="flex-1 py-3 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-black uppercase tracking-wider hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-white/5 cursor-pointer transition-colors"
                 >
                   Cancelar
                 </button>
@@ -3581,26 +3616,27 @@ export const ScoreboardPage: React.FC = () => {
       {/* MODAL 5: BULK POINTS ASSIGNMENT (ASIGNACIÓN MÚLTIPLE EN TIEMPO REAL) */}
       {isBulkAwardModalOpen && currentScoreboard && (
         <div className="fixed inset-0 z-[9999] bg-slate-950/80 backdrop-blur-xl flex items-center justify-center p-4 animate-fadeIn">
-          <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] border-2 border-fuchsia-500/30 shadow-2xl w-full max-w-2xl overflow-hidden p-6 sm:p-7 space-y-5 max-h-[90vh] flex flex-col">
+          <div className="bg-white dark:bg-slate-900 rounded-[2rem] sm:rounded-[2.5rem] border-2 border-fuchsia-500/30 shadow-2xl w-full max-w-2xl overflow-hidden p-4 sm:p-7 space-y-4 sm:space-y-5 max-h-[90vh] flex flex-col">
 
             {/* Modal Header */}
-            <div className="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-white/5 shrink-0">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-fuchsia-600 via-pink-600 to-rose-600 flex items-center justify-center text-white shadow-lg shadow-fuchsia-600/30">
+            <div className="flex items-start sm:items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-white/5 shrink-0">
+              <div className="flex items-center gap-3 min-w-0">
+                <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-fuchsia-600 via-pink-600 to-rose-600 flex items-center justify-center text-white shadow-lg shadow-fuchsia-600/30 shrink-0">
                   <Sparkles size={20} />
                 </div>
-                <div>
-                  <h3 className="text-base font-black uppercase text-slate-800 dark:text-white tracking-wider">
+                <div className="min-w-0">
+                  <h3 className="text-sm sm:text-base font-black uppercase text-slate-800 dark:text-white tracking-wider truncate">
                     Asignación Múltiple en Tiempo Real
                   </h3>
-                  <p className="text-[10px] font-bold text-fuchsia-600 dark:text-fuchsia-400 uppercase tracking-widest">
-                    Otorga Puntos simultáneamente a Varios Grupos o Participantes
+                  <p className="text-[10px] font-bold text-fuchsia-600 dark:text-fuchsia-400 uppercase tracking-widest truncate">
+                    Otorga Puntos a Varios Grupos o Participantes
                   </p>
                 </div>
               </div>
               <button
+                type="button"
                 onClick={() => setIsBulkAwardModalOpen(false)}
-                className="text-slate-400 hover:text-slate-600 dark:hover:text-white cursor-pointer transition p-1"
+                className="w-9 h-9 flex items-center justify-center rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 hover:text-slate-700 dark:hover:text-white hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer shrink-0"
               >
                 <X size={18} />
               </button>
@@ -3641,7 +3677,7 @@ export const ScoreboardPage: React.FC = () => {
                     placeholder={`Buscar ${bulkTargetType === 'GROUPS' ? 'grupo' : 'participante o cargo'}...`}
                     value={bulkSearch}
                     onChange={(e) => setBulkSearch(e.target.value)}
-                    className="w-full bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-white/10 pl-9 pr-8 py-2 rounded-xl text-xs font-bold text-slate-800 dark:text-white focus:outline-none focus:border-fuchsia-500 focus:ring-2 focus:ring-fuchsia-500/20"
+                    className="w-full bg-slate-50 dark:bg-slate-800/90 border border-slate-200 dark:border-white/10 pl-9 pr-8 py-2 rounded-xl text-xs font-bold text-slate-800 dark:text-white focus:outline-none focus:border-fuchsia-500 focus:ring-2 focus:ring-fuchsia-500/20 transition"
                   />
                   {bulkSearch && (
                     <button
@@ -3843,7 +3879,7 @@ export const ScoreboardPage: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsBulkAwardModalOpen(false)}
-                  className="flex-1 py-3 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-black uppercase tracking-wider hover:bg-slate-200 cursor-pointer"
+                  className="flex-1 py-3 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs font-black uppercase tracking-wider hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-white/5 cursor-pointer transition-colors"
                 >
                   Cancelar
                 </button>

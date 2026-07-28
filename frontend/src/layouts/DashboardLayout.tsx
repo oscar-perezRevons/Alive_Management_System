@@ -158,7 +158,9 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
           <MenuLink to="/dashboard/matinales" icon={<BookOpen size={19} />} label="Matinales" open={isExpanded} />
           <MenuLink to="/dashboard/eventos" icon={<Users size={19} />} label="Eventos" open={isExpanded} />
           <MenuLink to="/dashboard/ranking" icon={<BarChart3 size={19} />} label="Ranking" open={isExpanded} />
-          <MenuLink to="/dashboard/scoreboards" icon={<Trophy size={19} />} label="Puntuaciones Extra" open={isExpanded} />
+          {hasAnyAccessRole(user, ['ADMIN']) && (
+            <MenuLink to="/dashboard/scoreboards" icon={<Trophy size={19} />} label="Puntuaciones Extra" open={isExpanded} />
+          )}
           <MenuLink to="/dashboard/materiales" icon={<Folder size={19} />} label="Materiales" open={isExpanded} />
           <MenuLink to="/dashboard/profile" icon={<User size={19} />} label="Mi Perfil" open={isExpanded} />
 
