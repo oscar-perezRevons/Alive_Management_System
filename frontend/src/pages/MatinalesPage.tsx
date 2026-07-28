@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from '../stores/authStore';
-import { BookOpen, Calendar, Upload, Download, Trash2, FileText, CheckCircle2, AlertCircle, Sparkles, Loader2, UserCheck } from 'lucide-react';
+import { BookOpen, Calendar, Upload, Download, Trash2, FileText, CheckCircle2, AlertCircle, Sparkles, Loader2 } from 'lucide-react';
 import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
@@ -35,7 +35,7 @@ export function MatinalesPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
-  const fetchMatinales = async () => {
+  const fetchMatinales = useCallback(async () => {
     setLoading(true);
     try {
       const response = await axios.get(`${API_URL}/matinales?date=${selectedDate}`, {
@@ -49,13 +49,13 @@ export function MatinalesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [selectedDate, token]);
 
   useEffect(() => {
     if (token) {
       fetchMatinales();
     }
-  }, [selectedDate, token]);
+  }, [fetchMatinales, token]);
 
   const handleFileUpload = async (id: number, file: File) => {
     setUploadingId(id);

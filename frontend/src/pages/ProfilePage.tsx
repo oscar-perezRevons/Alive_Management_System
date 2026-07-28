@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuthStore } from '../stores/authStore';
-import { User, Mail, Shield, Users, Calendar, Key, CheckCircle, Camera, AlertCircle, Save, Loader2, Sparkles } from 'lucide-react';
+import { User, Mail, Users, Calendar, Key, CheckCircle, Camera, AlertCircle, Save, Loader2, Sparkles } from 'lucide-react';
 import axios from 'axios';
 
 const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
@@ -9,7 +9,6 @@ export function ProfilePage() {
   const { user, token, setUser } = useAuthStore();
   const [name, setName] = useState('');
   const [birthDate, setBirthDate] = useState('');
-  const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
 
@@ -101,7 +100,6 @@ export function ProfilePage() {
         setMessage({ type: 'success', text: 'Perfil actualizado exitosamente.' });
         setNewPassword('');
         setConfirmPassword('');
-        setCurrentPassword('');
       }
     } catch (err: any) {
       setMessage({
