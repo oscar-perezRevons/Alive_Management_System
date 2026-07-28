@@ -12,15 +12,15 @@ if (!fs.existsSync(uploadDir)) {
 }
 
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => { cb(null, uploadDir); },
-  filename: (req, file, cb) => {
+  destination: (req: any, file: any, cb: any) => { cb(null, uploadDir); },
+  filename: (req: any, file: any, cb: any) => {
     cb(null, `programa-guia.pdf`);
   }
 });
 
 const upload = multer({
   storage,
-  fileFilter: (req, file, cb) => {
+  fileFilter: (req: any, file: any, cb: any) => {
     if (file.mimetype === 'application/pdf') cb(null, true);
     else cb(new Error('Solo se permiten archivos en formato PDF'));
   }

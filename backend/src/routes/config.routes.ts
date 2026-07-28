@@ -8,14 +8,14 @@ import { AuthRequest } from '../types';
 const router = Router();
 
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
+  destination: (req: any, file: any, cb: any) => {
     const dir = './uploads/brand';
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }
     cb(null, dir);
   },
-  filename: (req, file, cb) => {
+  filename: (req: any, file: any, cb: any) => {
     const fileExtension = path.extname(file.originalname);
     cb(null, `${file.fieldname}-official${fileExtension}`);
   }

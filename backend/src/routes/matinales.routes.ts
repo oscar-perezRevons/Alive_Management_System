@@ -11,8 +11,8 @@ if (!fs.existsSync(uploadDir)) {
 }
 
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => { cb(null, uploadDir); },
-  filename: (req, file, cb) => {
+  destination: (req: any, file: any, cb: any) => { cb(null, uploadDir); },
+  filename: (req: any, file: any, cb: any) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
     cb(null, `matinal-${req.params.id}-${uniqueSuffix}${path.extname(file.originalname)}`);
   }
@@ -20,7 +20,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage,
-  fileFilter: (req, file, cb) => {
+  fileFilter: (req: any, file: any, cb: any) => {
     const allowedMimes = [
       'application/pdf',
       'image/png',
