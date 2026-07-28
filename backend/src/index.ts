@@ -151,8 +151,26 @@ import scoreboardsRoutes from './routes/scoreboards.routes';
 
 const app = express();
 
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:5000',
+  'https://alive-management-system.vercel.app',
+  ...(process.env.CORS_ORIGIN ? [process.env.CORS_ORIGIN] : [])
+];
+
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || 'http://localhost:3000',
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    if (
+      allowedOrigins.includes(origin) ||
+      origin.endsWith('.vercel.app') ||
+      origin.endsWith('.onrender.com') ||
+      process.env.CORS_ORIGIN === '*'
+    ) {
+      return callback(null, true);
+    }
+    return callback(null, true);
+  },
   credentials: true,
 }));
 app.use(express.json());
