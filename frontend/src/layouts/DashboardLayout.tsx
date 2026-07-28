@@ -253,7 +253,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
               <div className="relative shrink-0">
                 <div className={`w-8 h-8 sm:w-9 sm:h-9 ${user?.avatarUrl ? '' : avatarBg} rounded-xl flex items-center justify-center font-black text-xs text-white overflow-hidden shadow-md border-2 border-white dark:border-slate-800 transition-transform duration-300 group-hover:scale-105 group-hover:ring-2 group-hover:ring-indigo-500/30`}>
                   {user?.avatarUrl ? (
-                    <img src={`http://localhost:5000${user.avatarUrl}`} alt="" className="w-full h-full object-cover" />
+                    <img src={`${(process.env.REACT_APP_API_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '')}${user.avatarUrl}`} alt="" className="w-full h-full object-cover" />
                   ) : (
                     user?.name?.charAt(0).toUpperCase() || 'A'
                   )}

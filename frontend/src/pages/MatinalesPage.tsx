@@ -13,6 +13,8 @@ import jovenesImg from '../assets/matinal_jovenes.jpg';
 import mujeresImg from '../assets/matinal_mujeres.jpg';
 import adultosImg from '../assets/matinal_adultos.jpg';
 
+const backendBase = (process.env.REACT_APP_API_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '');
+
 export const MatinalesPage: React.FC = () => {
   const { user } = useAuthStore();
   const currentUserRole = user?.role || 'USER';
@@ -632,7 +634,7 @@ export const MatinalesPage: React.FC = () => {
                               {/* The Live Visual Preview - Top Area (Full Width with soft gradient backdrop for PDF alignment) */}
                               <div 
                                 onClick={() => setViewingFile({
-                                  url: `http://localhost:5000${file.fileUrl}`,
+                                  url: `${backendBase}${file.fileUrl}`,
                                   type: isFileImage ? 'image' : 'pdf',
                                   name: file.fileName || 'Archivo Devocional'
                                 })}
@@ -642,7 +644,7 @@ export const MatinalesPage: React.FC = () => {
                               >
                                 {isFileImage ? (
                                   <img 
-                                    src={`http://localhost:5000${file.fileUrl}`} 
+                                    src={`${backendBase}${file.fileUrl}`} 
                                     alt={file.fileName || 'Miniatura'} 
                                     className="w-full h-full object-cover transition-transform duration-500 group-hover/thumb:scale-105"
                                   />
@@ -650,7 +652,7 @@ export const MatinalesPage: React.FC = () => {
                                   /* Beautiful Floating Portrait Document mockup to hide Chrome grey browser viewer boundaries */
                                   <div className="w-[65%] h-[90%] rounded-xl border border-slate-200/80 dark:border-slate-700 shadow-md bg-white overflow-hidden relative flex items-center justify-center transition-all duration-300 group-hover/thumb:scale-[1.03] group-hover/thumb:shadow-lg">
                                     <iframe 
-                                      src={`http://localhost:5000${file.fileUrl}#view=FitH&toolbar=0&navpanes=0&scrollbar=0`} 
+                                      src={`${backendBase}${file.fileUrl}#view=FitH&toolbar=0&navpanes=0&scrollbar=0`} 
                                       className="w-[140%] h-[140%] border-none absolute origin-top-left scale-[0.71] pointer-events-none select-none"
                                       title="Miniatura PDF"
                                     />
@@ -692,7 +694,7 @@ export const MatinalesPage: React.FC = () => {
                                 <div className="flex items-center gap-2 w-full">
                                   <button
                                     onClick={() => setViewingFile({
-                                      url: `http://localhost:5000${file.fileUrl}`,
+                                      url: `${backendBase}${file.fileUrl}`,
                                       type: isFileImage ? 'image' : 'pdf',
                                       name: file.fileName || 'Archivo Devocional'
                                     })}

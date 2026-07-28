@@ -18,6 +18,8 @@ import futbolImg from '../assets/futbol.jpg';
 import recreacionImg from '../assets/recreacion.jpg';
 import logoImage from '../assets/logo.png';
 
+const backendBase = (process.env.REACT_APP_API_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '');
+
 export const EventosPage: React.FC = () => {
   const { user } = useAuthStore();
   const userCanManageEvents = user?.role === 'ADMIN';
@@ -1193,7 +1195,7 @@ export const EventosPage: React.FC = () => {
                     <div key={ev.id} className="border border-slate-200/60 dark:border-slate-800 bg-white/70 dark:bg-slate-900/90 backdrop-blur-xl rounded-2xl p-4 sm:p-5 shadow-sm hover:border-indigo-300 dark:hover:border-indigo-700/60 hover:bg-white/90 dark:hover:bg-slate-900 hover:shadow-indigo-500/10 hover:shadow-lg transition-all duration-300 relative group flex flex-col sm:flex-row gap-4">
                       <div className="w-full sm:w-32 h-44 sm:h-32 rounded-2xl shrink-0 overflow-hidden relative shadow-md border border-slate-200/60 dark:border-slate-800 bg-indigo-50/50 dark:bg-indigo-950/40">
                         {ev.imageUrl ? (
-                           <img src={`http://localhost:5000${ev.imageUrl}`} alt={ev.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                           <img src={`${backendBase}${ev.imageUrl}`} alt={ev.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                         ) : (
                           <div className="w-full h-full bg-gradient-to-br from-indigo-600 to-violet-700 flex flex-col items-center justify-center text-white">
                             <Calendar size={26} />
@@ -1230,7 +1232,7 @@ export const EventosPage: React.FC = () => {
                             <span className="truncate">{ev.location}</span>
                           </span>
                           {ev.pdfUrl && (
-                            <a href={`http://localhost:5000${ev.pdfUrl}`} target="_blank" rel="noopener noreferrer" className="whitespace-nowrap inline-flex items-center gap-1.5 text-white bg-gradient-to-r from-rose-500 to-red-600 border border-rose-400/30 shadow-md shadow-rose-500/20 px-2.5 py-1 rounded-xl font-black text-[10px] sm:text-xs hover:scale-105 active:scale-95 transition-all duration-200">
+                            <a href={`${backendBase}${ev.pdfUrl}`} target="_blank" rel="noopener noreferrer" className="whitespace-nowrap inline-flex items-center gap-1.5 text-white bg-gradient-to-r from-rose-500 to-red-600 border border-rose-400/30 shadow-md shadow-rose-500/20 px-2.5 py-1 rounded-xl font-black text-[10px] sm:text-xs hover:scale-105 active:scale-95 transition-all duration-200">
                               <FileText size={13} className="shrink-0" /> PDF Adjunto
                             </a>
                           )}
@@ -1458,7 +1460,7 @@ export const EventosPage: React.FC = () => {
                     <div key={ev.id} className="border border-slate-200/60 dark:border-slate-800 bg-white/70 dark:bg-slate-900/90 backdrop-blur-xl rounded-2xl p-4 sm:p-5 shadow-sm hover:border-orange-300 dark:hover:border-orange-700/60 hover:bg-white/90 dark:hover:bg-slate-900 hover:shadow-orange-500/10 hover:shadow-lg transition-all duration-300 relative group flex flex-col sm:flex-row gap-4">
                       <div className="w-full sm:w-32 h-44 sm:h-32 rounded-2xl flex items-center justify-center shrink-0 overflow-hidden relative shadow-md border border-slate-200/60 dark:border-slate-800 bg-orange-50/50 dark:bg-orange-950/40">
                         {ev.imageUrl ? (
-                          <img src={`http://localhost:5000${ev.imageUrl}`} alt={ev.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                          <img src={`${backendBase}${ev.imageUrl}`} alt={ev.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                         ) : (
                           <div className="w-full h-full bg-gradient-to-br from-amber-400 via-orange-500 to-rose-500 flex flex-col items-center justify-center text-white">
                             <Trophy size={28} className="opacity-95" />
@@ -1497,7 +1499,7 @@ export const EventosPage: React.FC = () => {
                           </span>
                           {ev.pdfUrl && (
                             <a 
-                              href={`http://localhost:5000${ev.pdfUrl}`} 
+                              href={`${backendBase}${ev.pdfUrl}`} 
                               target="_blank" 
                               rel="noopener noreferrer" 
                               className="whitespace-nowrap inline-flex items-center gap-1.5 text-white bg-gradient-to-r from-rose-500 to-red-600 border border-rose-400/30 shadow-md shadow-rose-500/20 px-2.5 py-1 rounded-xl font-black text-[10px] sm:text-xs hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer"
@@ -1769,7 +1771,7 @@ export const EventosPage: React.FC = () => {
                 </div>
                 {selectedDetails.event?.imageUrl && (
                   <div className="w-full h-36 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm">
-                    <img src={`http://localhost:5000${selectedDetails.event.imageUrl}`} className="w-full h-full object-cover" alt="Vista previa de portada" />
+                    <img src={`${backendBase}${selectedDetails.event.imageUrl}`} className="w-full h-full object-cover" alt="Vista previa de portada" />
                   </div>
                 )}
                 <div className="bg-indigo-50/30 dark:bg-indigo-950/40 border border-indigo-100/50 dark:border-indigo-800/40 rounded-xl p-3 text-slate-700 dark:text-slate-200 font-bold leading-relaxed">
@@ -2150,7 +2152,7 @@ export const EventosPage: React.FC = () => {
                   </label>
                   {formFields.imageUrl ? (
                     <div className="relative w-full h-28 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-lg shadow-slate-200/50 dark:shadow-none group">
-                      <img src={`http://localhost:5000${formFields.imageUrl}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" alt="Vista previa" />
+                      <img src={`${backendBase}${formFields.imageUrl}`} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" alt="Vista previa" />
                       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                         <button 
                           type="button" 
@@ -2538,7 +2540,7 @@ export const EventosPage: React.FC = () => {
               <div className="relative h-44 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 overflow-hidden flex flex-col justify-between p-5 text-white">
                 {selectedInfoEvent.imageUrl && (
                   <img
-                    src={`http://localhost:5000${selectedInfoEvent.imageUrl}`}
+                    src={`${backendBase}${selectedInfoEvent.imageUrl}`}
                     alt={selectedInfoEvent.title}
                     className="absolute inset-0 w-full h-full object-cover"
                   />
@@ -2632,7 +2634,7 @@ export const EventosPage: React.FC = () => {
                       </div>
                     </div>
                     <a
-                      href={`http://localhost:5000${selectedInfoEvent.pdfUrl}`}
+                      href={`${backendBase}${selectedInfoEvent.pdfUrl}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg font-black text-xs uppercase transition shadow-sm"
