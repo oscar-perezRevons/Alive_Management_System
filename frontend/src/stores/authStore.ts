@@ -7,6 +7,7 @@ interface User {
   email: string;
   role: string;
   groupRole?: string;
+  birthDate?: string | null;
   avatarUrl?: string | null;
   groupSmallId?: number | null;
   groupSmall?: { id: number; name: string } | null;
@@ -19,6 +20,7 @@ interface AuthStore {
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
   loadFromStorage: () => void;
+  setUser: (user: User | null) => void;
 }
 
 export const useAuthStore = create<AuthStore>((set) => ({
@@ -61,5 +63,14 @@ export const useAuthStore = create<AuthStore>((set) => ({
     } else {
       set({ isAuthenticated: false });
     }
+  },
+
+  setUser: (user) => {
+    if (user) {
+      localStorage.setItem('user', JSON.stringify(user));
+    } else {
+      localStorage.removeItem('user');
+    }
+    set({ user });
   }
 }));

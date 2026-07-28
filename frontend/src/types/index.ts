@@ -4,6 +4,7 @@ export interface User {
   name: string;
   role: 'ADMIN' | 'USER';
   groupRole?: string;
+  birthDate?: string | null;
   isActive: boolean;
   createdAt: string;
   avatarUrl?: string | null;
