@@ -10,13 +10,7 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-const storage = multer.diskStorage({
-  destination: (req: any, file: any, cb: any) => { cb(null, uploadDir); },
-  filename: (req: any, file: any, cb: any) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, `material-${uniqueSuffix}${path.extname(file.originalname)}`);
-  }
-});
+const storage = multer.memoryStorage();
 
 const upload = multer({
   storage,
@@ -44,6 +38,7 @@ router.get('/categories', materialsController.getCategories);
 router.post('/categories', materialsController.createCategory);
 router.get('/', materialsController.getMaterials);
 router.post('/upload', upload.any(), materialsController.uploadMaterial);
+router.post('/migrate-to-cloud', materialsController.migrateLocalToCloudinary);
 router.put('/:id/visibility', materialsController.toggleVisibility);
 router.put('/:id', upload.any(), materialsController.updateMaterial);
 router.delete('/:id', materialsController.deleteMaterial);

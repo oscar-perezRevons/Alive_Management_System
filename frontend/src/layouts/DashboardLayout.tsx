@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { getFullMediaUrl } from '../utils/mediaUtils';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
 import { hasAnyAccessRole, resolveAccessRole } from '../utils/access';
@@ -191,9 +192,9 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
       <div className="flex-1 flex flex-col overflow-hidden min-w-0">
         
         {/* Header */}
-        <header className="sticky top-0 z-30 h-16 px-3 sm:px-6 flex justify-between items-center backdrop-blur-xl bg-white/80 dark:bg-slate-900/85 border-b border-slate-200/80 dark:border-slate-800/80 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_25px_-5px_rgba(0,0,0,0.4)] transition-colors duration-300">
+        <header className="sticky top-0 z-30 h-16 px-2.5 sm:px-6 flex justify-between items-center backdrop-blur-xl bg-white/80 dark:bg-slate-900/85 border-b border-slate-200/80 dark:border-slate-800/80 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.04)] dark:shadow-[0_4px_25px_-5px_rgba(0,0,0,0.4)] transition-colors duration-300">
           {/* Left: Mobile Trigger & System Tag */}
-          <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
+          <div className="flex items-center gap-1.5 sm:gap-3.5 min-w-0">
             {/* Mobile Sidebar Trigger */}
             <button
               onClick={() => setMobileSidebarOpen(true)}
@@ -204,26 +205,29 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
             </button>
 
             {/* System Capsule Pill */}
-            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100/90 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 shadow-inner shrink-0">
-              <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-full bg-slate-100/90 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/60 shadow-inner min-w-0">
+              <div className="flex items-center gap-1.5 shrink-0">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                 </span>
-                <span className="w-1.5 h-1.5 rounded-full bg-indigo-500/60 dark:bg-indigo-400/60"></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-indigo-500/60 dark:bg-indigo-400/60 hidden xs:inline-block"></span>
               </div>
-              <h2 className="text-[10px] sm:text-[11px] font-extrabold tracking-wider text-slate-600 dark:text-slate-300 uppercase truncate">
+              <h2 className="text-[10px] sm:text-[11px] font-extrabold tracking-wider text-slate-600 dark:text-slate-300 uppercase truncate hidden xs:inline">
                 Sistema de Gestión Colectiva
+              </h2>
+              <h2 className="text-[10px] font-extrabold tracking-wider text-slate-600 dark:text-slate-300 uppercase xs:hidden">
+                ALIVE
               </h2>
             </div>
           </div>
           
           {/* Right: Actions & User Info */}
-          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
-              className="relative group p-2.5 text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-300 bg-slate-100/80 dark:bg-slate-800/60 hover:bg-indigo-50/80 dark:hover:bg-indigo-950/60 border border-slate-200/80 dark:border-slate-700/60 rounded-xl transition-all duration-300 cursor-pointer active:scale-95 shadow-sm"
+              className="relative group p-2 sm:p-2.5 text-slate-500 dark:text-slate-400 hover:text-indigo-600 dark:hover:text-indigo-300 bg-slate-100/80 dark:bg-slate-800/60 hover:bg-indigo-50/80 dark:hover:bg-indigo-950/60 border border-slate-200/80 dark:border-slate-700/60 rounded-xl transition-all duration-300 cursor-pointer active:scale-95 shadow-sm"
               title={theme === 'light' ? "Activar Modo Oscuro" : "Activar Modo Claro"}
             >
               {theme === 'light' ? (
@@ -233,12 +237,12 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
               )}
             </button>
 
-            <div className="w-px h-6 bg-gradient-to-b from-transparent via-slate-300 dark:via-slate-700 to-transparent"></div>
+            <div className="w-px h-6 bg-gradient-to-b from-transparent via-slate-300 dark:via-slate-700 to-transparent hidden sm:block"></div>
 
             {/* User Profile Link */}
             <Link 
               to="/dashboard/profile" 
-              className="flex items-center gap-2.5 p-1 sm:p-1.5 pl-2.5 rounded-2xl bg-slate-100/60 dark:bg-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200/70 dark:border-slate-700/60 transition-all duration-300 group shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700/50"
+              className="flex items-center gap-2.5 p-1 sm:p-1.5 sm:pl-2.5 rounded-2xl bg-slate-100/60 dark:bg-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200/70 dark:border-slate-700/60 transition-all duration-300 group shadow-sm hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700/50"
               title="Ir a mi configuración de perfil"
             >
               <div className="flex flex-col text-right hidden md:flex">
@@ -253,7 +257,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
               <div className="relative shrink-0">
                 <div className={`w-8 h-8 sm:w-9 sm:h-9 ${user?.avatarUrl ? '' : avatarBg} rounded-xl flex items-center justify-center font-black text-xs text-white overflow-hidden shadow-md border-2 border-white dark:border-slate-800 transition-transform duration-300 group-hover:scale-105 group-hover:ring-2 group-hover:ring-indigo-500/30`}>
                   {user?.avatarUrl ? (
-                    <img src={`${(process.env.REACT_APP_API_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '')}${user.avatarUrl}`} alt="" className="w-full h-full object-cover" />
+                    <img src={getFullMediaUrl(user.avatarUrl)} alt="" className="w-full h-full object-cover" />
                   ) : (
                     user?.name?.charAt(0).toUpperCase() || 'A'
                   )}
@@ -262,17 +266,17 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
               </div>
             </Link>
             
-            {/* Role Badge */}
-            <span className="px-2.5 py-1 text-[8px] sm:text-[9px] font-black tracking-widest rounded-xl bg-gradient-to-r from-indigo-500/10 via-violet-500/10 to-indigo-500/10 dark:from-indigo-500/20 dark:via-violet-500/20 dark:to-indigo-500/20 text-indigo-700 dark:text-indigo-300 border border-indigo-400/30 dark:border-indigo-500/40 uppercase shadow-sm shrink-0">
+            {/* Role Badge (Visible on medium+ screens to avoid mobile header collision) */}
+            <span className="px-2.5 py-1 text-[8px] sm:text-[9px] font-black tracking-widest rounded-xl bg-gradient-to-r from-indigo-500/10 via-violet-500/10 to-indigo-500/10 dark:from-indigo-500/20 dark:via-violet-500/20 dark:to-indigo-500/20 text-indigo-700 dark:text-indigo-300 border border-indigo-400/30 dark:border-indigo-500/40 uppercase shadow-sm shrink-0 hidden md:inline-flex">
               {accessRole === 'LIDER_GP' ? 'LIDER GP' : user?.role}
             </span>
             
-            <div className="w-px h-6 bg-gradient-to-b from-transparent via-slate-300 dark:via-slate-700 to-transparent"></div>
+            <div className="w-px h-6 bg-gradient-to-b from-transparent via-slate-300 dark:via-slate-700 to-transparent hidden sm:block"></div>
 
             {/* Logout Button */}
             <button
               onClick={handleLogout}
-              className="p-2.5 text-slate-400 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 bg-slate-100/80 dark:bg-slate-800/60 hover:bg-rose-50 dark:hover:bg-rose-950/50 border border-slate-200/80 dark:border-slate-700/60 hover:border-rose-200 dark:hover:border-rose-800/50 rounded-xl transition-all duration-300 cursor-pointer active:scale-95 shrink-0 shadow-sm"
+              className="p-2 sm:p-2.5 text-slate-400 dark:text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 bg-slate-100/80 dark:bg-slate-800/60 hover:bg-rose-50 dark:hover:bg-rose-950/50 border border-slate-200/80 dark:border-slate-700/60 hover:border-rose-200 dark:hover:border-rose-800/50 rounded-xl transition-all duration-300 cursor-pointer active:scale-95 shrink-0 shadow-sm"
               title="Cerrar Sesión"
             >
               <LogOut size={17} />

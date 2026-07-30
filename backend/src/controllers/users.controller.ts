@@ -1,6 +1,9 @@
 import { Response } from 'express';
 import prisma from '../config/database';
 import bcrypt from 'bcryptjs';
+import { uploadBufferToCloudinary, isCloudinaryConfigured, deleteFromCloudinary } from '../services/cloudinary.service';
+import fs from 'fs';
+import path from 'path';
 
 export const userPasswordStore = new Map<number, string>();
 
@@ -57,14 +60,33 @@ export class UsersController {
         return res.status(400).json({ success: false, message: 'No se ha proporcionado ningún archivo binario.' });
       }
 
-      const avatarUrl = `/uploads/${req.file.filename}`;
+      let avatarUrl = '';
+
+      if (isCloudinaryConfigured() && req.file.buffer) {
+        const uploadResult = await uploadBufferToCloudinary(
+          req.file.buffer,
+          'avatars',
+          `user-${userId}-${req.file.originalname}`
+        );
+        avatarUrl = uploadResult.secure_url;
+      } else if (req.file.filename) {
+        avatarUrl = `/uploads/${req.file.filename}`;
+      } else {
+        return res.status(500).json({ success: false, message: 'Error al procesar el archivo subido.' });
+      }
+
+      // Fetch user to check if old avatar needs cleanup
+      const currentUser = await prisma.user.findUnique({ where: { id: userId }, select: { avatarUrl: true } });
+      if (currentUser?.avatarUrl && currentUser.avatarUrl.includes('cloudinary.com')) {
+        deleteFromCloudinary(currentUser.avatarUrl).catch(() => {});
+      }
 
       await prisma.user.update({
         where: { id: userId },
         data: { avatarUrl }
       });
 
-      return res.status(200).json({ success: true, message: 'Imagen de perfil guardada.', avatarUrl });
+      return res.status(200).json({ success: true, message: 'Imagen de perfil guardada con éxito en la nube.', avatarUrl });
     } catch (error: any) {
       return res.status(500).json({ success: false, message: error.message });
     }

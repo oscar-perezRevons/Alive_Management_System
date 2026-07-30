@@ -1,5 +1,6 @@
 import fs from 'fs';
 import path from 'path';
+import { deleteFromCloudinary } from './cloudinary.service';
 
 interface MatinalItem {
   id: number;
@@ -96,30 +97,38 @@ export class MatinalesService {
     return `${yyyy}-${mm}-${dd}`;
   }
 
-  updateMatinalPdf(id: number, filename: string, originalName: string, date: string) {
+  updateMatinalPdf(id: number, filenameOrUrl: string, originalName: string, date: string) {
     const registry = this.loadRegistry();
     if (!registry[date]) {
       registry[date] = {};
     }
 
-    const fileType = filename.toLowerCase().endsWith('.pdf') ? 'pdf' : 'image';
+    const fileUrl = filenameOrUrl.startsWith('http')
+      ? filenameOrUrl
+      : `/uploads/matinales/${filenameOrUrl}`;
+
+    const isPdf = originalName.toLowerCase().endsWith('.pdf') || filenameOrUrl.toLowerCase().endsWith('.pdf');
+    const fileType = isPdf ? 'pdf' : 'image';
     
     const currentUploadsRaw = registry[date][String(id)] || [];
     const currentUploads: SaturdayUpload[] = Array.isArray(currentUploadsRaw) ? currentUploadsRaw : [currentUploadsRaw].filter(Boolean);
 
     if (currentUploads.length >= 2) {
-      // Clean up uploaded file from disk because it exceeds limit
-      const tempPath = path.join(__dirname, '../../uploads/matinales', filename);
-      try {
-        if (fs.existsSync(tempPath)) fs.unlinkSync(tempPath);
-      } catch (err) {
-        console.error('Error clean up temp file:', err);
+      if (!filenameOrUrl.startsWith('http')) {
+        const tempPath = path.join(__dirname, '../../uploads/matinales', filenameOrUrl);
+        try {
+          if (fs.existsSync(tempPath)) fs.unlinkSync(tempPath);
+        } catch (err) {
+          console.error('Error clean up temp file:', err);
+        }
+      } else {
+        deleteFromCloudinary(filenameOrUrl).catch(() => {});
       }
       throw new Error('Límite alcanzado: máximo de 2 archivos por categoría.');
     }
 
     const newUpload: SaturdayUpload = {
-      fileUrl: `/uploads/matinales/${filename}`,
+      fileUrl,
       fileName: originalName,
       fileType,
       uploadedAt: new Date().toISOString()
@@ -153,13 +162,17 @@ export class MatinalesService {
 
       if (targetIndex !== -1 && uploads[targetIndex]) {
         const upload = uploads[targetIndex];
-        const filePath = path.join(__dirname, '../../', upload.fileUrl);
-        try {
-          if (fs.existsSync(filePath)) {
-            fs.unlinkSync(filePath);
+        if (upload.fileUrl.includes('cloudinary.com')) {
+          deleteFromCloudinary(upload.fileUrl).catch(() => {});
+        } else {
+          const filePath = path.join(__dirname, '../../', upload.fileUrl);
+          try {
+            if (fs.existsSync(filePath)) {
+              fs.unlinkSync(filePath);
+            }
+          } catch (err) {
+            console.error('Error al eliminar archivo físico:', err);
           }
-        } catch (err) {
-          console.error('Error al eliminar archivo físico:', err);
         }
         
         uploads.splice(targetIndex, 1);

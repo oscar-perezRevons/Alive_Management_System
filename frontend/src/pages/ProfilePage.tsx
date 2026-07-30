@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
+import { getFullMediaUrl } from '../utils/mediaUtils';
 import { createPortal } from 'react-dom';
 import { useAuthStore } from '../stores/authStore';
 import { usersService, authService } from '../services/api';
@@ -389,7 +390,7 @@ export const ProfilePage: React.FC = () => {
           <div className="relative pt-6 sm:pt-8 z-10 inline-block mx-auto">
             <div className={`w-28 h-28 sm:w-32 sm:h-32 ${avatarUrl ? '' : selectedBg} mx-auto rounded-3xl flex items-center justify-center text-3xl sm:text-4xl font-black uppercase shadow-xl border-4 border-white dark:border-slate-800 overflow-hidden transition-all duration-300 transform group-hover:scale-105`}>
               {avatarUrl ? (
-                <img src={`${(process.env.REACT_APP_API_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '')}${avatarUrl}`} alt="Avatar de perfil" className="w-full h-full object-cover" />
+                <img src={getFullMediaUrl(avatarUrl)} alt="Avatar de perfil" className="w-full h-full object-cover" />
               ) : (
                 name ? name.charAt(0) : user?.name?.charAt(0) || 'A'
               )}

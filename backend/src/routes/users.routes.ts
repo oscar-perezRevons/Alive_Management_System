@@ -8,17 +8,11 @@ import path from 'path';
 const router = Router();
 router.use(authMiddleware);
 
-const storage = multer.diskStorage({
-  destination: 'uploads/',
-  filename: (req: any, file, cb) => {
-    const userId = req.userId || req.params.id || 'avatar';
-    cb(null, `avatar-${userId}${path.extname(file.originalname)}`);
-  }
-});
+const storage = multer.memoryStorage();
 
 const upload = multer({ 
   storage,
-  limits: { fileSize: 1024 * 1024 * 5 }, 
+  limits: { fileSize: 1024 * 1024 * 10 }, // 10MB
   fileFilter: (req, file, cb) => {
     if (file.mimetype.startsWith('image/')) cb(null, true);
     else cb(new Error('El archivo debe ser una imagen válida.'));

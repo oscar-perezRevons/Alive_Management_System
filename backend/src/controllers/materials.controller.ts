@@ -3,6 +3,7 @@ import prisma from '../config/database';
 import jwt from 'jsonwebtoken';
 import fs from 'fs';
 import path from 'path';
+import { uploadBufferToCloudinary, isCloudinaryConfigured, deleteFromCloudinary } from '../services/cloudinary.service';
 
 async function verificarPermisosAdmin(req: any): Promise<boolean> {
   try {
@@ -98,7 +99,22 @@ export class MaterialsController {
       const f1 = files[0];
       const type1 = f1.mimetype === 'application/pdf' ? 'PDF' : 'IMAGE';
       const size1 = formatSize(f1.size);
-      const fileUrl1 = `/uploads/materials/${f1.filename}`;
+      let fileUrl1 = '';
+
+      if (isCloudinaryConfigured() && f1.buffer) {
+        const upload1 = await uploadBufferToCloudinary(f1.buffer, 'materials', f1.originalname);
+        fileUrl1 = upload1.secure_url;
+      } else if (f1.filename) {
+        fileUrl1 = `/uploads/materials/${f1.filename}`;
+      }
+
+      // Validate: never save a material with an empty file URL
+      if (!fileUrl1) {
+        return res.status(500).json({
+          success: false,
+          message: 'No se pudo almacenar el archivo. Cloudinary no está configurado o el archivo no fue procesado correctamente.'
+        });
+      }
 
       let type2 = '';
       let size2 = '';
@@ -108,7 +124,13 @@ export class MaterialsController {
         const f2 = files[1];
         type2 = f2.mimetype === 'application/pdf' ? 'PDF' : 'IMAGE';
         size2 = formatSize(f2.size);
-        fileUrl2 = `/uploads/materials/${f2.filename}`;
+        if (isCloudinaryConfigured() && f2.buffer) {
+          const upload2 = await uploadBufferToCloudinary(f2.buffer, 'materials', f2.originalname);
+          fileUrl2 = upload2.secure_url;
+        } else if (f2.filename) {
+          fileUrl2 = `/uploads/materials/${f2.filename}`;
+        }
+        // fileUrl2 is optional so we don't validate it the same way
       }
 
       const newMaterial = await (prisma as any).material.create({
@@ -126,7 +148,7 @@ export class MaterialsController {
         }
       });
 
-      return res.status(201).json({ success: true, message: 'Material subido correctamente.', material: newMaterial });
+      return res.status(201).json({ success: true, message: 'Material subido correctamente en la nube.', material: newMaterial });
     } catch (error: any) {
       const files: any[] = req.files || (req.file ? [req.file] : []);
       files.forEach((f: any) => { if (f.path && fs.existsSync(f.path)) fs.unlinkSync(f.path); });
@@ -171,20 +193,28 @@ export class MaterialsController {
         return res.status(404).json({ success: false, message: 'Material no encontrado.' });
       }
 
-      // Eliminar los archivos físicos
+      // Eliminar los archivos físicos o de Cloudinary
       if (material.fileUrl) {
-        const filename = path.basename(material.fileUrl);
-        const filepath = path.join(__dirname, '../../uploads/materials', filename);
-        if (fs.existsSync(filepath)) {
-          try { fs.unlinkSync(filepath); } catch (e) {}
+        if (material.fileUrl.includes('cloudinary.com')) {
+          deleteFromCloudinary(material.fileUrl).catch(() => {});
+        } else {
+          const filename = path.basename(material.fileUrl);
+          const filepath = path.join(__dirname, '../../uploads/materials', filename);
+          if (fs.existsSync(filepath)) {
+            try { fs.unlinkSync(filepath); } catch (e) {}
+          }
         }
       }
 
       if (material.fileUrl2) {
-        const filename2 = path.basename(material.fileUrl2);
-        const filepath2 = path.join(__dirname, '../../uploads/materials', filename2);
-        if (fs.existsSync(filepath2)) {
-          try { fs.unlinkSync(filepath2); } catch (e) {}
+        if (material.fileUrl2.includes('cloudinary.com')) {
+          deleteFromCloudinary(material.fileUrl2).catch(() => {});
+        } else {
+          const filename2 = path.basename(material.fileUrl2);
+          const filepath2 = path.join(__dirname, '../../uploads/materials', filename2);
+          if (fs.existsSync(filepath2)) {
+            try { fs.unlinkSync(filepath2); } catch (e) {}
+          }
         }
       }
 
@@ -225,33 +255,59 @@ export class MaterialsController {
       };
 
       if (files.length > 0) {
-        // Eliminar el archivo antiguo 1 del servidor
+        // Eliminar el archivo antiguo 1 del servidor o Cloudinary
         if (material.fileUrl) {
-          const oldFilename = path.basename(material.fileUrl);
-          const oldFilepath = path.join(__dirname, '../../uploads/materials', oldFilename);
-          if (fs.existsSync(oldFilepath)) {
-            try { fs.unlinkSync(oldFilepath); } catch (e) {}
+          if (material.fileUrl.includes('cloudinary.com')) {
+            deleteFromCloudinary(material.fileUrl).catch(() => {});
+          } else {
+            const oldFilename = path.basename(material.fileUrl);
+            const oldFilepath = path.join(__dirname, '../../uploads/materials', oldFilename);
+            if (fs.existsSync(oldFilepath)) {
+              try { fs.unlinkSync(oldFilepath); } catch (e) {}
+            }
           }
         }
-        // Eliminar el archivo antiguo 2 del servidor
+        // Eliminar el archivo antiguo 2 del servidor o Cloudinary
         if (material.fileUrl2) {
-          const oldFilename2 = path.basename(material.fileUrl2);
-          const oldFilepath2 = path.join(__dirname, '../../uploads/materials', oldFilename2);
-          if (fs.existsSync(oldFilepath2)) {
-            try { fs.unlinkSync(oldFilepath2); } catch (e) {}
+          if (material.fileUrl2.includes('cloudinary.com')) {
+            deleteFromCloudinary(material.fileUrl2).catch(() => {});
+          } else {
+            const oldFilename2 = path.basename(material.fileUrl2);
+            const oldFilepath2 = path.join(__dirname, '../../uploads/materials', oldFilename2);
+            if (fs.existsSync(oldFilepath2)) {
+              try { fs.unlinkSync(oldFilepath2); } catch (e) {}
+            }
           }
         }
 
         const f1 = files[0];
         updateData.size = formatSize(f1.size);
         updateData.type = f1.mimetype === 'application/pdf' ? 'PDF' : 'IMAGE';
-        updateData.fileUrl = `/uploads/materials/${f1.filename}`;
+        if (isCloudinaryConfigured() && f1.buffer) {
+          const up1 = await uploadBufferToCloudinary(f1.buffer, 'materials', f1.originalname);
+          updateData.fileUrl = up1.secure_url;
+        } else if (f1.filename) {
+          updateData.fileUrl = `/uploads/materials/${f1.filename}`;
+        }
+
+        // Validate: never update to an empty file URL
+        if (!updateData.fileUrl) {
+          return res.status(500).json({
+            success: false,
+            message: 'No se pudo almacenar el archivo de reemplazo. Cloudinary no está configurado o el archivo no fue procesado correctamente.'
+          });
+        }
 
         if (files.length > 1) {
           const f2 = files[1];
           updateData.size2 = formatSize(f2.size);
           updateData.type2 = f2.mimetype === 'application/pdf' ? 'PDF' : 'IMAGE';
-          updateData.fileUrl2 = `/uploads/materials/${f2.filename}`;
+          if (isCloudinaryConfigured() && f2.buffer) {
+            const up2 = await uploadBufferToCloudinary(f2.buffer, 'materials', f2.originalname);
+            updateData.fileUrl2 = up2.secure_url;
+          } else if (f2.filename) {
+            updateData.fileUrl2 = `/uploads/materials/${f2.filename}`;
+          }
         } else {
           updateData.size2 = '';
           updateData.type2 = '';
@@ -313,6 +369,88 @@ export class MaterialsController {
       return res.status(500).json({ success: false, message: 'Error al crear categoría', error: error.message });
     }
   }
+
+  /**
+   * Migrates materials stored with local file paths (/uploads/...) to Cloudinary.
+   * This is a one-time admin utility to ensure all files are cloud-persisted.
+   */
+  async migrateLocalToCloudinary(req: any, res: Response): Promise<Response> {
+    try {
+      if (!(await verificarPermisosAdmin(req))) {
+        return res.status(403).json({ success: false, message: 'Acceso denegado. Se requiere rol de Administrador.' });
+      }
+
+      if (!isCloudinaryConfigured()) {
+        return res.status(400).json({ success: false, message: 'Cloudinary no está configurado. No se puede realizar la migración.' });
+      }
+
+      const allMaterials = await (prisma as any).material.findMany();
+      const results: { id: number; title: string; status: string; error?: string }[] = [];
+
+      for (const material of allMaterials) {
+        const needsMigration1 = material.fileUrl && material.fileUrl.startsWith('/uploads/');
+        const needsMigration2 = material.fileUrl2 && material.fileUrl2.startsWith('/uploads/');
+
+        if (!needsMigration1 && !needsMigration2) {
+          results.push({ id: material.id, title: material.title, status: 'skipped (already on Cloudinary or no local path)' });
+          continue;
+        }
+
+        const updateData: any = {};
+
+        try {
+          if (needsMigration1) {
+            const localPath = path.join(__dirname, '../../', material.fileUrl);
+            if (fs.existsSync(localPath)) {
+              const buffer = fs.readFileSync(localPath);
+              const filename = path.basename(material.fileUrl);
+              const uploaded = await uploadBufferToCloudinary(buffer, 'materials', filename);
+              updateData.fileUrl = uploaded.secure_url;
+            } else {
+              results.push({ id: material.id, title: material.title, status: 'error', error: `Local file not found: ${localPath}` });
+              continue;
+            }
+          }
+
+          if (needsMigration2) {
+            const localPath2 = path.join(__dirname, '../../', material.fileUrl2);
+            if (fs.existsSync(localPath2)) {
+              const buffer2 = fs.readFileSync(localPath2);
+              const filename2 = path.basename(material.fileUrl2);
+              const uploaded2 = await uploadBufferToCloudinary(buffer2, 'materials', filename2);
+              updateData.fileUrl2 = uploaded2.secure_url;
+            }
+            // fileUrl2 is optional — if local file is missing, just clear it
+            else {
+              updateData.fileUrl2 = '';
+            }
+          }
+
+          await (prisma as any).material.update({
+            where: { id: material.id },
+            data: updateData
+          });
+
+          results.push({ id: material.id, title: material.title, status: 'migrated to Cloudinary' });
+        } catch (err: any) {
+          results.push({ id: material.id, title: material.title, status: 'error', error: err.message });
+        }
+      }
+
+      const migrated = results.filter(r => r.status === 'migrated to Cloudinary').length;
+      const skipped = results.filter(r => r.status.startsWith('skipped')).length;
+      const errors = results.filter(r => r.status === 'error').length;
+
+      return res.status(200).json({
+        success: true,
+        message: `Migración completada: ${migrated} migrados, ${skipped} omitidos, ${errors} errores.`,
+        results
+      });
+    } catch (error: any) {
+      return res.status(500).json({ success: false, message: 'Error durante la migración', error: error.message });
+    }
+  }
 }
 
 export const materialsController = new MaterialsController();
+

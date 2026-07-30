@@ -11,16 +11,9 @@ if (!fs.existsSync(uploadDir)) {
   fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-const storage = multer.diskStorage({
-  destination: (req: any, file: any, cb: any) => {
-    cb(null, uploadDir);
-  },
-  filename: (req: any, file: any, cb: any) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
-  }
-});
+import { uploadBufferToCloudinary, isCloudinaryConfigured } from '../services/cloudinary.service';
 
+const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 const router = Router();
@@ -38,15 +31,25 @@ router.post('/:id/participantes', eventosController.updateConfirmedMembers);
 router.get('/:id/admin-details', eventosController.getEventAdminDetails);
 router.get('/mis-participaciones', eventosController.getMyParticipations);
 
-router.post('/upload', upload.single('file'), (req: any, res: any) => {
+router.post('/upload', upload.single('file'), async (req: any, res: any) => {
   try {
     if (!req.file) {
       return res.status(400).json({ success: false, message: 'No se envió ningún archivo.' });
     }
-    const fileUrl = `/uploads/eventos/${req.file.filename}`;
+
+    let fileUrl = '';
+    if (isCloudinaryConfigured() && req.file.buffer) {
+      const uploadResult = await uploadBufferToCloudinary(req.file.buffer, 'eventos', req.file.originalname);
+      fileUrl = uploadResult.secure_url;
+    } else if (req.file.filename) {
+      fileUrl = `/uploads/eventos/${req.file.filename}`;
+    } else {
+      return res.status(500).json({ success: false, message: 'Error procesando archivo.' });
+    }
+
     return res.status(200).json({ success: true, fileUrl });
   } catch (error: any) {
-    return res.status(555).json({ success: false, message: error.message });
+    return res.status(500).json({ success: false, message: error.message });
   }
 });
 

@@ -31,6 +31,7 @@ export class AuthService {
         email: user.email,
         role: user.role,
         groupRole: user.groupRole,
+        avatarUrl: user.avatarUrl || null,
         groupSmallId: user.groupSmallId,
         groupSmall: user.groupSmall ? { id: user.groupSmall.id, name: user.groupSmall.name } : null
       }

@@ -176,7 +176,14 @@ app.use(cors({
 app.use(express.json());
 
 app.use('/static/brand', express.static(path.join(__dirname, '../uploads/brand')));
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+app.use('/uploads', express.static(path.join(__dirname, '../uploads'), {
+  setHeaders: (res, filePath) => {
+    if (filePath.toLowerCase().endsWith('.pdf')) {
+      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader('Content-Disposition', 'inline');
+    }
+  }
+}));
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', usersRoutes);

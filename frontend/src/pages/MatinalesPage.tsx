@@ -13,6 +13,8 @@ import jovenesImg from '../assets/matinal_jovenes.jpg';
 import mujeresImg from '../assets/matinal_mujeres.jpg';
 import adultosImg from '../assets/matinal_adultos.jpg';
 
+import { getFullMediaUrl } from '../utils/mediaUtils';
+
 const backendBase = (process.env.REACT_APP_API_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '');
 
 export const MatinalesPage: React.FC = () => {
@@ -621,7 +623,10 @@ export const MatinalesPage: React.FC = () => {
                     {mat.files && mat.files.length > 0 ? (
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
                         {mat.files.map((file: any) => {
-                          const isFileImage = file.fileType === 'image' || !file.fileUrl.toLowerCase().endsWith('.pdf');
+                          const isFilePdf = file.fileType === 'pdf' || 
+                            (file.fileName && file.fileName.toLowerCase().endsWith('.pdf')) || 
+                            (file.fileUrl && file.fileUrl.toLowerCase().includes('.pdf'));
+                          const isFileImage = !isFilePdf;
                           return (
                             <div
                               key={file.fileUrl}
@@ -630,7 +635,7 @@ export const MatinalesPage: React.FC = () => {
                               {/* The Live Visual Preview - Top Area (Full Width with soft gradient backdrop for PDF alignment) */}
                               <div
                                 onClick={() => setViewingFile({
-                                  url: `${backendBase}${file.fileUrl}`,
+                                  url: getFullMediaUrl(file.fileUrl),
                                   type: isFileImage ? 'image' : 'pdf',
                                   name: file.fileName || 'Archivo Devocional'
                                 })}
@@ -639,19 +644,25 @@ export const MatinalesPage: React.FC = () => {
                               >
                                 {isFileImage ? (
                                   <img
-                                    src={`${backendBase}${file.fileUrl}`}
+                                    src={getFullMediaUrl(file.fileUrl)}
                                     alt={file.fileName || 'Miniatura'}
                                     className="w-full h-full object-cover transition-transform duration-500 group-hover/thumb:scale-105"
                                   />
                                 ) : (
-                                  /* Beautiful Floating Portrait Document mockup to hide Chrome grey browser viewer boundaries */
-                                  <div className="w-[65%] h-[90%] rounded-xl border border-slate-200/80 dark:border-slate-700 shadow-md bg-white overflow-hidden relative flex items-center justify-center transition-all duration-300 group-hover/thumb:scale-[1.03] group-hover/thumb:shadow-lg">
-                                    <iframe
-                                      src={`${backendBase}${file.fileUrl}#view=FitH&toolbar=0&navpanes=0&scrollbar=0`}
-                                      className="w-[140%] h-[140%] border-none absolute origin-top-left scale-[0.71] pointer-events-none select-none"
-                                      title="Miniatura PDF"
-                                    />
-                                    <div className="absolute inset-0 bg-transparent z-10" />
+                                  /* PDF Thumbnail - polished icon card (Cloudinary raw PDFs cannot be embedded inline) */
+                                  <div className="w-[65%] h-[90%] rounded-xl border border-slate-200/60 dark:border-slate-700/60 shadow-lg bg-white dark:bg-slate-800 overflow-hidden relative flex flex-col items-center justify-center gap-3 transition-all duration-300 group-hover/thumb:scale-[1.03] group-hover/thumb:shadow-xl px-4">
+                                    {/* PDF icon */}
+                                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center shadow-lg shadow-red-500/30 transition-transform duration-300 group-hover/thumb:scale-110">
+                                      <svg viewBox="0 0 24 24" className="w-7 h-7 text-white" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                        <polyline points="14 2 14 8 20 8"/>
+                                        <line x1="16" y1="13" x2="8" y2="13"/>
+                                        <line x1="16" y1="17" x2="8" y2="17"/>
+                                        <polyline points="10 9 9 9 8 9"/>
+                                      </svg>
+                                    </div>
+                                    <p className="text-[9px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 text-center leading-tight">Documento PDF</p>
+                                    <p className="text-[8px] font-bold text-slate-300 dark:text-slate-600 text-center">Click para ver</p>
                                   </div>
                                 )}
 
@@ -687,7 +698,7 @@ export const MatinalesPage: React.FC = () => {
                                 <div className="flex items-center gap-2 w-full">
                                   <button
                                     onClick={() => setViewingFile({
-                                      url: `${backendBase}${file.fileUrl}`,
+                                      url: getFullMediaUrl(file.fileUrl),
                                       type: isFileImage ? 'image' : 'pdf',
                                       name: file.fileName || 'Archivo Devocional'
                                     })}
@@ -940,11 +951,23 @@ export const MatinalesPage: React.FC = () => {
                   className="max-w-full max-h-full object-contain rounded-xl shadow-2xl border border-white/5"
                 />
               ) : (
-                <iframe
-                  src={`${viewingFile.url}#toolbar=1&navpanes=1`}
-                  className="w-full h-full border-none rounded-xl bg-white"
-                  title="Visor PDF Completo"
-                />
+                (() => {
+                  // Cloudinary raw PDFs (and other external URLs) cannot be embedded directly.
+                  // Use Google Docs Viewer as a proxy for external URLs; direct embed only for local /uploads/ paths.
+                  const isExternal = viewingFile.url.startsWith('http://') || viewingFile.url.startsWith('https://');
+                  const viewerSrc = isExternal
+                    ? `https://docs.google.com/viewer?url=${encodeURIComponent(viewingFile.url)}&embedded=true`
+                    : `${viewingFile.url}#toolbar=1&navpanes=1`;
+                  return (
+                    <iframe
+                      key={viewerSrc}
+                      src={viewerSrc}
+                      className="w-full h-full border-none rounded-xl bg-white"
+                      title="Visor PDF Completo"
+                      allow="fullscreen"
+                    />
+                  );
+                })()
               )}
             </div>
           </div>

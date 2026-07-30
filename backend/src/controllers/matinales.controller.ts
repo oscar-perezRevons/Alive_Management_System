@@ -1,7 +1,8 @@
 import { Response } from 'express';
 import { matinalesService } from '../services/matinales.service';
 import prisma from '../config/database';
-import jwt from 'jsonwebtoken'; 
+import jwt from 'jsonwebtoken';
+import { uploadBufferToCloudinary, isCloudinaryConfigured } from '../services/cloudinary.service'; 
 
 async function verificarPermisosAdmin(req: any): Promise<boolean> {
   try {
@@ -77,13 +78,28 @@ export class MatinalesController {
         return res.status(400).json({ success: false, message: 'Se requiere especificar la fecha del sábado.' });
       }
 
+      let fileUrlOrName = '';
+
+      if (isCloudinaryConfigured() && req.file.buffer) {
+        const uploadResult = await uploadBufferToCloudinary(
+          req.file.buffer,
+          'matinales',
+          `matinal-${req.params.id}-${req.file.originalname}`
+        );
+        fileUrlOrName = uploadResult.secure_url;
+      } else if (req.file.filename) {
+        fileUrlOrName = req.file.filename;
+      } else {
+        return res.status(500).json({ success: false, message: 'Error al procesar el archivo.' });
+      }
+
       const updated = matinalesService.updateMatinalPdf(
         parseInt(req.params.id), 
-        req.file.filename, 
+        fileUrlOrName, 
         req.file.originalname, 
         date
       );
-      return res.status(200).json({ success: true, message: 'Material guardado correctamente.', data: updated });
+      return res.status(200).json({ success: true, message: 'Material guardado correctamente en la nube.', data: updated });
     } catch (error: any) {
       return res.status(500).json({ success: false, message: 'Error en el servidor al procesar archivo.', error: error.message });
     }

@@ -37,6 +37,20 @@
         "fileType": "image",
         "uploadedAt": "2026-07-29T20:50:06.521Z"
       }
+    ],
+    "2": [
+      {
+        "fileUrl": "https://res.cloudinary.com/udditox8/image/upload/v1785365592/alive/matinales/1785365593701-matinal-2-54b3de08-ffb1-4be1-8cbb-439771f0bbdd.jpg",
+        "fileName": "54b3de08-ffb1-4be1-8cbb-439771f0bbdd.jpg",
+        "fileType": "image",
+        "uploadedAt": "2026-07-29T22:53:15.253Z"
+      },
+      {
+        "fileUrl": "https://res.cloudinary.com/udditox8/raw/upload/v1785365677/alive/matinales/1785365678835-matinal-2-Plantilla_Formatos_Programa_Alive",
+        "fileName": "Plantilla_Formatos_Programa_Alive.pdf",
+        "fileType": "pdf",
+        "uploadedAt": "2026-07-29T22:54:39.676Z"
+      }
     ]
   }
 }

@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { 
   FileText, Download, Image, Shield, Layers, Plus, Trash2, 
-  Eye, EyeOff, X, RefreshCw, Upload, AlertCircle, Search, Pencil
+  Eye, EyeOff, X, RefreshCw, Upload, AlertCircle, Search, Pencil, ExternalLink
 } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
 import { materialsService } from '../services/api';
+import { getFullMediaUrl, openPdfInNewTab, downloadFile } from '../utils/mediaUtils';
+import { PdfViewer } from '../components/PdfViewer';
 
 const colorMap: Record<string, { bg: string; text: string; border: string; badge: string; shadow: string; btnBg: string; borderLeft: string }> = {
   indigo: {
@@ -349,8 +351,7 @@ export const MaterialesPage: React.FC = () => {
   };
 
   const getFileAbsoluteUrl = (relativeUrl: string) => {
-    const baseUrl = (process.env.REACT_APP_API_URL || 'http://localhost:5000/api').replace('/api', '');
-    return `${baseUrl}${relativeUrl}`;
+    return getFullMediaUrl(relativeUrl);
   };
 
   // Filter materials based on search term, category chip and type filter card
@@ -555,10 +556,10 @@ export const MaterialesPage: React.FC = () => {
             return (
               <div
                 key={mat.id}
-                className={`bg-white dark:bg-slate-900/50 backdrop-blur-md rounded-3xl border border-slate-200/60 dark:border-white/10 shadow-md hover:shadow-2xl hover:-translate-y-1 transition-all duration-300 relative overflow-hidden group flex flex-col ${!mat.isVisible ? 'opacity-70 dark:opacity-60 bg-slate-50/50 dark:bg-slate-950/20' : ''}`}
+                className={`bg-white dark:bg-slate-900/60 backdrop-blur-xl rounded-[2rem] border border-slate-200/80 dark:border-white/10 shadow-md hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 relative overflow-hidden group flex flex-col ${!mat.isVisible ? 'opacity-70 dark:opacity-60 bg-slate-50/50 dark:bg-slate-950/20' : ''}`}
               >
                 {/* Visual Area (Previsualización Directa de 1 o 2 Archivos) */}
-                <div className="relative h-44 bg-slate-950 overflow-hidden rounded-t-[1.45rem] border-b border-slate-105 dark:border-white/5">
+                <div className="relative h-48 bg-slate-950 overflow-hidden rounded-t-[1.9rem] border-b border-slate-200/60 dark:border-white/5">
                   {mat.fileUrl2 ? (
                     /* Layout dividido de 2 Archivos / Imágenes */
                     <div className="w-full h-full grid grid-cols-2 gap-0.5 bg-slate-950">
@@ -566,7 +567,7 @@ export const MaterialesPage: React.FC = () => {
                       <div 
                         onClick={() => { setPreviewMaterial(mat); setActivePreviewIndex(0); }}
                         className="relative w-full h-full overflow-hidden group/img1 cursor-pointer border-r border-white/10"
-                        title="Haz clic para ver Imagen 1"
+                        title="Haz clic para ver Archivo 1"
                       >
                         {mat.type === 'IMAGE' ? (
                           <img 
@@ -575,9 +576,16 @@ export const MaterialesPage: React.FC = () => {
                             className="w-full h-full object-cover transition-transform duration-500 group-hover/img1:scale-110"
                           />
                         ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-indigo-950 via-slate-900 to-slate-950 flex flex-col items-center justify-center p-2">
-                            <FileText size={26} className="text-indigo-400" />
-                            <span className="text-[7px] font-black text-indigo-300 uppercase tracking-widest mt-1">PDF #1</span>
+                          <div className="w-full h-full bg-gradient-to-br from-slate-950 via-indigo-950/70 to-slate-950 flex flex-col items-center justify-center p-2 relative overflow-hidden">
+                            <div className="w-12 h-16 bg-white dark:bg-slate-800 rounded-lg border border-white/20 shadow-md p-1.5 flex flex-col justify-between transform group-hover/img1:scale-110 transition-transform">
+                              <div className="h-1 w-6 bg-indigo-500 rounded-full" />
+                              <div className="space-y-0.5">
+                                <div className="h-0.5 w-8 bg-slate-300 dark:bg-slate-600 rounded-full" />
+                                <div className="h-0.5 w-6 bg-slate-200 dark:bg-slate-700 rounded-full" />
+                              </div>
+                              <FileText size={12} className="text-rose-500 self-end" />
+                            </div>
+                            <span className="text-[8px] font-black text-indigo-300 uppercase tracking-widest mt-1.5">PDF #1</span>
                           </div>
                         )}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover/img1:opacity-100 transition-opacity flex items-end p-2">
@@ -594,7 +602,7 @@ export const MaterialesPage: React.FC = () => {
                       <div 
                         onClick={() => { setPreviewMaterial(mat); setActivePreviewIndex(1); }}
                         className="relative w-full h-full overflow-hidden group/img2 cursor-pointer"
-                        title="Haz clic para ver Imagen 2"
+                        title="Haz clic para ver Archivo 2"
                       >
                         {mat.type2 === 'IMAGE' ? (
                           <img 
@@ -603,9 +611,16 @@ export const MaterialesPage: React.FC = () => {
                             className="w-full h-full object-cover transition-transform duration-500 group-hover/img2:scale-110"
                           />
                         ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-violet-950 via-slate-900 to-slate-950 flex flex-col items-center justify-center p-2">
-                            <FileText size={26} className="text-violet-400" />
-                            <span className="text-[7px] font-black text-violet-300 uppercase tracking-widest mt-1">PDF #2</span>
+                          <div className="w-full h-full bg-gradient-to-br from-slate-950 via-violet-950/70 to-slate-950 flex flex-col items-center justify-center p-2 relative overflow-hidden">
+                            <div className="w-12 h-16 bg-white dark:bg-slate-800 rounded-lg border border-white/20 shadow-md p-1.5 flex flex-col justify-between transform group-hover/img2:scale-110 transition-transform">
+                              <div className="h-1 w-6 bg-violet-500 rounded-full" />
+                              <div className="space-y-0.5">
+                                <div className="h-0.5 w-8 bg-slate-300 dark:bg-slate-600 rounded-full" />
+                                <div className="h-0.5 w-6 bg-slate-200 dark:bg-slate-700 rounded-full" />
+                              </div>
+                              <FileText size={12} className="text-rose-500 self-end" />
+                            </div>
+                            <span className="text-[8px] font-black text-violet-300 uppercase tracking-widest mt-1.5">PDF #2</span>
                           </div>
                         )}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover/img2:opacity-100 transition-opacity flex items-end p-2">
@@ -625,26 +640,74 @@ export const MaterialesPage: React.FC = () => {
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                     />
                   ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-slate-900 to-indigo-950/80 flex items-center justify-center relative overflow-hidden">
-                      {/* Background decorative elements */}
-                      <div className="absolute -top-12 -right-12 w-28 h-28 bg-indigo-500/10 rounded-full blur-xl" />
-                      <div className="absolute -bottom-8 -left-8 w-24 h-24 bg-violet-500/10 rounded-full blur-xl" />
-                      <FileText size={42} className="text-indigo-400/80 drop-shadow-[0_4px_10px_rgba(99,102,241,0.25)]" />
+                    /* High-End 3D PDF Document Mockup Preview */
+                    <div 
+                      onClick={() => { setPreviewMaterial(mat); setActivePreviewIndex(0); }}
+                      className="w-full h-full bg-gradient-to-br from-slate-950 via-[#0b1329] to-slate-950 flex items-center justify-center relative overflow-hidden cursor-pointer group/pdf"
+                    >
+                      {/* Ambient Glow Orbs matching category theme */}
+                      <div className={`absolute -top-10 -right-10 w-36 h-36 ${theme.bg} opacity-25 rounded-full blur-2xl group-hover/pdf:opacity-45 transition-opacity duration-500`} />
+                      <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-violet-600/20 opacity-20 rounded-full blur-2xl group-hover/pdf:opacity-40 transition-opacity duration-500" />
+                      
+                      {/* Micro Mesh Dot Pattern */}
+                      <div className="absolute inset-0 bg-[radial-gradient(rgba(255,255,255,0.08)_1px,transparent_1px)] [background-size:12px_12px] opacity-40 pointer-events-none" />
+
+                      {/* Floating 3D Document Paper Card */}
+                      <div className="relative w-36 h-32 bg-white dark:bg-[#1e293b] rounded-xl shadow-[0_12px_30px_rgba(0,0,0,0.55)] border border-white/20 dark:border-white/10 p-3 flex flex-col justify-between transition-all duration-500 group-hover/pdf:scale-105 group-hover/pdf:-translate-y-1.5 group-hover/pdf:shadow-[0_20px_40px_rgba(99,102,241,0.3)]">
+                        
+                        {/* Paper Page Corner Fold Accent */}
+                        <div className="absolute top-0 right-0 w-5 h-5 bg-gradient-to-bl from-slate-300 via-slate-200 to-white dark:from-slate-700 dark:via-slate-800 dark:to-slate-900 rounded-bl-md shadow-sm border-l border-b border-black/10" />
+
+                        {/* Top Header Accent Line matching Category */}
+                        <div className="space-y-1.5">
+                          <div className={`h-1.5 w-14 rounded-full ${theme.bg} shadow-sm`} />
+                          <div className="h-1 w-20 bg-slate-200 dark:bg-slate-700 rounded-full" />
+                          <div className="h-1 w-16 bg-slate-200 dark:bg-slate-700/80 rounded-full" />
+                        </div>
+
+                        {/* Center PDF Badge */}
+                        <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-white/5">
+                          <div className="flex items-center gap-1.5">
+                            <div className="p-1.5 rounded-lg bg-gradient-to-br from-rose-500 to-red-600 text-white shadow-md shadow-rose-500/30 ring-1 ring-white/30">
+                              <FileText size={14} className="drop-shadow-sm" />
+                            </div>
+                            <span className="text-[9px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-200">
+                              {mat.type || 'PDF'}
+                            </span>
+                          </div>
+                          <span className="text-[8px] font-mono font-bold text-slate-400 dark:text-slate-500">
+                            {mat.size}
+                          </span>
+                        </div>
+
+                        {/* Bottom Skeleton Lines */}
+                        <div className="space-y-1 pt-1">
+                          <div className="h-1 w-full bg-slate-100 dark:bg-slate-800 rounded-full" />
+                          <div className="h-1 w-3/4 bg-slate-100 dark:bg-slate-800 rounded-full" />
+                        </div>
+                      </div>
+
+                      {/* Hover Action Sheen & Label */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-transparent opacity-0 group-hover/pdf:opacity-100 transition-opacity duration-300 flex items-end justify-center p-2.5">
+                        <span className="text-[9px] font-black uppercase tracking-widest text-white bg-indigo-600/90 backdrop-blur-md px-3 py-1.5 rounded-xl shadow-lg border border-white/20 flex items-center gap-1.5 transform translate-y-2 group-hover/pdf:translate-y-0 transition-transform duration-300">
+                          <Eye size={12} /> Previsualizar PDF
+                        </span>
+                      </div>
                     </div>
                   )}
 
                   {/* Absolute Badges on the preview area */}
                   <div className="absolute top-3.5 left-3.5 flex gap-1.5 z-10 pointer-events-none">
                     {mat.fileUrl2 ? (
-                      <span className="text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded-lg bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 text-white shadow-md backdrop-blur-md">
+                      <span className="text-[8px] font-black uppercase tracking-wider px-2.5 py-1 rounded-xl bg-gradient-to-r from-indigo-500 via-violet-500 to-fuchsia-500 text-white shadow-md backdrop-blur-md">
                         2 ARCHIVOS
                       </span>
                     ) : (
-                      <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-lg ${theme.badge} backdrop-blur-md bg-opacity-80 dark:bg-opacity-25`}>
+                      <span className={`text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-xl ${theme.badge} backdrop-blur-md shadow-sm`}>
                         {mat.type}
                       </span>
                     )}
-                    <span className="text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-lg bg-slate-950/60 text-slate-200 border border-white/10 backdrop-blur-md">
+                    <span className="text-[9px] font-black uppercase tracking-wider px-2.5 py-1 rounded-xl bg-slate-950/75 text-slate-100 border border-white/15 backdrop-blur-md shadow-sm">
                       {mat.category}
                     </span>
                   </div>
@@ -694,7 +757,7 @@ export const MaterialesPage: React.FC = () => {
 
                   {/* Oculto indicator badge */}
                   {!mat.isVisible && isAdmin && (
-                    <div className="absolute bottom-3 left-3.5 bg-amber-500/10 border border-amber-500/25 text-amber-550 dark:text-amber-400 px-2 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-wider backdrop-blur-md">
+                    <div className="absolute bottom-3 left-3.5 bg-amber-500/10 border border-amber-500/25 text-amber-550 dark:text-amber-400 px-2.5 py-0.5 rounded-lg text-[9px] font-black uppercase tracking-wider backdrop-blur-md">
                       Oculto para usuarios
                     </div>
                   )}
@@ -702,38 +765,37 @@ export const MaterialesPage: React.FC = () => {
 
                 {/* Metadata content body */}
                 <div className="p-5 flex-1 flex flex-col justify-between">
-                  <div className="space-y-1">
-                    <h3 className="text-sm font-black text-slate-800 dark:text-slate-100 leading-tight group-hover:text-indigo-650 dark:group-hover:text-indigo-400 transition-colors duration-200">
+                  <div className="space-y-1.5">
+                    <h3 className="text-sm font-black text-slate-900 dark:text-white leading-snug tracking-wide group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors duration-200">
                       {mat.title}
                     </h3>
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed line-clamp-2">
+                    <p className="text-xs text-slate-500 dark:text-slate-400 font-medium leading-relaxed line-clamp-2">
                       {mat.description || 'Sin descripción de recurso.'}
                     </p>
                   </div>
 
-                  <div className="flex flex-col xs:flex-row items-stretch xs:items-center justify-between gap-2.5 mt-4 pt-3.5 sm:pt-4 border-t border-slate-100 dark:border-white/5">
-                    <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider shrink-0">
+                  <div className="flex flex-col xs:flex-row items-stretch xs:items-center justify-between gap-2.5 mt-5 pt-4 border-t border-slate-100 dark:border-white/5">
+                    <span className="text-[10px] font-extrabold text-slate-400 dark:text-slate-500 uppercase tracking-widest bg-slate-100 dark:bg-slate-800/80 px-2.5 py-1 rounded-lg border border-slate-200/60 dark:border-white/5 shrink-0 self-start xs:self-auto">
                       {mat.fileUrl2 ? `${mat.size} • ${mat.size2}` : mat.size}
                     </span>
-                    <div className="flex items-center gap-1.5 sm:gap-2 w-full xs:w-auto justify-end">
+                    <div className="flex items-center gap-2 w-full xs:w-auto justify-end">
                       {/* Vista Previa Button */}
                       <button
+                        type="button"
                         onClick={() => { setPreviewMaterial(mat); setActivePreviewIndex(0); }}
-                        className="flex-1 xs:flex-initial flex items-center justify-center gap-1.5 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-[10px] sm:text-xs font-black uppercase tracking-wider transition-all duration-205 active:scale-95 border border-indigo-200 dark:border-indigo-500/25 bg-indigo-50/50 hover:bg-indigo-100/50 dark:bg-indigo-950/20 dark:hover:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 hover:scale-[1.03] cursor-pointer whitespace-nowrap"
+                        className="flex-1 xs:flex-initial flex items-center justify-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-2xl text-[10px] sm:text-xs font-black uppercase tracking-wider transition-all duration-300 active:scale-95 border border-indigo-200 dark:border-indigo-500/30 bg-indigo-50/70 hover:bg-indigo-600 hover:text-white dark:bg-indigo-950/40 dark:hover:bg-indigo-600 text-indigo-600 dark:text-indigo-400 hover:shadow-lg hover:shadow-indigo-500/25 hover:border-transparent cursor-pointer whitespace-nowrap"
                       >
-                        <Eye size={12} className="shrink-0" />
+                        <Eye size={13} className="shrink-0" />
                         Visualizar
                       </button>
-                      <a
-                        href={getFileAbsoluteUrl(mat.fileUrl)}
-                        className={`flex-1 xs:flex-initial flex items-center justify-center gap-1.5 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-[10px] sm:text-xs font-black uppercase tracking-wider transition-all duration-200 active:scale-95 border ${theme.btnBg} hover:scale-[1.03] shadow-sm cursor-pointer whitespace-nowrap`}
-                        target="_blank"
-                        rel="noreferrer"
-                        download
+                      <button
+                        type="button"
+                        onClick={() => downloadFile(mat.fileUrl, mat.title, mat.type)}
+                        className={`flex-1 xs:flex-initial flex items-center justify-center gap-1.5 px-3.5 sm:px-4 py-2 rounded-2xl text-[10px] sm:text-xs font-black uppercase tracking-wider transition-all duration-300 active:scale-95 border ${theme.btnBg} hover:scale-[1.02] shadow-md cursor-pointer whitespace-nowrap`}
                       >
-                        <Download size={12} className="shrink-0" />
+                        <Download size={13} className="shrink-0" />
                         Descargar
-                      </a>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -1409,14 +1471,14 @@ export const MaterialesPage: React.FC = () => {
 
       {/* FULLSCREEN PREVIEW LIGHTBOX */}
       {previewMaterial && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 animate-fadeIn">
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-3 pt-16 pb-6 sm:px-4 sm:pt-20 sm:pb-8 animate-fadeIn">
           <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md" onClick={() => setPreviewMaterial(null)} />
           
           <div 
             className="p-[3px] sm:p-[4px] rounded-[2rem] sm:rounded-[2.5rem] bg-gradient-to-r from-[#ff3366] via-[#ff00ff] via-[#6600ff] via-[#00ffff] via-[#33ff66] via-[#ffcc00] to-[#ff3366] max-w-4xl w-full relative z-10 shadow-[0_32px_64px_-12px_rgba(0,0,0,0.4)]"
             style={{ backgroundSize: '300% 300%', animation: 'borderRotate 5s linear infinite' }}
           >
-            <div className="bg-gradient-to-b from-white to-slate-50 dark:from-[#0f172a] dark:to-[#0b0f19] backdrop-blur-2xl rounded-[1.95rem] sm:rounded-[2.45rem] overflow-hidden flex flex-col max-h-[90vh] border border-slate-200 dark:border-white/5">
+            <div className="bg-gradient-to-b from-white to-slate-50 dark:from-[#0f172a] dark:to-[#0b0f19] backdrop-blur-2xl rounded-[1.95rem] sm:rounded-[2.45rem] overflow-hidden flex flex-col border border-slate-200 dark:border-white/5" style={{ maxHeight: '82vh', height: '82vh' }}>
               
               {/* Header */}
               <div className="border-b border-slate-100 dark:border-white/5 p-4 sm:p-5 bg-slate-50 dark:bg-slate-950/40 space-y-3">
@@ -1476,39 +1538,61 @@ export const MaterialesPage: React.FC = () => {
                         Archivo #2 ({previewMaterial.type2})
                       </button>
                     </div>
-                  ) : (
-                    <div />
-                  )}
+                  ) : null}
 
-                  {/* Download Button */}
-                  <a
-                    href={getFileAbsoluteUrl(activePreviewIndex === 0 ? previewMaterial.fileUrl : previewMaterial.fileUrl2)}
-                    download
-                    className="flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl sm:rounded-2xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-black uppercase tracking-wider transition active:scale-95 cursor-pointer shadow-md shadow-indigo-600/20 border-none whitespace-nowrap w-full sm:w-auto text-center"
-                  >
-                    <Download size={14} className="shrink-0" />
-                    Descargar {previewMaterial.fileUrl2 ? (activePreviewIndex === 1 ? '#2' : '#1') : ''}
-                  </a>
+                  {/* Action Buttons: Open in New Tab + Download */}
+                  <div className="flex items-center gap-2 w-full sm:w-auto">
+                    <button
+                      type="button"
+                      onClick={() => openPdfInNewTab(activePreviewIndex === 0 ? previewMaterial.fileUrl : previewMaterial.fileUrl2)}
+                      className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-slate-200/80 hover:bg-slate-300 dark:bg-slate-800/80 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-black uppercase tracking-wider transition active:scale-95 cursor-pointer border border-slate-300/40 dark:border-white/10 whitespace-nowrap text-center shadow-sm"
+                    >
+                      <ExternalLink size={14} className="shrink-0 text-indigo-500" />
+                      {(activePreviewIndex === 0 ? previewMaterial.type : previewMaterial.type2) === 'PDF' ? 'Abrir PDF' : 'Abrir Archivo'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const currentUrl = activePreviewIndex === 0 ? previewMaterial.fileUrl : previewMaterial.fileUrl2;
+                        const currentType = activePreviewIndex === 0 ? previewMaterial.type : previewMaterial.type2;
+                        downloadFile(currentUrl, previewMaterial.title, currentType);
+                      }}
+                      className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white text-xs font-black uppercase tracking-wider transition active:scale-95 cursor-pointer shadow-md shadow-indigo-600/25 border-none whitespace-nowrap text-center"
+                    >
+                      <Download size={14} className="shrink-0" />
+                      Descargar {previewMaterial.fileUrl2 ? (activePreviewIndex === 1 ? '#2' : '#1') : ''}
+                    </button>
+                  </div>
                 </div>
               </div>
               
               {/* Viewer Area */}
-              <div className="p-3 sm:p-5 flex-1 overflow-y-auto flex items-center justify-center bg-slate-100 dark:bg-slate-900/50">
-                {((activePreviewIndex === 0 ? previewMaterial.type : previewMaterial.type2) === 'IMAGE') ? (
-                  <div className="relative max-h-[60vh] sm:max-h-[65vh] rounded-lg overflow-hidden border border-slate-200 dark:border-white/5 shadow-2xl bg-white dark:bg-slate-950">
-                    <img 
-                      src={getFileAbsoluteUrl(activePreviewIndex === 0 ? previewMaterial.fileUrl : previewMaterial.fileUrl2)} 
-                      alt={previewMaterial.title} 
-                      className="max-w-full max-h-[60vh] sm:max-h-[65vh] object-contain"
-                    />
-                  </div>
-                ) : (
-                  <iframe
-                    src={getFileAbsoluteUrl(activePreviewIndex === 0 ? previewMaterial.fileUrl : previewMaterial.fileUrl2)}
-                    title={previewMaterial.title}
-                    className="w-full h-[50vh] sm:h-[65vh] rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-slate-955 shadow-2xl"
-                  />
-                )}
+              <div className="flex-1 overflow-hidden flex flex-col min-h-0 bg-slate-100 dark:bg-slate-900/50">
+                {(() => {
+                  const currentPath = activePreviewIndex === 0 ? previewMaterial.fileUrl : previewMaterial.fileUrl2;
+                  const currentType = activePreviewIndex === 0 ? previewMaterial.type : previewMaterial.type2;
+                  const rawUrl = getFileAbsoluteUrl(currentPath);
+
+                  if (currentType === 'IMAGE') {
+                    return (
+                      <div className="flex-1 overflow-auto flex items-center justify-center p-4">
+                        <div className="relative rounded-lg overflow-hidden border border-slate-200 dark:border-white/5 shadow-2xl bg-white dark:bg-slate-950">
+                          <img 
+                            src={rawUrl} 
+                            alt={previewMaterial.title} 
+                            className="max-w-full max-h-[75vh] object-contain"
+                          />
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+                      <PdfViewer url={rawUrl} title={previewMaterial.title} />
+                    </div>
+                  );
+                })()}
               </div>
             </div>
           </div>
