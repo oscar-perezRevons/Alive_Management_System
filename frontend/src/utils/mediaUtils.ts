@@ -1,10 +1,33 @@
 export const getFullMediaUrl = (url?: string | null): string => {
   if (!url) return '';
-  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('blob:')) {
-    return url;
+  const trimmed = url.trim();
+
+  // Extract full Cloudinary or HTTP(S) URL if prepended by backend base domain
+  if (trimmed.includes('cloudinary.com') || (trimmed.includes('http') && (trimmed.match(/https?:\/\//gi) || []).length > 1)) {
+    const match = trimmed.match(/(https?:\/\/[^\s"']+cloudinary\.com[^\s"']*)/i) || trimmed.match(/(https?:\/\/[^\s"']+)/i);
+    if (match) {
+      return match[1];
+    }
   }
+
+  // Direct HTTP, HTTPS, Blob, or Data URLs
+  if (
+    trimmed.startsWith('http://') || 
+    trimmed.startsWith('https://') || 
+    trimmed.startsWith('blob:') || 
+    trimmed.startsWith('data:')
+  ) {
+    return trimmed;
+  }
+
+  // Protocol-relative URLs
+  if (trimmed.startsWith('//')) {
+    return `https:${trimmed}`;
+  }
+
   const backendBase = (process.env.REACT_APP_API_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '');
-  return `${backendBase}${url.startsWith('/') ? '' : '/'}${url}`;
+  const cleanPath = trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
+  return `${backendBase}${cleanPath}`;
 };
 
 /**

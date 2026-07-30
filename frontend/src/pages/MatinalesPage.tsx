@@ -15,8 +15,6 @@ import adultosImg from '../assets/matinal_adultos.jpg';
 
 import { getFullMediaUrl } from '../utils/mediaUtils';
 
-const backendBase = (process.env.REACT_APP_API_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '');
-
 export const MatinalesPage: React.FC = () => {
   const { user } = useAuthStore();
   const currentUserRole = user?.role || 'USER';
