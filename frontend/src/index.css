@@ -15,6 +15,10 @@ body {
   background-color: #f8fafc; 
 }
 
+.font-display {
+  font-family: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+}
+
 .dark body {
   background-color: #020617;
 }

@@ -19,6 +19,7 @@ import { MaterialesPage } from './pages/MaterialesPage';
 import { MatinalesPage } from './pages/MatinalesPage'; 
 import { RankingPage } from './pages/RankingPage'; 
 import { ProfilePage } from './pages/ProfilePage';
+import { LandingPage } from './pages/LandingPage';
 
 function App() {
   const { loadFromStorage } = useAuthStore();
@@ -172,8 +173,8 @@ function App() {
           }
         />
         
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/" element={<LandingPage />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );
