@@ -6,7 +6,6 @@ import { resolveAccessRole } from '../utils/access';
 import { 
   LogIn, 
   UserPlus, 
-  Shield, 
   Users, 
   CalendarDays, 
   Trophy, 
@@ -15,25 +14,16 @@ import {
   ChevronRight, 
   Sparkles, 
   Award, 
-  FileText, 
   Moon, 
   Sun, 
   ArrowRight,
-  Zap,
   Layers,
   LayoutDashboard,
   Menu,
-  X,
-  Pause,
-  Play,
-  CheckCircle2,
-  Home,
-  User,
-  Compass
+  X
 } from 'lucide-react';
 
 import logoImage from '../assets/logo.png';
-import bgImage from '../assets/background.png';
 import bg2Image from '../assets/background2.jpg';
 import bannerDefault from '../assets/banner-default.png';
 import campamentoImg from '../assets/campamento.jpg';
@@ -760,7 +750,11 @@ export const LandingPage: React.FC = () => {
       </header>
 
       {/* ════════════════ HERO SECTION (LAMBORGHINI LUXURY TABBED SHOWCASE 3-SECOND KINETIC ROTATION) ════════════════ */}
-      <section className="relative pt-8 pb-20 lg:pt-14 lg:pb-28 px-4 sm:px-6 md:px-10 lg:px-12 w-full">
+      <section 
+        onMouseEnter={() => setIsPaused(true)}
+        onMouseLeave={() => setIsPaused(false)}
+        className="relative pt-8 pb-20 lg:pt-14 lg:pb-28 px-4 sm:px-6 md:px-10 lg:px-12 w-full"
+      >
         
         {/* Top Interactive Selector Tabs (Luxury Telemetry Capsule - Anti-Overflow) */}
         <div className="w-full flex items-center justify-center mb-10 px-2">
