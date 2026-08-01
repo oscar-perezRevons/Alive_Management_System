@@ -165,7 +165,7 @@ export const LoginPage: React.FC = () => {
                       setEmail((prev) => prev + '@gmail.com');
                     }
                   }}
-                  className="w-full bg-[#0c0e18]/80 hover:bg-[#111424]/90 border border-white/15 pl-12 pr-28 py-3.5 sm:py-4 rounded-xl font-medium text-sm text-white focus:outline-none focus:border-amber-400 focus:bg-[#0c0e18] focus:ring-4 focus:ring-amber-400/15 transition-all duration-300 placeholder:text-slate-500" 
+                  className={`w-full bg-[#0c0e18]/80 hover:bg-[#111424]/90 border border-white/15 pl-12 ${showEmailSuggestion ? "pr-24 sm:pr-28" : "pr-4"} py-3.5 sm:py-4 rounded-xl font-medium text-sm text-white focus:outline-none focus:border-amber-400 focus:bg-[#0c0e18] focus:ring-4 focus:ring-amber-400/15 transition-all duration-300 placeholder:text-slate-500`} 
                 />
                 {showEmailSuggestion && (
                   <button

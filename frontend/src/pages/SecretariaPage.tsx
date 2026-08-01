@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { secretariaService } from '../services/api';
 import { 
   Users, UserPlus, Calendar, Crown, Star, FileText, UserCheck,
@@ -49,17 +50,22 @@ export const SecretariaPage: React.FC = () => {
       const groupsData = res.data || [];
       setGroups(groupsData);
       
-      const nextGroupId = targetGroupId || (groupsData.length > 0 ? groupsData[0].id : null);
+      const nextGroupId = targetGroupId !== null ? targetGroupId : (groupsData.length > 0 ? groupsData[0].id : null);
       if (nextGroupId !== null) {
         setActiveGroupId(nextGroupId);
         const panelRes = await secretariaService.getGroupPanel(nextGroupId);
         setMembers(panelRes.data.members || []);
         setIdentity(panelRes.data.identity || null);
+      } else {
+        setActiveGroupId(null);
+        setMembers([]);
+        setIdentity(null);
       }
     } catch (err) {
       showAlert('error', 'Fallo de Sincronización', 'Error al sincronizar el ecosistema de Grupos Pequeños.');
     } finally {
       setLoading(false);
+      setRefreshing(false);
     }
   }, []);
 
@@ -122,9 +128,11 @@ export const SecretariaPage: React.FC = () => {
       });
       setIsLinkModalOpen(false);
       showAlert('success', '¡ACTUALIZACIÓN EXITOSA!', 'El nuevo integrante ha sido indexado correctamente.');
-      loadPanelDetails(activeGroupId);
+      await loadPanelDetails(activeGroupId);
     } catch (err) {
       showAlert('error', 'Error Operativo', 'Fallo al enlazar el usuario al Grupo Pequeño.');
+    } finally {
+      setRefreshing(false);
     }
   };
 
@@ -142,9 +150,11 @@ export const SecretariaPage: React.FC = () => {
       await secretariaService.createAndLinkMember(activeGroupId, newMemberForm);
       setIsCreateMemberModalOpen(false);
       showAlert('success', '¡REGISTRO EXITOSO!', 'Se ha registrado al usuario y asignado su cargo en el grupo.');
-      loadPanelDetails(activeGroupId);
+      await loadPanelDetails(activeGroupId);
     } catch (err: any) {
       showAlert('error', 'Error de Registro', err.response?.data?.error || 'Fallo al procesar el alta transaccional.');
+    } finally {
+      setRefreshing(false);
     }
   };
 
@@ -165,9 +175,11 @@ export const SecretariaPage: React.FC = () => {
       });
       setIsEditMemberModalOpen(false);
       showAlert('success', 'MODIFICACIÓN COMPLETADA', 'La responsabilidad del miembro ha sido actualizada con éxito.');
-      loadPanelDetails(activeGroupId);
+      await loadPanelDetails(activeGroupId);
     } catch (err) {
       showAlert('error', 'Error de Edición', 'No se pudo actualizar el cargo del integrante.');
+    } finally {
+      setRefreshing(false);
     }
   };
 
@@ -182,9 +194,11 @@ export const SecretariaPage: React.FC = () => {
       await secretariaService.deleteMemberFromGroup(activeGroupId, deleteConfirm.memberId);
       setDeleteConfirm({ isOpen: false, memberId: null, memberName: '' });
       showAlert('success', 'Baja Registrada', 'El feligrés ha sido removido de las actas del grupo.');
-      loadPanelDetails(activeGroupId);
+      await loadPanelDetails(activeGroupId);
     } catch (err) {
       showAlert('error', 'Error', 'No se pudo completar la remoción.');
+    } finally {
+      setRefreshing(false);
     }
   };
 
@@ -210,16 +224,18 @@ export const SecretariaPage: React.FC = () => {
         const res = await secretariaService.createGroup(formData);
         setIsModalOpen(false);
         showAlert('success', '¡Registro Exitoso!', `El grupo "${formData.name.toUpperCase()}" ha sido incorporado.`);
-        loadGroupsList(res.data.id);
+        await loadGroupsList(res.data.id);
       } else {
         await secretariaService.updateGroup(activeGroupId!, formData);
         setIsModalOpen(false);
         showAlert('success', '¡Actualización Exitosa!', 'Los datos del grupo han sido modificados.');
-        loadPanelDetails(activeGroupId!);
-        loadGroupsList(activeGroupId!);
+        await loadPanelDetails(activeGroupId!);
+        await loadGroupsList(activeGroupId!);
       }
     } catch (err: any) {
       showAlert('error', 'Error Operativo', 'No se pudo procesar la solicitud.');
+    } finally {
+      setRefreshing(false);
     }
   };
 
@@ -369,7 +385,7 @@ export const SecretariaPage: React.FC = () => {
   }
 
   return (
-    <div className="space-y-4 sm:space-y-6 font-sans text-slate-800 dark:text-slate-100 animate-fadeIn bg-[#f0f2fc] dark:bg-slate-950 w-full px-2 sm:px-6 select-none pb-12 transition-colors duration-300">
+    <div className="space-y-4 sm:space-y-6 font-sans text-slate-800 dark:text-slate-100 animate-fadeIn w-full px-2 sm:px-6 select-none pb-12 transition-colors duration-300">
       <style>{`
         @keyframes gradient-flow {
           0% { background-position: 0% 50%; }
@@ -398,38 +414,6 @@ export const SecretariaPage: React.FC = () => {
         @keyframes spin-border {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
-        }
-        .animated-gradient-border {
-          position: relative;
-          padding: 2px;
-          background: transparent;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-        }
-        .animated-gradient-border::before {
-          content: '';
-          position: absolute;
-          width: 160%;
-          height: 160%;
-          background: conic-gradient(
-            from 0deg,
-            #8b5cf6,
-            #d946ef,
-            #ec4899,
-            #3b82f6,
-            #10b981,
-            #f59e0b,
-            #8b5cf6
-          );
-          animation: spin-border 6s linear infinite;
-          z-index: 0;
-        }
-        .animated-gradient-border-content {
-          position: relative;
-          z-index: 1;
-          width: 100%;
-          height: 100%;
         }
         .date-premium {
           color-scheme: light dark;
@@ -522,6 +506,31 @@ export const SecretariaPage: React.FC = () => {
       ) : identity ? (
         <div className="space-y-6 animate-fadeIn">
           
+          {/* BANNER INFORMATIVO: GRUPO SIN INTEGRANTES */}
+          {members.length === 0 && (
+            <div className="bg-gradient-to-r from-amber-500/15 via-orange-500/10 to-amber-500/15 border-2 border-amber-400/50 dark:border-amber-400/40 rounded-2xl sm:rounded-3xl p-4 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 animate-fadeIn shadow-md">
+              <div className="flex items-center gap-3.5">
+                <div className="p-3 bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 text-black font-black rounded-2xl shadow-md shadow-amber-500/30 shrink-0">
+                  <UserPlus size={22} className="stroke-[2.5]" />
+                </div>
+                <div>
+                  <h3 className="text-xs sm:text-sm font-black text-amber-900 dark:text-amber-200 uppercase tracking-wide font-display">
+                    ¡RECORDATORIO: ESTE GRUPO AÚN NO TIENE INTEGRANTES!
+                  </h3>
+                  <p className="text-[11px] sm:text-xs font-bold text-amber-800/90 dark:text-amber-300/90 mt-0.5 leading-relaxed">
+                    Para habilitar el seguimiento de asistencia, asignación de directiva y puntuaciones en el ecosistema, recuerda incorporar feligreses a este Grupo Pequeño.
+                  </p>
+                </div>
+              </div>
+              <button 
+                onClick={openLinkModal}
+                className="w-full sm:w-auto px-5 py-2.5 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-black font-black text-xs uppercase tracking-wider rounded-xl transition-all duration-300 hover:scale-[1.03] active:scale-95 cursor-pointer shadow-md shadow-amber-500/20 shrink-0 flex items-center justify-center gap-2"
+              >
+                <UserPlus size={14} /> Registrar Miembros Ahora
+              </button>
+            </div>
+          )}
+
           {/* TARJETAS DE MÉTRICAS (Estilo Puntuaciones) */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
             {/* Card 1: Integrantes */}
@@ -607,56 +616,82 @@ export const SecretariaPage: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-900 font-bold">
-                  {members.map((m, i) => (
-                    <tr key={m.id} className="hover:bg-indigo-50/20 dark:hover:bg-slate-800/40 transform hover:scale-[1.002] transition-all duration-150 group border-b border-slate-100 dark:border-slate-800/60 last:border-b-0">
-                      <td className={`p-4 text-center text-slate-400 dark:text-slate-400 font-mono font-black text-sm border-l-4 border-l-transparent transition-all ${getRoleHoverStyles(m.roleInGP)}`}>
-                        {i + 1}
-                      </td>
-                      <td className="p-4 font-black text-slate-900 dark:text-white text-base">
-                        <div className="flex items-center gap-3">
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center font-black text-xs uppercase shrink-0 border-2 transition-all duration-300 group-hover:scale-110 shadow-xs bg-gradient-to-tr ${getAvatarGradient(m.roleInGP)}`}>
-                            {m.name.charAt(0)}
+                  {members.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="p-10 text-center bg-slate-50/40 dark:bg-slate-900/40">
+                        <div className="max-w-md mx-auto space-y-3 py-2">
+                          <div className="w-14 h-14 mx-auto bg-amber-400/15 text-amber-500 rounded-2xl flex items-center justify-center border border-amber-400/30 shadow-xs">
+                            <Users size={28} className="stroke-[2.5]" />
                           </div>
-                          <span className="capitalize tracking-tight text-sm font-black">{m.name}</span>
-                        </div>
-                      </td>
-                      <td className="p-4 text-slate-600 dark:text-slate-300 font-bold">
-                        <span className="inline-flex items-center gap-2 bg-indigo-50 dark:bg-indigo-950/60 px-3 py-1 rounded-full border border-indigo-100/50 dark:border-indigo-800/60 text-xs font-semibold text-slate-700 dark:text-slate-200">
-                          <Calendar size={12} className="text-indigo-500 dark:text-indigo-400 shrink-0" />
-                          {m.birthDate || 'No registrada'}
-                        </span>
-                      </td>
-                      <td className="p-4 text-center">
-                        <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full font-black text-[10px] tracking-wider uppercase border shadow-sm hover:scale-[1.03] transition-transform duration-200 ${
-                          m.hasLifeInsurance 
-                            ? 'bg-gradient-to-r from-sky-500 to-indigo-600 dark:from-sky-600 dark:to-indigo-700 text-white border-transparent' 
-                            : 'bg-gradient-to-r from-rose-500 to-red-600 dark:from-rose-600 dark:to-red-700 text-white border-transparent'
-                        }`}>
-                          <span className="w-2 h-2 rounded-full shrink-0 bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)] animate-pulse" />
-                          {m.hasLifeInsurance ? 'VIGENTE' : 'FALTA'}
-                        </span>
-                      </td>
-                      <td className="p-4 text-center">
-                        <div className="flex justify-center">{drawRoleBadge(m.roleInGP)}</div>
-                      </td>
-                      <td className="p-4 text-center">
-                        <div className="flex justify-center gap-2.5">
+                          <div>
+                            <h4 className="text-xs font-black text-slate-800 dark:text-white uppercase tracking-wider font-display">Aún no hay integrantes en este GP</h4>
+                            <p className="text-[11px] text-slate-400 dark:text-slate-400 font-bold mt-1">
+                              Presiona el botón <span className="text-amber-600 dark:text-amber-400 font-black font-mono">"Agregar Integrante"</span> para vincular o registrar feligreses a este grupo.
+                            </p>
+                          </div>
                           <button 
-                            onClick={() => openEditMemberModal(m)} 
-                            className="p-2.5 text-indigo-600 dark:text-indigo-400 bg-indigo-50/50 dark:bg-indigo-950/60 hover:bg-indigo-600 dark:hover:bg-indigo-600 hover:text-white dark:hover:text-white border border-indigo-100/50 dark:border-indigo-800/60 rounded-xl transition-all duration-300 hover:scale-110 active:scale-90 shadow-3xs cursor-pointer"
+                            onClick={openLinkModal}
+                            className="inline-flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-black font-black text-[10px] uppercase tracking-wider rounded-xl transition-all duration-200 cursor-pointer shadow-sm shadow-amber-500/20"
                           >
-                            <Pencil size={13} />
-                          </button>
-                          <button 
-                            onClick={() => initiateRemoveMember(m.id, m.name)} 
-                            className="p-2.5 text-rose-600 dark:text-rose-400 bg-rose-50/50 dark:bg-rose-950/60 hover:bg-rose-600 dark:hover:bg-rose-600 hover:text-white dark:hover:text-white border border-rose-100/50 dark:border-rose-800/60 rounded-xl transition-all duration-300 hover:scale-110 active:scale-90 shadow-3xs cursor-pointer"
-                          >
-                            <Trash2 size={13} />
+                            <UserPlus size={13} /> Vincular Primer Miembro
                           </button>
                         </div>
                       </td>
                     </tr>
-                  ))}
+                  ) : (
+                    <React.Fragment>
+                      {members.map((m, i) => (
+                        <tr key={m.id} className="hover:bg-indigo-50/20 dark:hover:bg-slate-800/40 transform hover:scale-[1.002] transition-all duration-150 group border-b border-slate-100 dark:border-slate-800/60 last:border-b-0">
+                          <td className={`p-4 text-center text-slate-400 dark:text-slate-400 font-mono font-black text-sm border-l-4 border-l-transparent transition-all ${getRoleHoverStyles(m.roleInGP)}`}>
+                            {i + 1}
+                          </td>
+                          <td className="p-4 font-black text-slate-900 dark:text-white text-base">
+                            <div className="flex items-center gap-3">
+                              <div className={`w-8 h-8 rounded-full flex items-center justify-center font-black text-xs uppercase shrink-0 border-2 transition-all duration-300 group-hover:scale-110 shadow-xs bg-gradient-to-tr ${getAvatarGradient(m.roleInGP)}`}>
+                                {m.name.charAt(0)}
+                              </div>
+                              <span className="capitalize tracking-tight text-sm font-black">{m.name}</span>
+                            </div>
+                          </td>
+                          <td className="p-4 text-slate-600 dark:text-slate-300 font-bold">
+                            <span className="inline-flex items-center gap-2 bg-indigo-50 dark:bg-indigo-950/60 px-3 py-1 rounded-full border border-indigo-100/50 dark:border-indigo-800/60 text-xs font-semibold text-slate-700 dark:text-slate-200">
+                              <Calendar size={12} className="text-indigo-500 dark:text-indigo-400 shrink-0" />
+                              {m.birthDate || 'No registrada'}
+                            </span>
+                          </td>
+                          <td className="p-4 text-center">
+                            <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full font-black text-[10px] tracking-wider uppercase border shadow-sm hover:scale-[1.03] transition-transform duration-200 ${
+                              m.hasLifeInsurance 
+                                ? 'bg-gradient-to-r from-sky-500 to-indigo-600 dark:from-sky-600 dark:to-indigo-700 text-white border-transparent' 
+                                : 'bg-gradient-to-r from-rose-500 to-red-600 dark:from-rose-600 dark:to-red-700 text-white border-transparent'
+                            }`}>
+                              <span className="w-2 h-2 rounded-full shrink-0 bg-white shadow-[0_0_8px_rgba(255,255,255,0.8)] animate-pulse" />
+                              {m.hasLifeInsurance ? 'VIGENTE' : 'FALTA'}
+                            </span>
+                          </td>
+                          <td className="p-4 text-center">
+                            <div className="flex justify-center">{drawRoleBadge(m.roleInGP)}</div>
+                          </td>
+                          <td className="p-4 text-center">
+                            <div className="flex justify-center gap-2.5">
+                              <button 
+                                onClick={() => openEditMemberModal(m)} 
+                                className="p-2.5 text-indigo-600 dark:text-indigo-400 bg-indigo-50/50 dark:bg-indigo-950/60 hover:bg-indigo-600 dark:hover:bg-indigo-600 hover:text-white dark:hover:text-white border border-indigo-100/50 dark:border-indigo-800/60 rounded-xl transition-all duration-300 hover:scale-110 active:scale-90 shadow-3xs cursor-pointer"
+                              >
+                                <Pencil size={13} />
+                              </button>
+                              <button 
+                                onClick={() => initiateRemoveMember(m.id, m.name)} 
+                                className="p-2.5 text-rose-600 dark:text-rose-400 bg-rose-50/50 dark:bg-rose-950/60 hover:bg-rose-600 dark:hover:bg-rose-600 hover:text-white dark:hover:text-white border border-rose-100/50 dark:border-rose-800/60 rounded-xl transition-all duration-300 hover:scale-110 active:scale-90 shadow-3xs cursor-pointer"
+                              >
+                                <Trash2 size={13} />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </React.Fragment>
+                  )}
                 </tbody>
               </table>
             </div>
@@ -785,249 +820,370 @@ export const SecretariaPage: React.FC = () => {
           </div>
         </div>
       ) : (
-        <div className="p-16 text-center text-sm font-black text-slate-400 dark:text-slate-400 bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800 rounded-3xl uppercase tracking-wider italic shadow-md">Crea tu primer grupo pequeño desde el botón superior de configuración.</div>
+        <div className="p-16 text-center text-sm font-black text-slate-400 dark:text-slate-400 bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800 rounded-3xl uppercase tracking-wider italic shadow-md">
+          Crea tu primer grupo pequeño desde el botón superior de configuración.
+        </div>
       )}
-
-      {/* CONFIRM DELETE MODAL */}
-      {deleteConfirm.isOpen && (
-        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm flex items-start justify-center z-50 p-4 pt-10 sm:pt-16 md:pt-20 lg:pt-28 overflow-y-auto animate-fadeIn">
-          <div className="w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animated-gradient-border animate-scaleUp">
-            <div className="animated-gradient-border-content rounded-[22px] overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-center">
-              {/* Barra de gradiente superior */}
-              <div className="h-1.5 bg-gradient-to-r from-rose-500 to-pink-600" />
-              
-              {/* Header del Modal */}
-              <div className="p-5 pb-2 flex justify-between items-center border-b border-rose-100/40 dark:border-slate-800 text-left">
-                <div className="flex items-center gap-2.5">
-                  <div className="p-2 bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 rounded-xl border border-rose-100 dark:border-rose-900/40 shadow-3xs">
-                    <Trash2 size={16} className="stroke-[2.5]" />
-                  </div>
-                  <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider">¿Confirmar desvinculación?</h3>
+      {deleteConfirm.isOpen && createPortal(
+        <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-md flex items-center justify-center z-[9999] p-4 animate-fadeIn select-none">
+          <div className="w-full max-w-md bg-white dark:bg-[#0d0e15] border-2 border-rose-500/40 dark:border-rose-500/30 rounded-3xl shadow-2xl overflow-hidden animate-scaleUp my-auto text-center">
+            {/* Barra de gradiente superior */}
+            <div className="h-1.5 bg-gradient-to-r from-rose-500 to-pink-600" />
+            
+            {/* Header del Modal */}
+            <div className="p-5 pb-2 flex justify-between items-center border-b border-rose-100/40 dark:border-white/10 text-left">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 rounded-xl border border-rose-100 dark:border-rose-900/40 shadow-3xs">
+                  <Trash2 size={16} className="stroke-[2.5]" />
                 </div>
-                <button type="button" onClick={() => setDeleteConfirm({ isOpen: false, memberId: null, memberName: '' })} className="text-rose-500 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/40 p-1.5 rounded-xl transition-all duration-200 hover:rotate-90 cursor-pointer"><X size={16} /></button>
+                <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-wider font-display">¿Confirmar desvinculación?</h3>
               </div>
-              <div className="p-6 space-y-4">
-                <p className="text-xs text-slate-500 dark:text-slate-300 font-bold leading-relaxed px-1">
-                  ¿Estás seguro que deseas remover a <span className="text-slate-900 dark:text-white font-black font-mono">"{deleteConfirm.memberName}"</span> de las actas de este GP?
-                </p>
-                <div className="flex gap-2.5 pt-1">
-                  <button 
-                    type="button" 
-                    disabled={refreshing} 
-                    onClick={() => setDeleteConfirm({ isOpen: false, memberId: null, memberName: '' })} 
-                    className="flex-1 py-3 bg-rose-50/50 dark:bg-rose-950/40 border-2 border-rose-100 dark:border-rose-800 hover:border-rose-200 dark:hover:border-rose-700 text-rose-600 dark:text-rose-300 rounded-2xl font-black uppercase text-[10px] cursor-pointer transition-all active:scale-95"
-                  >
-                    Cancelar
-                  </button>
-                  <button 
-                    type="button" 
-                    disabled={refreshing} 
-                    onClick={executeRemoveMember} 
-                    className="flex-1 py-3 bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white font-black uppercase tracking-wider text-[10px] rounded-2xl cursor-pointer transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-1.5 shadow-md shadow-rose-500/20"
-                  >
-                    {refreshing ? <RefreshCw size={11} className="animate-spin" /> : 'Confirmar'}
-                  </button>
-                </div>
+              <button type="button" onClick={() => setDeleteConfirm({ isOpen: false, memberId: null, memberName: '' })} className="text-slate-400 hover:text-rose-500 p-1.5 rounded-xl transition-all duration-200 hover:rotate-90 cursor-pointer"><X size={16} /></button>
+            </div>
+            <div className="p-6 space-y-4">
+              <p className="text-xs text-slate-600 dark:text-slate-300 font-bold leading-relaxed px-1">
+                ¿Estás seguro que deseas remover a <span className="text-slate-900 dark:text-white font-black font-mono">"{deleteConfirm.memberName}"</span> de las actas de este GP?
+              </p>
+              <div className="flex gap-2.5 pt-1">
+                <button 
+                  type="button" 
+                  disabled={refreshing} 
+                  onClick={() => setDeleteConfirm({ isOpen: false, memberId: null, memberName: '' })} 
+                  className="flex-1 py-3 bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/15 text-slate-700 dark:text-slate-300 rounded-2xl font-black uppercase text-[10px] cursor-pointer transition-all active:scale-95"
+                >
+                  Cancelar
+                </button>
+                <button 
+                  type="button" 
+                  disabled={refreshing} 
+                  onClick={executeRemoveMember} 
+                  className="flex-1 py-3 bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white font-black uppercase tracking-wider text-[10px] rounded-2xl cursor-pointer transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-1.5 shadow-md shadow-rose-500/20"
+                >
+                  {refreshing ? <RefreshCw size={11} className="animate-spin" /> : 'Confirmar'}
+                </button>
               </div>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
-      {isEditMemberModalOpen && editingMember && (
-        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center z-50 p-3 sm:p-4 overflow-y-auto animate-fadeIn">
-          <div className="w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden animated-gradient-border animate-scaleUp my-auto">
-            <div className="animated-gradient-border-content rounded-[22px] overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-              {/* Barra de gradiente superior */}
-              <div className="h-1.5 bg-gradient-to-r from-violet-500 via-indigo-500 via-violet-500 via-fuchsia-500 to-orange-400" />
-              
-              {/* Header del Modal */}
-              <div className="p-4 sm:p-6 pb-2 flex justify-between items-center border-b border-slate-100 dark:border-slate-800">
-                <div className="flex items-center gap-2.5">
-                  <div className="p-2 bg-gradient-to-br from-violet-500 to-fuchsia-600 text-white rounded-xl shadow-md shadow-violet-500/20 shrink-0">
-                    <Sliders size={16} className="stroke-[2.5]" />
-                  </div>
-                  <h3 className="text-xs sm:text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest">Editar Cargo</h3>
+      {/* EDIT MEMBER ROLE MODAL */}
+      {isEditMemberModalOpen && editingMember && createPortal(
+        <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-md flex items-center justify-center z-[9999] p-3 sm:p-4 overflow-y-auto animate-fadeIn select-none">
+          <div className="w-full max-w-xl bg-white dark:bg-[#0d0e15] border-2 border-amber-400/40 dark:border-amber-400/30 rounded-3xl shadow-2xl overflow-hidden animate-scaleUp my-auto">
+            {/* Barra de gradiente superior */}
+            <div className="h-1.5 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500" />
+            
+            {/* Header del Modal */}
+            <div className="p-4 sm:p-6 pb-2 flex justify-between items-center border-b border-slate-100 dark:border-white/10">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 text-black rounded-xl shadow-md shadow-amber-500/20 shrink-0">
+                  <Sliders size={16} className="stroke-[2.5]" />
                 </div>
-                <button type="button" onClick={() => setIsEditMemberModalOpen(false)} className="text-violet-500 hover:text-violet-700 hover:bg-violet-50 dark:hover:bg-violet-950/40 p-1.5 rounded-xl transition-all duration-200 hover:rotate-90 cursor-pointer"><X size={16} /></button>
+                <h3 className="text-xs sm:text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest font-display">Editar Cargo</h3>
+              </div>
+              <button type="button" onClick={() => setIsEditMemberModalOpen(false)} className="text-slate-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-white/10 p-1.5 rounded-xl transition-all duration-200 hover:rotate-90 cursor-pointer"><X size={16} /></button>
+            </div>
+            
+            <form onSubmit={handleEditMemberSubmit} className="p-4 sm:p-6 pt-4 space-y-4 text-xs font-bold text-slate-600 dark:text-slate-300 max-h-[80vh] overflow-y-auto">
+              <div className="space-y-1 bg-amber-400/10 dark:bg-amber-400/10 p-3 rounded-xl border border-amber-400/30 shadow-xs">
+                <span className="text-[9px] font-black text-amber-700 dark:text-amber-300 uppercase tracking-widest block">Integrante Seleccionado</span>
+                <span className="text-sm font-black text-slate-900 dark:text-white block mt-0.5 capitalize">{editingMember.name}</span>
               </div>
               
-              <form onSubmit={handleEditMemberSubmit} className="p-4 sm:p-6 pt-4 space-y-4 text-xs font-bold text-slate-600 dark:text-slate-300 max-h-[80vh] overflow-y-auto">
-                <div className="space-y-1 bg-indigo-50/60 dark:bg-indigo-950/40 p-3 rounded-xl border border-indigo-100 dark:border-indigo-900/40 shadow-sm">
-                  <span className="text-[9px] font-black text-indigo-700 dark:text-indigo-300 uppercase tracking-widest block">Integrante Seleccionado</span>
-                  <span className="text-sm font-black text-slate-900 dark:text-white block mt-0.5 capitalize">{editingMember.name}</span>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest block mb-1">Selecciona el Cargo</label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {roleCardsOptions.map((roleOpt) => {
+                    const isSelected = editMemberRole === roleOpt.value;
+                    return (
+                      <button
+                        key={roleOpt.value}
+                        type="button"
+                        onClick={() => setEditMemberRole(roleOpt.value)}
+                        className={`w-full text-left p-3.5 rounded-2xl border-2 transition-all duration-300 flex items-center justify-between cursor-pointer transform hover:scale-[1.015] active:scale-[0.985] hover:shadow-xs ${
+                          isSelected ? roleOpt.activeClass : roleOpt.defaultClass
+                        }`}
+                      >
+                        <div className="flex items-center gap-3.5 min-w-0">
+                          <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-colors duration-300 ${isSelected ? roleOpt.activeIconClass : roleOpt.iconClass}`}>
+                            {roleOpt.icon}
+                          </div>
+                          <div className="min-w-0">
+                            <span className="text-xs font-black block uppercase tracking-wide truncate">{roleOpt.label}</span>
+                            <span className={`text-[10px] block font-medium truncate mt-0.5 ${isSelected ? 'opacity-90 font-bold' : 'text-slate-400'}`}>{roleOpt.desc}</span>
+                          </div>
+                        </div>
+                        {isSelected && <CheckCircle2 size={15} className="shrink-0 text-current ml-2 animate-fadeIn" />}
+                      </button>
+                    );
+                  })}
                 </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-3 border-t border-slate-100 dark:border-white/10">
+                <button type="button" onClick={() => setIsEditMemberModalOpen(false)} className="px-5 py-2.5 bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/15 text-slate-700 dark:text-slate-300 rounded-xl font-black uppercase text-[10px] transition-all duration-200 active:scale-95 cursor-pointer">Cancelar</button>
+                <button type="submit" disabled={refreshing} className="px-4 py-2.5 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-black rounded-xl font-black uppercase text-[10px] cursor-pointer transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-1.5 shadow-md shadow-amber-500/20">
+                  {refreshing ? <RefreshCw size={11} className="animate-spin" /> : 'Sincronizar'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* CREATE OR EDIT GROUP MODAL */}
+      {isModalOpen && createPortal(
+        <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-md flex items-center justify-center z-[9999] p-3 sm:p-4 overflow-y-auto animate-fadeIn select-none">
+          <div className="w-full max-w-xl bg-white dark:bg-[#0d0e15] border-2 border-amber-400/40 dark:border-amber-400/30 rounded-3xl shadow-2xl overflow-hidden animate-scaleUp my-auto">
+            {/* Barra de gradiente superior */}
+            <div className="h-1.5 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500" />
+            
+            {/* Header del Modal */}
+            <div className="p-4 sm:p-6 pb-2 flex justify-between items-center border-b border-slate-100 dark:border-white/10">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 text-black rounded-xl shadow-md shadow-amber-500/20 shrink-0">
+                  <Sliders size={16} className="stroke-[2.5]" />
+                </div>
+                <div>
+                  <h3 className="text-xs sm:text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest font-display">
+                    {modalMode === 'CREATE' ? 'Nuevo Grupo Pequeño' : 'Modificar Grupo'}
+                  </h3>
+                </div>
+              </div>
+              <button type="button" onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-white/10 p-1.5 rounded-xl transition-all duration-200 hover:rotate-90 cursor-pointer"><X size={16} /></button>
+            </div>
+
+            <form onSubmit={handleFormSubmit} className="p-4 sm:p-6 pt-4 space-y-4 text-xs font-bold text-slate-600 dark:text-slate-300 max-h-[80vh] overflow-y-auto">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <label className="text-[9px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest block">Nombre del Grupo *</label>
+                  <input type="text" required placeholder="Ej: Siloé" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full p-2.5 bg-slate-50 dark:bg-slate-800/60 border-2 border-slate-200 dark:border-slate-700 hover:border-amber-300 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-100 focus:outline-none focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10 transition duration-200" />
+                </div>
+                <div className="space-y-1">
+                  <label className="text-[9px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest block">Lema o Slogan</label>
+                  <input type="text" placeholder="Ej: Firmes en la fe" value={formData.motto} onChange={(e) => setFormData({...formData, motto: e.target.value})} className="w-full p-2.5 bg-slate-50 dark:bg-slate-800/60 border-2 border-slate-200 dark:border-slate-700 hover:border-amber-300 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-100 focus:outline-none focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10 transition duration-200" />
+                </div>
+              </div>
+              <div className="space-y-1">
+                <label className="text-[9px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest block">Título del Himno Oficial</label>
+                <input type="text" placeholder="Ej: Cuán Grande es Él" value={formData.anthemUrl} onChange={(e) => setFormData({...formData, anthemUrl: e.target.value})} className="w-full p-2.5 bg-slate-50 dark:bg-slate-800/60 border-2 border-slate-200 dark:border-slate-700 hover:border-amber-300 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-100 focus:outline-none focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10 transition duration-200" />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[9px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest block">Versículo Bíblico Corporativo</label>
+                <textarea placeholder="Texto bíblico..." rows={3} value={formData.bibleVerse} onChange={(e) => setFormData({...formData, bibleVerse: e.target.value})} className="w-full p-2.5 bg-slate-50 dark:bg-slate-800/60 border-2 border-slate-200 dark:border-slate-700 hover:border-amber-300 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-100 focus:outline-none focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10 resize-none transition duration-200" />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[9px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest block">Descripción</label>
+                <input type="text" placeholder="Breve reseña..." value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} className="w-full p-2.5 bg-slate-50 dark:bg-slate-800/60 border-2 border-slate-200 dark:border-slate-700 hover:border-amber-300 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-100 focus:outline-none focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10 transition duration-200" />
+              </div>
+              <div className="flex justify-end gap-2 pt-3 border-t border-slate-100 dark:border-white/10">
+                <button type="button" onClick={() => setIsModalOpen(false)} className="px-5 py-2.5 bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/15 text-slate-700 dark:text-slate-300 rounded-xl font-black uppercase text-[10px] transition-all duration-200 active:scale-95 cursor-pointer">Cancelar</button>
+                <button type="submit" disabled={refreshing} className="px-4 py-2.5 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-black rounded-xl font-black uppercase text-[10px] cursor-pointer transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-1.5 shadow-md shadow-amber-500/20">
+                  {refreshing && <RefreshCw size={11} className="animate-spin shrink-0" />} Guardar Registro
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>,
+        document.body
+      )}
+
+      {/* LINK AVAILABLE MEMBER MODAL */}
+      {isLinkModalOpen && createPortal(
+        <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-md flex items-center justify-center z-[9999] p-3 sm:p-4 overflow-y-auto animate-fadeIn select-none">
+          <div className="w-full max-w-xl bg-white dark:bg-[#0d0e15] border-2 border-amber-400/40 dark:border-amber-400/30 rounded-3xl shadow-2xl overflow-hidden animate-scaleUp my-auto">
+            {/* Barra de gradiente superior */}
+            <div className="h-1.5 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500" />
+            
+            {/* Header del Modal */}
+            <div className="p-4 sm:p-6 pb-2 flex justify-between items-center border-b border-slate-100 dark:border-white/10">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 text-black rounded-xl shadow-md shadow-amber-500/20 shrink-0">
+                  <UserCheck size={16} className="stroke-[2.5]" />
+                </div>
+                <h3 className="text-xs sm:text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest font-display">Vincular Integrante</h3>
+              </div>
+              <button type="button" onClick={() => setIsLinkModalOpen(false)} className="text-slate-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-white/10 p-1.5 rounded-xl transition-all duration-200 hover:rotate-90 cursor-pointer"><X size={16} /></button>
+            </div>
+            
+            <form onSubmit={handleLinkSubmit} className="p-4 sm:p-6 pt-4 space-y-4 text-xs font-bold text-slate-600 dark:text-slate-300 max-h-[80vh] overflow-y-auto">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest block">Seleccionar Feligrés Disponible</label>
                 
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black text-violet-600 dark:text-violet-400 uppercase tracking-widest block mb-1">Selecciona el Cargo</label>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                    {roleCardsOptions.map((roleOpt) => {
-                      const isSelected = editMemberRole === roleOpt.value;
+                {availableUsers.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-56 overflow-y-auto pr-1 border border-slate-100 dark:border-slate-800 p-2 rounded-2xl bg-slate-50/50 dark:bg-slate-900/50 scrollbar-none">
+                    {availableUsers.map((user) => {
+                      const isUserSelected = linkData.userId === String(user.id);
                       return (
                         <button
-                          key={roleOpt.value}
+                          key={user.id}
                           type="button"
-                          onClick={() => setEditMemberRole(roleOpt.value)}
-                          className={`w-full text-left p-3.5 rounded-2xl border-2 transition-all duration-300 flex items-center justify-between cursor-pointer transform hover:scale-[1.015] active:scale-[0.985] hover:shadow-xs ${
-                            isSelected ? roleOpt.activeClass : roleOpt.defaultClass
+                          onClick={() => setLinkData({ ...linkData, userId: String(user.id) })}
+                          className={`w-full p-2.5 rounded-xl border text-left flex items-center justify-between transition-all duration-150 transform hover:scale-[1.01] cursor-pointer ${
+                            isUserSelected 
+                              ? 'border-amber-400 dark:border-amber-400 bg-amber-400/15 dark:bg-amber-400/10 text-amber-900 dark:text-amber-300 ring-2 ring-amber-400/30 font-black shadow-xs' 
+                              : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
                           }`}
                         >
-                          <div className="flex items-center gap-3.5 min-w-0">
-                            <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-colors duration-300 ${isSelected ? roleOpt.activeIconClass : roleOpt.iconClass}`}>
-                              {roleOpt.icon}
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <div className={`w-7 h-7 rounded-full flex items-center justify-center font-black text-[10px] shrink-0 ${isUserSelected ? 'bg-amber-400 text-black' : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-400'}`}>
+                              {user.name.charAt(0).toUpperCase()}
                             </div>
-                            <div className="min-w-0">
-                              <span className="text-xs font-black block uppercase tracking-wide truncate">{roleOpt.label}</span>
-                              <span className={`text-[10px] block font-medium truncate mt-0.5 ${isSelected ? 'opacity-90 font-bold' : 'text-slate-400'}`}>{roleOpt.desc}</span>
+                            <div className="truncate">
+                              <span className="text-xs font-bold block truncate">{user.name}</span>
+                              <span className={`text-[9px] block font-mono ${isUserSelected ? 'text-amber-600 dark:text-amber-400 font-bold' : 'text-slate-400 dark:text-slate-400'}`}>{user.email}</span>
                             </div>
                           </div>
-                          {isSelected && <CheckCircle2 size={15} className="shrink-0 text-current ml-2 animate-fadeIn" />}
+                          {isUserSelected && <CheckCircle2 size={14} className="shrink-0 text-current ml-2" />}
                         </button>
                       );
                     })}
                   </div>
-                </div>
-   
-                <div className="flex justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
-                  <button type="button" onClick={() => setIsEditMemberModalOpen(false)} className="px-5 py-2.5 bg-violet-50/50 dark:bg-violet-950/40 border-2 border-violet-100 dark:border-violet-800 hover:border-violet-200 dark:hover:border-violet-700 text-violet-600 dark:text-violet-300 rounded-xl font-black uppercase text-[10px] transition-all duration-200 active:scale-95 cursor-pointer">Cancelar</button>
-                  <button type="submit" disabled={refreshing} className="px-4 py-2.5 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white rounded-xl font-black uppercase text-[10px] cursor-pointer transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-1.5 shadow-md shadow-violet-500/20">
-                    {refreshing ? <RefreshCw size={11} className="animate-spin" /> : 'Sincronizar'}
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* CREATE OR EDIT GROUP MODAL */}
-      {isModalOpen && (
-        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center z-50 p-3 sm:p-4 overflow-y-auto animate-fadeIn">
-          <div className="w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden animated-gradient-border animate-scaleUp my-auto">
-            <div className="animated-gradient-border-content rounded-[22px] overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-              {/* Barra de gradiente superior */}
-              <div className="h-1.5 bg-gradient-to-r from-violet-500 via-indigo-500 via-violet-500 via-fuchsia-500 to-orange-400" />
-              
-              {/* Header del Modal */}
-              <div className="p-4 sm:p-6 pb-2 flex justify-between items-center border-b border-slate-100 dark:border-slate-800">
-                <div className="flex items-center gap-2.5">
-                  <div className="p-2 bg-gradient-to-br from-violet-500 to-fuchsia-600 text-white rounded-xl shadow-md shadow-violet-500/20 shrink-0">
-                    <Sliders size={16} className="stroke-[2.5]" />
-                  </div>
-                  <h3 className="text-xs sm:text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest">{modalMode === 'CREATE' ? 'Nuevo Grupo' : 'Modificar Grupo'}</h3>
-                </div>
-                <button type="button" onClick={() => setIsModalOpen(false)} className="text-violet-500 hover:text-violet-700 hover:bg-violet-50 dark:hover:bg-violet-950/30 p-1.5 rounded-xl transition-all duration-200 hover:rotate-90 cursor-pointer"><X size={16} /></button>
-              </div>
-
-              <form onSubmit={handleFormSubmit} className="p-4 sm:p-6 pt-4 space-y-4 text-xs font-bold text-slate-600 dark:text-slate-300 max-h-[80vh] overflow-y-auto">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <label className="text-[9px] font-black text-violet-600 dark:text-violet-400 uppercase tracking-widest block">Nombre del Grupo *</label>
-                    <input type="text" required placeholder="Ej: Siloé" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full p-2.5 bg-slate-50 dark:bg-slate-800/60 border-2 border-slate-200 dark:border-slate-700 hover:border-violet-300 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-100 focus:outline-none focus:border-violet-500 focus:ring-4 focus:ring-violet-500/10 transition duration-200" />
-                  </div>
-                  <div className="space-y-1">
-                    <label className="text-[9px] font-black text-violet-600 dark:text-violet-400 uppercase tracking-widest block">Lema o Slogan</label>
-                    <input type="text" placeholder="Ej: Firmes en la fe" value={formData.motto} onChange={(e) => setFormData({...formData, motto: e.target.value})} className="w-full p-2.5 bg-slate-50 dark:bg-slate-800/60 border-2 border-slate-200 dark:border-slate-700 hover:border-violet-300 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-100 focus:outline-none focus:border-violet-500 focus:ring-4 focus:ring-violet-500/10 transition duration-200" />
-                  </div>
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[9px] font-black text-violet-600 dark:text-violet-400 uppercase tracking-widest block">Título del Himno Oficial</label>
-                  <input type="text" placeholder="Ej: Cuán Grande es Él" value={formData.anthemUrl} onChange={(e) => setFormData({...formData, anthemUrl: e.target.value})} className="w-full p-2.5 bg-slate-50 dark:bg-slate-800/60 border-2 border-slate-200 dark:border-slate-700 hover:border-violet-300 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-100 focus:outline-none focus:border-violet-500 focus:ring-4 focus:ring-violet-500/10 transition duration-200" />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[9px] font-black text-violet-600 dark:text-violet-400 uppercase tracking-widest block">Versículo Bíblico Corporativo</label>
-                  <textarea placeholder="Texto bíblico..." rows={3} value={formData.bibleVerse} onChange={(e) => setFormData({...formData, bibleVerse: e.target.value})} className="w-full p-2.5 bg-slate-50 dark:bg-slate-800/60 border-2 border-slate-200 dark:border-slate-700 hover:border-violet-300 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-100 focus:outline-none focus:border-violet-500 focus:ring-4 focus:ring-violet-500/10 resize-none transition duration-200" />
-                </div>
-                <div className="space-y-1">
-                  <label className="text-[9px] font-black text-violet-600 dark:text-violet-400 uppercase tracking-widest block">Descripción</label>
-                  <input type="text" placeholder="Breve reseña..." value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})} className="w-full p-2.5 bg-slate-50 dark:bg-slate-800/60 border-2 border-slate-200 dark:border-slate-700 hover:border-violet-300 rounded-xl text-xs font-bold text-slate-800 dark:text-slate-100 focus:outline-none focus:border-violet-500 focus:ring-4 focus:ring-violet-500/10 transition duration-200" />
-                </div>
-                <div className="flex justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
-                  <button type="button" onClick={() => setIsModalOpen(false)} className="px-5 py-2.5 bg-violet-50/50 dark:bg-violet-950/40 border-2 border-violet-100 dark:border-violet-800 hover:border-violet-200 dark:hover:border-violet-700 text-violet-600 dark:text-violet-300 rounded-xl font-black uppercase text-[10px] transition-all duration-200 active:scale-95 cursor-pointer">Cancelar</button>
-                  <button type="submit" disabled={refreshing} className="px-4 py-2.5 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white rounded-xl font-black uppercase text-[10px] cursor-pointer transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-1.5 shadow-md shadow-violet-500/20">
-                    {refreshing && <RefreshCw size={11} className="animate-spin shrink-0" />} Guardar Registro
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* LINK AVAILABLE MEMBER MODAL */}
-      {isLinkModalOpen && (
-        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center z-50 p-3 sm:p-4 overflow-y-auto animate-fadeIn">
-          <div className="w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden animated-gradient-border animate-scaleUp my-auto">
-            <div className="animated-gradient-border-content rounded-[22px] overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-              {/* Barra de gradiente superior */}
-              <div className="h-1.5 bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600" />
-              
-              {/* Header del Modal */}
-              <div className="p-4 sm:p-6 pb-2 flex justify-between items-center border-b border-slate-100 dark:border-slate-800">
-                <div className="flex items-center gap-2.5">
-                  <div className="p-2 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 rounded-xl border border-indigo-100 dark:border-indigo-800/60 shadow-3xs shrink-0">
-                    <UserCheck size={16} className="stroke-[2.5]" />
-                  </div>
-                  <h3 className="text-xs sm:text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest">Vincular Integrante</h3>
-                </div>
-                <button type="button" onClick={() => setIsLinkModalOpen(false)} className="text-indigo-500 hover:text-indigo-700 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 p-1.5 rounded-xl transition-all duration-200 hover:rotate-90 cursor-pointer"><X size={16} /></button>
+                ) : (
+                  <p className="text-[10px] font-black text-slate-400 dark:text-slate-400 py-4 text-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50/30 dark:bg-slate-900/30">No existen feligreses sin vinculación en la central.</p>
+                )}
+                <button 
+                  type="button" 
+                  onClick={switchToCreateMemberModal} 
+                  className="text-[9px] font-black text-amber-600 dark:text-amber-400 hover:underline mt-1 block cursor-pointer uppercase tracking-widest"
+                >
+                  ¿No encuentras al usuario? Regístralo aquí
+                </button>
               </div>
               
-              <form onSubmit={handleLinkSubmit} className="p-4 sm:p-6 pt-4 space-y-4 text-xs font-bold text-slate-600 dark:text-slate-300 max-h-[80vh] overflow-y-auto">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest block">Seleccionar Feligrés Disponible</label>
-                  
-                  {availableUsers.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-56 overflow-y-auto pr-1 border border-slate-100 dark:border-slate-800 p-2 rounded-2xl bg-slate-50/50 dark:bg-slate-900/50 scrollbar-none">
-                      {availableUsers.map((user) => {
-                        const isUserSelected = linkData.userId === String(user.id);
-                        return (
-                          <button
-                            key={user.id}
-                            type="button"
-                            onClick={() => setLinkData({ ...linkData, userId: String(user.id) })}
-                            className={`w-full p-2.5 rounded-xl border text-left flex items-center justify-between transition-all duration-150 transform hover:scale-[1.01] cursor-pointer ${
-                              isUserSelected 
-                                ? 'border-indigo-500 dark:border-indigo-500 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 ring-2 ring-indigo-500/25 font-black shadow-xs' 
-                                : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800'
-                            }`}
-                          >
-                            <div className="flex items-center gap-2.5 min-w-0">
-                              <div className={`w-7 h-7 rounded-full flex items-center justify-center font-black text-[10px] shrink-0 ${isUserSelected ? 'bg-indigo-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-400'}`}>
-                                {user.name.charAt(0).toUpperCase()}
-                              </div>
-                              <div className="truncate">
-                                <span className="text-xs font-bold block truncate">{user.name}</span>
-                                <span className={`text-[9px] block font-mono ${isUserSelected ? 'text-indigo-500 dark:text-indigo-400 font-bold' : 'text-slate-400 dark:text-slate-400'}`}>{user.email}</span>
-                              </div>
-                            </div>
-                            {isUserSelected && <CheckCircle2 size={14} className="shrink-0 text-current ml-2" />}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  ) : (
-                    <p className="text-[10px] font-black text-slate-400 dark:text-slate-400 py-4 text-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl bg-slate-50/30 dark:bg-slate-900/30">No existen feligreses sin vinculación en la central.</p>
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest block">Cargo Asignado en Grupo</label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {roleCardsOptions.map((roleOpt) => {
+                    const isSelected = linkData.groupRole === roleOpt.value;
+                    return (
+                      <button
+                        key={`link-${roleOpt.value}`}
+                        type="button"
+                        onClick={() => setLinkData({ ...linkData, groupRole: roleOpt.value })}
+                        className={`w-full text-left p-3.5 rounded-2xl border-2 transition-all duration-300 flex items-center justify-between cursor-pointer transform hover:scale-[1.015] active:scale-[0.985] hover:shadow-xs ${
+                          isSelected ? roleOpt.activeClass : roleOpt.defaultClass
+                        }`}
+                      >
+                        <div className="flex items-center gap-3.5 min-w-0">
+                          <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-colors duration-300 ${isSelected ? roleOpt.activeIconClass : roleOpt.iconClass}`}>
+                            {roleOpt.icon}
+                          </div>
+                          <div className="min-w-0">
+                            <span className="text-xs font-black block uppercase tracking-wide truncate">{roleOpt.label}</span>
+                            <span className={`text-[10px] block font-medium truncate mt-0.5 ${isSelected ? 'opacity-90 font-bold' : 'text-slate-400 dark:text-slate-400'}`}>{roleOpt.desc}</span>
+                          </div>
+                        </div>
+                        {isSelected && <CheckCircle2 size={15} className="shrink-0 text-current ml-2 animate-fadeIn" />}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-3 border-t border-slate-100 dark:border-white/10">
+                <button type="button" onClick={() => setIsLinkModalOpen(false)} className="px-5 py-2.5 bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/15 text-slate-700 dark:text-slate-300 rounded-xl font-black uppercase text-[10px] cursor-pointer transition-all duration-200 active:scale-95">Cancelar</button>
+                <button type="submit" disabled={availableUsers.length === 0 || refreshing} className="px-4 py-2.5 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-black rounded-xl font-black uppercase text-[10px] cursor-pointer transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-1.5 shadow-md shadow-amber-500/20">
+                  {refreshing && <RefreshCw size={11} className="animate-spin shrink-0" />} Vincular Integrante
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>,
+        document.body
+      )}
+
+       {/* CREATE NEW MEMBER MODAL */}
+      {isCreateMemberModalOpen && createPortal(
+        <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-md flex items-center justify-center z-[9999] p-3 sm:p-4 overflow-y-auto animate-fadeIn select-none">
+          <div className="w-full max-w-xl bg-white dark:bg-[#0d0e15] border-2 border-amber-400/40 dark:border-amber-400/30 rounded-3xl shadow-2xl overflow-hidden animate-scaleUp my-auto">
+            {/* Barra de gradiente superior */}
+            <div className="h-1.5 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500" />
+            
+            {/* Header del Modal */}
+            <div className="p-4 sm:p-6 pb-2 flex justify-between items-center border-b border-slate-100 dark:border-white/10">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 bg-gradient-to-br from-amber-400 via-yellow-500 to-amber-600 text-black rounded-xl shadow-md shadow-amber-500/20 shrink-0">
+                  <UserPlus size={16} className="stroke-[2.5]" />
+                </div>
+                <h3 className="text-xs sm:text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest font-display">Registrar Miembro</h3>
+              </div>
+              <button type="button" onClick={() => setIsCreateMemberModalOpen(false)} className="text-slate-400 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-white/10 p-1.5 rounded-xl transition-all duration-200 hover:rotate-90 cursor-pointer"><X size={16} /></button>
+            </div>
+            
+            <form onSubmit={handleCreateAndLinkSubmit} className="p-4 sm:p-6 pt-4 space-y-4 text-xs font-bold text-slate-600 dark:text-slate-300 max-h-[80vh] overflow-y-auto">
+              <div className="space-y-1">
+                <label className="text-[9px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest block">Nombre Completo *</label>
+                <div className="relative">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 dark:text-slate-400"><UserIcon size={13} /></span>
+                  <input type="text" required placeholder="Ej: Gabriel Espinoza" value={newMemberForm.name} onChange={(e) => setNewMemberForm({...newMemberForm, name: e.target.value})} className="w-full pl-8 p-2.5 bg-slate-50 dark:bg-slate-800/60 border-2 border-slate-200 hover:border-amber-300 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-800 dark:text-white focus:outline-none focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10 focus:bg-white dark:focus:bg-slate-900 transition duration-200" />
+                </div>
+              </div>
+              
+              <div className="space-y-1">
+                <label className="text-[9px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest block">Correo Electrónico *</label>
+                <div className="relative flex gap-2">
+                  <div className="relative flex-1">
+                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 dark:text-slate-400"><Mail size={13} /></span>
+                    <input type="text" required placeholder="ejemplo" value={newMemberForm.email} onChange={(e) => setNewMemberForm({...newMemberForm, email: e.target.value})} className="w-full pl-8 p-2.5 bg-slate-50 dark:bg-slate-800/60 border-2 border-slate-200 hover:border-amber-300 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-800 dark:text-white focus:outline-none focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10 focus:bg-white dark:focus:bg-slate-800/60 transition duration-200" />
+                  </div>
+                  {!newMemberForm.email.includes('@') && newMemberForm.email.trim().length > 0 && (
+                    <button 
+                      type="button" 
+                      onClick={appendGmailSuffix}
+                      className="px-2.5 bg-amber-400/15 border border-amber-400/30 text-amber-700 dark:text-amber-300 rounded-xl font-black text-[10px] transition-colors hover:bg-amber-400/25 cursor-pointer"
+                    >
+                      + @gmail.com
+                    </button>
                   )}
-                  <button 
-                    type="button" 
-                    onClick={switchToCreateMemberModal} 
-                    className="text-[9px] font-black text-indigo-600 dark:text-indigo-400 hover:underline mt-1 block cursor-pointer uppercase tracking-widest"
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-[9px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest block">Contraseña de Acceso</label>
+                <div className="relative">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 dark:text-slate-400"><Lock size={13} /></span>
+                  <input 
+                    type={showMemberPassword ? "text" : "password"} 
+                    placeholder="Ej: 123456 (Opcional - defecto: AliveMaranata2026)" 
+                    value={newMemberForm.password} 
+                    onChange={(e) => setNewMemberForm({...newMemberForm, password: e.target.value})} 
+                    className="w-full pl-8 pr-10 p-2.5 bg-slate-50 dark:bg-slate-800/60 border-2 border-slate-200 hover:border-amber-300 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-800 dark:text-white focus:outline-none focus:border-amber-500 focus:ring-4 focus:ring-amber-500/10 focus:bg-white dark:focus:bg-slate-800/60 transition duration-200" 
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowMemberPassword(!showMemberPassword)}
+                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-amber-500 transition-colors cursor-pointer"
+                    title={showMemberPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
                   >
-                    ¿No encuentras al usuario? Regístralo aquí
+                    {showMemberPassword ? <EyeOff size={14} /> : <Eye size={14} />}
                   </button>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <div className="space-y-1">
+                  <label className="text-[9px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest block">Fecha de Nacimiento</label>
+                  <CustomDatePicker
+                    value={newMemberForm.birthDate}
+                    onChange={(val) => setNewMemberForm({...newMemberForm, birthDate: val})}
+                    placeholder="Seleccionar fecha (Ej: 24/07/1995)"
+                  />
                 </div>
                 
-                <div className="space-y-2">
-                  <label className="text-[10px] font-black text-indigo-600 dark:text-indigo-400 uppercase tracking-widest block">Cargo Asignado en Grupo</label>
+                <div className="space-y-1.5">
+                  <label className="text-[9px] font-black text-amber-600 dark:text-amber-400 uppercase tracking-widest block">Cargo Asignado</label>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                     {roleCardsOptions.map((roleOpt) => {
-                      const isSelected = linkData.groupRole === roleOpt.value;
+                      const isSelected = newMemberForm.groupRole === roleOpt.value;
                       return (
                         <button
-                          key={`link-${roleOpt.value}`}
+                          key={`create-${roleOpt.value}`}
                           type="button"
-                          onClick={() => setLinkData({ ...linkData, groupRole: roleOpt.value })}
+                          onClick={() => setNewMemberForm({ ...newMemberForm, groupRole: roleOpt.value })}
                           className={`w-full text-left p-3.5 rounded-2xl border-2 transition-all duration-300 flex items-center justify-between cursor-pointer transform hover:scale-[1.015] active:scale-[0.985] hover:shadow-xs ${
                             isSelected ? roleOpt.activeClass : roleOpt.defaultClass
                           }`}
@@ -1047,160 +1203,40 @@ export const SecretariaPage: React.FC = () => {
                     })}
                   </div>
                 </div>
-
-                <div className="flex justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
-                  <button type="button" onClick={() => setIsLinkModalOpen(false)} className="px-5 py-2.5 bg-indigo-50/50 dark:bg-indigo-950/40 border-2 border-indigo-100 dark:border-indigo-800 hover:border-indigo-200 dark:hover:border-indigo-700 text-indigo-600 dark:text-indigo-300 rounded-xl font-black uppercase text-[10px] cursor-pointer transition-all duration-200 active:scale-95">Cancelar</button>
-                  <button type="submit" disabled={availableUsers.length === 0 || refreshing} className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-black uppercase text-[10px] cursor-pointer transition-all duration-300 hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-1.5 shadow-xs">
-                    {refreshing && <RefreshCw size={11} className="animate-spin shrink-0" />} Vincular Integrante
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      )}
-
-       {/* CREATE NEW MEMBER MODAL */}
-      {isCreateMemberModalOpen && (
-        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center z-50 p-3 sm:p-4 overflow-y-auto animate-fadeIn">
-          <div className="w-full max-w-xl rounded-3xl shadow-2xl overflow-hidden animated-gradient-border animate-scaleUp my-auto">
-            <div className="animated-gradient-border-content rounded-[22px] overflow-hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800">
-              {/* Barra de gradiente superior */}
-              <div className="h-1.5 bg-gradient-to-r from-emerald-500 to-teal-500" />
-              
-              {/* Header del Modal */}
-              <div className="p-4 sm:p-6 pb-2 flex justify-between items-center border-b border-slate-100 dark:border-slate-800">
-                <div className="flex items-center gap-2.5">
-                  <div className="p-2 bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 rounded-xl border border-emerald-100 dark:border-emerald-800/60 shadow-3xs shrink-0">
-                    <UserPlus size={16} className="stroke-[2.5]" />
-                  </div>
-                  <h3 className="text-xs sm:text-sm font-black text-slate-900 dark:text-white uppercase tracking-widest">Registrar Miembro</h3>
-                </div>
-                <button type="button" onClick={() => setIsCreateMemberModalOpen(false)} className="text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 p-1.5 rounded-xl transition-all duration-200 hover:rotate-90 cursor-pointer"><X size={16} /></button>
               </div>
-              
-              <form onSubmit={handleCreateAndLinkSubmit} className="p-4 sm:p-6 pt-4 space-y-4 text-xs font-bold text-slate-600 dark:text-slate-300 max-h-[80vh] overflow-y-auto">
-                <div className="space-y-1">
-                  <label className="text-[9px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest block">Nombre Completo *</label>
-                  <div className="relative">
-                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 dark:text-slate-400"><UserIcon size={13} /></span>
-                    <input type="text" required placeholder="Ej: Gabriel Espinoza" value={newMemberForm.name} onChange={(e) => setNewMemberForm({...newMemberForm, name: e.target.value})} className="w-full pl-8 p-2.5 bg-slate-50 dark:bg-slate-800/60 border-2 border-slate-200 hover:border-emerald-300 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-800 dark:text-white focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 focus:bg-white dark:focus:bg-slate-900 transition duration-200" />
-                  </div>
-                </div>
-                
-                <div className="space-y-1">
-                  <label className="text-[9px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest block">Correo Electrónico *</label>
-                  <div className="relative flex gap-2">
-                    <div className="relative flex-1">
-                      <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 dark:text-slate-400"><Mail size={13} /></span>
-                      <input type="text" required placeholder="ejemplo" value={newMemberForm.email} onChange={(e) => setNewMemberForm({...newMemberForm, email: e.target.value})} className="w-full pl-8 p-2.5 bg-slate-50 dark:bg-slate-800/60 border-2 border-slate-200 hover:border-emerald-300 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-800 dark:text-white focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 focus:bg-white dark:focus:bg-slate-800/60 transition duration-200" />
-                    </div>
-                    {!newMemberForm.email.includes('@') && newMemberForm.email.trim().length > 0 && (
-                      <button 
-                        type="button" 
-                        onClick={appendGmailSuffix}
-                        className="px-2.5 bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900/60 text-emerald-600 dark:text-emerald-400 rounded-xl font-black text-[10px] transition-colors hover:bg-emerald-100/50 cursor-pointer"
-                      >
-                        + @gmail.com
-                      </button>
-                    )}
-                  </div>
-                </div>
 
-                <div className="space-y-1">
-                  <label className="text-[9px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest block">Contraseña de Acceso</label>
-                  <div className="relative">
-                    <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400 dark:text-slate-400"><Lock size={13} /></span>
-                    <input 
-                      type={showMemberPassword ? "text" : "password"} 
-                      placeholder="Ej: 123456 (Opcional - defecto: AliveMaranata2026)" 
-                      value={newMemberForm.password} 
-                      onChange={(e) => setNewMemberForm({...newMemberForm, password: e.target.value})} 
-                      className="w-full pl-8 pr-10 p-2.5 bg-slate-50 dark:bg-slate-800/60 border-2 border-slate-200 hover:border-emerald-300 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-800 dark:text-white focus:outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 focus:bg-white dark:focus:bg-slate-800/60 transition duration-200" 
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setShowMemberPassword(!showMemberPassword)}
-                      className="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors cursor-pointer"
-                      title={showMemberPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
-                    >
-                      {showMemberPassword ? <EyeOff size={14} /> : <Eye size={14} />}
-                    </button>
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <div className="space-y-1">
-                    <label className="text-[9px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest block">Fecha de Nacimiento</label>
-                    <CustomDatePicker
-                      value={newMemberForm.birthDate}
-                      onChange={(val) => setNewMemberForm({...newMemberForm, birthDate: val})}
-                      placeholder="Seleccionar fecha (Ej: 24/07/1995)"
-                    />
-                  </div>
-                  
-                  <div className="space-y-1.5">
-                    <label className="text-[9px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest block">Cargo Asignado</label>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                      {roleCardsOptions.map((roleOpt) => {
-                        const isSelected = newMemberForm.groupRole === roleOpt.value;
-                        return (
-                          <button
-                            key={`create-${roleOpt.value}`}
-                            type="button"
-                            onClick={() => setNewMemberForm({ ...newMemberForm, groupRole: roleOpt.value })}
-                            className={`w-full text-left p-3.5 rounded-2xl border-2 transition-all duration-300 flex items-center justify-between cursor-pointer transform hover:scale-[1.015] active:scale-[0.985] hover:shadow-xs ${
-                              isSelected ? roleOpt.activeClass : roleOpt.defaultClass
-                            }`}
-                          >
-                            <div className="flex items-center gap-3.5 min-w-0">
-                              <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 transition-colors duration-300 ${isSelected ? roleOpt.activeIconClass : roleOpt.iconClass}`}>
-                                {roleOpt.icon}
-                              </div>
-                              <div className="min-w-0">
-                                <span className="text-xs font-black block uppercase tracking-wide truncate">{roleOpt.label}</span>
-                                <span className={`text-[10px] block font-medium truncate mt-0.5 ${isSelected ? 'opacity-90 font-bold' : 'text-slate-400 dark:text-slate-400'}`}>{roleOpt.desc}</span>
-                              </div>
-                            </div>
-                            {isSelected && <CheckCircle2 size={15} className="shrink-0 text-current ml-2 animate-fadeIn" />}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
-                  <button type="button" onClick={() => setIsCreateMemberModalOpen(false)} className="px-5 py-2.5 bg-emerald-50/50 dark:bg-emerald-950/40 border-2 border-emerald-100 dark:border-emerald-800 hover:border-emerald-200 dark:hover:border-emerald-700 text-emerald-600 dark:text-emerald-300 rounded-xl font-black uppercase text-[10px] cursor-pointer transition-all duration-200 active:scale-95">Volver</button>
-                  <button type="submit" disabled={refreshing} className="px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white rounded-xl font-black uppercase text-[10px] cursor-pointer transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-1.5 shadow-md shadow-emerald-500/20">
-                    {refreshing && <RefreshCw size={11} className="animate-spin shrink-0" />} Registrar e Integrar
-                  </button>
-                </div>
-              </form>
-            </div>
+              <div className="flex justify-end gap-2 pt-3 border-t border-slate-100 dark:border-white/10">
+                <button type="button" onClick={() => setIsCreateMemberModalOpen(false)} className="px-5 py-2.5 bg-slate-100 dark:bg-white/10 border border-slate-200 dark:border-white/15 text-slate-700 dark:text-slate-300 rounded-xl font-black uppercase text-[10px] cursor-pointer transition-all duration-200 active:scale-95">Volver</button>
+                <button type="submit" disabled={refreshing} className="px-4 py-2.5 bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-black rounded-xl font-black uppercase text-[10px] cursor-pointer transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-1.5 shadow-md shadow-amber-500/20">
+                  {refreshing && <RefreshCw size={11} className="animate-spin shrink-0" />} Registrar e Integrar
+                </button>
+              </div>
+            </form>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
       {/* SYSTEM ALERTS */}
-      {alertConfig.isOpen && (
-        <div className="fixed inset-0 bg-slate-900/50 dark:bg-slate-900/70 flex items-center justify-center z-50 p-4 animate-fadeIn">
-          <div className="bg-white dark:bg-slate-900 w-full max-w-xs p-5 rounded-3xl border border-slate-200 dark:border-slate-800 text-center space-y-4 shadow-2xl shadow-black/20">
-            <div className={`w-12 h-12 mx-auto rounded-full flex items-center justify-center bg-blue-50 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400 border border-blue-100 dark:border-indigo-900/40 shadow-xs`}>
+      {alertConfig.isOpen && createPortal(
+        <div className="fixed inset-0 bg-slate-950/75 backdrop-blur-md flex items-center justify-center z-[99999] p-4 animate-fadeIn select-none">
+          <div className="bg-white dark:bg-[#0d0e15] w-full max-w-xs p-5 rounded-3xl border-2 border-amber-400/40 dark:border-amber-400/30 text-center space-y-4 shadow-2xl shadow-black/20">
+            <div className={`w-12 h-12 mx-auto rounded-2xl flex items-center justify-center bg-amber-400/15 text-amber-500 border border-amber-400/30 shadow-xs`}>
               {alertConfig.type === 'success' ? <CheckCircle2 size={24} /> : <AlertTriangle size={24} />}
             </div>
             <div className="space-y-1">
-              <h4 className="text-xs font-black text-slate-800 dark:text-white uppercase tracking-wider">{alertConfig.title}</h4>
+              <h4 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider font-display">{alertConfig.title}</h4>
               <p className="text-[11px] text-slate-500 dark:text-slate-400 font-semibold leading-relaxed">{alertConfig.message}</p>
             </div>
             <button 
               onClick={() => setAlertConfig({ ...alertConfig, isOpen: false })} 
-              className="w-full py-2.5 text-white font-black text-[10px] rounded-xl uppercase tracking-wider cursor-pointer bg-indigo-600 hover:bg-indigo-700 transition-colors shadow-sm shadow-indigo-500/10"
+              className="w-full py-2.5 text-black font-black text-[10px] rounded-xl uppercase tracking-wider cursor-pointer bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 transition-all shadow-md shadow-amber-500/20"
             >
               Entendido
             </button>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
     </div>

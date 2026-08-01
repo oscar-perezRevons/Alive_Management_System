@@ -56,6 +56,7 @@ export const LandingPage: React.FC = () => {
   // Lamborghini-Style Interactive Hero Showcase State
   const [activeTab, setActiveTab] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const tabRefs = React.useRef<(HTMLButtonElement | null)[]>([]);
 
   const isAdmin = accessRole === 'ADMIN';
   const isLeader = accessRole === 'LIDER_GP';
@@ -283,6 +284,19 @@ export const LandingPage: React.FC = () => {
   const toggleTheme = () => {
     setTheme(prev => prev === 'light' ? 'dark' : 'light');
   };
+
+
+  // Auto-scroll active tab pill into view smoothly when activeTab changes
+  useEffect(() => {
+    const activeEl = tabRefs.current[activeTab];
+    if (activeEl) {
+      activeEl.scrollIntoView({
+        behavior: 'smooth',
+        inline: 'center',
+        block: 'nearest'
+      });
+    }
+  }, [activeTab]);
 
   const activeShowcase = SHOWCASE_ITEMS[activeTab];
 
@@ -758,7 +772,7 @@ export const LandingPage: React.FC = () => {
         
         {/* Top Interactive Selector Tabs (Luxury Telemetry Capsule - Anti-Overflow) */}
         <div className="w-full flex items-center justify-center mb-10 px-2">
-          <div className="flex items-center gap-1 sm:gap-2 p-1.5 sm:p-2.5 rounded-2xl sm:rounded-3xl bg-white/90 dark:bg-[#0d0e15]/95 border border-slate-300/80 dark:border-white/15 backdrop-blur-2xl shadow-[0_15px_40px_rgba(0,0,0,0.08)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.6)] overflow-x-auto no-scrollbar max-w-full justify-start md:justify-center">
+          <div className="flex items-center gap-1 sm:gap-2 p-1 sm:p-2.5 rounded-2xl sm:rounded-3xl bg-white/90 dark:bg-[#0d0e15]/95 border border-slate-300/80 dark:border-white/15 backdrop-blur-2xl shadow-[0_15px_40px_rgba(0,0,0,0.08)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.6)] overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden w-full max-w-full justify-start sm:justify-center shrink-0">
             {SHOWCASE_ITEMS.map((item, idx) => {
               const TabIcon = idx === 0 ? Users : idx === 1 ? CalendarDays : idx === 2 ? Trophy : idx === 3 ? Folder : BookOpen;
               const isActive = activeTab === idx;
@@ -766,13 +780,13 @@ export const LandingPage: React.FC = () => {
                 <button
                   key={item.id}
                   onClick={() => setActiveTab(idx)}
-                  className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 lg:px-5 py-2 sm:py-2.5 rounded-xl sm:rounded-2xl text-[10px] sm:text-xs font-black uppercase tracking-wider transition-all duration-300 cursor-pointer whitespace-nowrap shrink-0 group/tab ${
+                  className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 lg:px-5 py-1.5 sm:py-2.5 rounded-xl sm:rounded-2xl text-[9px] sm:text-xs font-black uppercase tracking-wide transition-all duration-300 cursor-pointer whitespace-nowrap shrink-0 group/tab ${
                     isActive 
                       ? 'bg-gradient-to-r from-amber-400 via-yellow-400 to-amber-500 text-black shadow-[0_6px_25px_rgba(234,179,8,0.45)] scale-[1.02] border border-yellow-200/90' 
                       : 'text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white hover:bg-slate-200/80 dark:hover:bg-white/10 border border-transparent'
                   }`}
                 >
-                  <span className={`text-[9px] font-mono font-black px-1.5 py-0.5 rounded-md transition-colors ${
+                  <span className={`text-[8px] sm:text-[9px] font-mono font-black px-1 sm:px-1.5 py-0.5 rounded-md transition-colors ${
                     isActive ? 'bg-black/20 text-black' : 'bg-slate-200 dark:bg-white/10 text-slate-600 dark:text-slate-400 group-hover/tab:text-slate-900 dark:group-hover/tab:text-white'
                   }`}>
                     0{idx + 1}
@@ -868,67 +882,67 @@ export const LandingPage: React.FC = () => {
         </div>
 
         {/* Realtime Metrics Summary Bar (Coherent System Data per Role) */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 pt-16 w-full">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 pt-12 sm:pt-16 w-full">
           {!user ? (
             <>
-              <div className="bg-white/90 dark:bg-white/5 backdrop-blur-xl border border-slate-200 dark:border-white/10 hover:border-amber-500 dark:hover:border-amber-400/50 rounded-3xl p-6 text-center space-y-2 hover:-translate-y-2 transition-all duration-500 shadow-xl group cursor-default">
-                <div className="w-10 h-10 mx-auto rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                  <Users size={20} />
+              <div className="bg-white/90 dark:bg-white/5 backdrop-blur-xl border border-slate-200 dark:border-white/10 hover:border-amber-500 dark:hover:border-amber-400/50 rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 text-center space-y-1.5 sm:space-y-2 hover:-translate-y-2 transition-all duration-500 shadow-xl group cursor-default overflow-hidden">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 mx-auto rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-1 sm:mb-2 group-hover:scale-110 transition-transform shrink-0">
+                  <Users size={18} className="sm:w-5 sm:h-5" />
                 </div>
-                <p className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">+500</p>
-                <p className="text-xs font-black uppercase tracking-wider text-slate-600 dark:text-slate-300">Integrantes Registrados</p>
+                <p className="text-xl xs:text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors truncate tracking-tight">+500</p>
+                <p className="text-[9px] sm:text-xs font-black uppercase tracking-wider text-slate-600 dark:text-slate-300 leading-snug">Integrantes Registrados</p>
               </div>
-              <div className="bg-white/90 dark:bg-white/5 backdrop-blur-xl border border-slate-200 dark:border-white/10 hover:border-amber-500 dark:hover:border-amber-400/50 rounded-3xl p-6 text-center space-y-2 hover:-translate-y-2 transition-all duration-500 shadow-xl group cursor-default">
-                <div className="w-10 h-10 mx-auto rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                  <BookOpen size={20} />
+              <div className="bg-white/90 dark:bg-white/5 backdrop-blur-xl border border-slate-200 dark:border-white/10 hover:border-amber-500 dark:hover:border-amber-400/50 rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 text-center space-y-1.5 sm:space-y-2 hover:-translate-y-2 transition-all duration-500 shadow-xl group cursor-default overflow-hidden">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 mx-auto rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-1 sm:mb-2 group-hover:scale-110 transition-transform shrink-0">
+                  <BookOpen size={18} className="sm:w-5 sm:h-5" />
                 </div>
-                <p className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">5 EDADES</p>
-                <p className="text-xs font-black uppercase tracking-wider text-slate-600 dark:text-slate-300">Guías Devocionales Diarias</p>
+                <p className="text-xl xs:text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors truncate tracking-tight">5 EDADES</p>
+                <p className="text-[9px] sm:text-xs font-black uppercase tracking-wider text-slate-600 dark:text-slate-300 leading-snug">Guías Devocionales Diarias</p>
               </div>
-              <div className="bg-white/90 dark:bg-white/5 backdrop-blur-xl border border-slate-200 dark:border-white/10 hover:border-amber-500 dark:hover:border-amber-400/50 rounded-3xl p-6 text-center space-y-2 hover:-translate-y-2 transition-all duration-500 shadow-xl group cursor-default">
-                <div className="w-10 h-10 mx-auto rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                  <Trophy size={20} />
+              <div className="bg-white/90 dark:bg-white/5 backdrop-blur-xl border border-slate-200 dark:border-white/10 hover:border-amber-500 dark:hover:border-amber-400/50 rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 text-center space-y-1.5 sm:space-y-2 hover:-translate-y-2 transition-all duration-500 shadow-xl group cursor-default overflow-hidden">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 mx-auto rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-1 sm:mb-2 group-hover:scale-110 transition-transform shrink-0">
+                  <Trophy size={18} className="sm:w-5 sm:h-5" />
                 </div>
-                <p className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">100% EN VIVO</p>
-                <p className="text-xs font-black uppercase tracking-wider text-slate-600 dark:text-slate-300">Scoreboards & Ránkings GP</p>
+                <p className="text-xl xs:text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors truncate tracking-tight">100% EN VIVO</p>
+                <p className="text-[9px] sm:text-xs font-black uppercase tracking-wider text-slate-600 dark:text-slate-300 leading-snug">Scoreboards & Ránkings GP</p>
               </div>
-              <div className="bg-white/90 dark:bg-white/5 backdrop-blur-xl border border-slate-200 dark:border-white/10 hover:border-amber-500 dark:hover:border-amber-400/50 rounded-3xl p-6 text-center space-y-2 hover:-translate-y-2 transition-all duration-500 shadow-xl group cursor-default">
-                <div className="w-10 h-10 mx-auto rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                  <CalendarDays size={20} />
+              <div className="bg-white/90 dark:bg-white/5 backdrop-blur-xl border border-slate-200 dark:border-white/10 hover:border-amber-500 dark:hover:border-amber-400/50 rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 text-center space-y-1.5 sm:space-y-2 hover:-translate-y-2 transition-all duration-500 shadow-xl group cursor-default overflow-hidden">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 mx-auto rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-1 sm:mb-2 group-hover:scale-110 transition-transform shrink-0">
+                  <CalendarDays size={18} className="sm:w-5 sm:h-5" />
                 </div>
-                <p className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">GRATIS</p>
-                <p className="text-xs font-black uppercase tracking-wider text-slate-600 dark:text-slate-300">Programa & Biblioteca Digital</p>
+                <p className="text-xl xs:text-2xl sm:text-3xl md:text-4xl font-black text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors truncate tracking-tight">GRATIS</p>
+                <p className="text-[9px] sm:text-xs font-black uppercase tracking-wider text-slate-600 dark:text-slate-300 leading-snug">Programa & Biblioteca Digital</p>
               </div>
             </>
           ) : (
             <>
-              <div className="bg-white/90 dark:bg-white/5 backdrop-blur-xl border border-slate-200 dark:border-white/10 hover:border-amber-500 dark:hover:border-amber-400/50 rounded-3xl p-6 text-center space-y-2 hover:-translate-y-2 transition-all duration-500 shadow-xl group cursor-default">
-                <div className="w-10 h-10 mx-auto rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                  <Users size={20} />
+              <div className="bg-white/90 dark:bg-white/5 backdrop-blur-xl border border-slate-200 dark:border-white/10 hover:border-amber-500 dark:hover:border-amber-400/50 rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 text-center space-y-1.5 sm:space-y-2 hover:-translate-y-2 transition-all duration-500 shadow-xl group cursor-default overflow-hidden">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 mx-auto rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-1 sm:mb-2 group-hover:scale-110 transition-transform shrink-0">
+                  <Users size={18} className="sm:w-5 sm:h-5" />
                 </div>
-                <p className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">SECRETARÍA</p>
-                <p className="text-xs font-black uppercase tracking-wider text-slate-600 dark:text-slate-300">Asistencia & Grupos Pequeños</p>
+                <p className="text-[13px] xs:text-base sm:text-2xl md:text-3xl font-black text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors truncate tracking-tight">SECRETARÍA</p>
+                <p className="text-[9px] sm:text-xs font-black uppercase tracking-wider text-slate-600 dark:text-slate-300 leading-snug">Asistencia & Grupos Pequeños</p>
               </div>
-              <div className="bg-white/90 dark:bg-white/5 backdrop-blur-xl border border-slate-200 dark:border-white/10 hover:border-amber-500 dark:hover:border-amber-400/50 rounded-3xl p-6 text-center space-y-2 hover:-translate-y-2 transition-all duration-500 shadow-xl group cursor-default">
-                <div className="w-10 h-10 mx-auto rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                  <BookOpen size={20} />
+              <div className="bg-white/90 dark:bg-white/5 backdrop-blur-xl border border-slate-200 dark:border-white/10 hover:border-amber-500 dark:hover:border-amber-400/50 rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 text-center space-y-1.5 sm:space-y-2 hover:-translate-y-2 transition-all duration-500 shadow-xl group cursor-default overflow-hidden">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 mx-auto rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-1 sm:mb-2 group-hover:scale-110 transition-transform shrink-0">
+                  <BookOpen size={18} className="sm:w-5 sm:h-5" />
                 </div>
-                <p className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">5 EDADES</p>
-                <p className="text-xs font-black uppercase tracking-wider text-slate-600 dark:text-slate-300">Devocionales Matutinos</p>
+                <p className="text-[13px] xs:text-base sm:text-2xl md:text-3xl font-black text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors truncate tracking-tight">5 EDADES</p>
+                <p className="text-[9px] sm:text-xs font-black uppercase tracking-wider text-slate-600 dark:text-slate-300 leading-snug">Devocionales Matutinos</p>
               </div>
-              <div className="bg-white/90 dark:bg-white/5 backdrop-blur-xl border border-slate-200 dark:border-white/10 hover:border-amber-500 dark:hover:border-amber-400/50 rounded-3xl p-6 text-center space-y-2 hover:-translate-y-2 transition-all duration-500 shadow-xl group cursor-default">
-                <div className="w-10 h-10 mx-auto rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                  <Trophy size={20} />
+              <div className="bg-white/90 dark:bg-white/5 backdrop-blur-xl border border-slate-200 dark:border-white/10 hover:border-amber-500 dark:hover:border-amber-400/50 rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 text-center space-y-1.5 sm:space-y-2 hover:-translate-y-2 transition-all duration-500 shadow-xl group cursor-default overflow-hidden">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 mx-auto rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-1 sm:mb-2 group-hover:scale-110 transition-transform shrink-0">
+                  <Trophy size={18} className="sm:w-5 sm:h-5" />
                 </div>
-                <p className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">EN VIVO</p>
+                <p className="text-[13px] xs:text-base sm:text-2xl md:text-3xl font-black text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors truncate tracking-tight">EN VIVO</p>
                 <p className="text-xs font-black uppercase tracking-wider text-slate-600 dark:text-slate-300">Scoreboards & Ránkings GP</p>
               </div>
-              <div className="bg-white/90 dark:bg-white/5 backdrop-blur-xl border border-slate-200 dark:border-white/10 hover:border-amber-500 dark:hover:border-amber-400/50 rounded-3xl p-6 text-center space-y-2 hover:-translate-y-2 transition-all duration-500 shadow-xl group cursor-default">
-                <div className="w-10 h-10 mx-auto rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-2 group-hover:scale-110 transition-transform">
-                  <Folder size={20} />
+              <div className="bg-white/90 dark:bg-white/5 backdrop-blur-xl border border-slate-200 dark:border-white/10 hover:border-amber-500 dark:hover:border-amber-400/50 rounded-2xl sm:rounded-3xl p-3.5 sm:p-6 text-center space-y-1.5 sm:space-y-2 hover:-translate-y-2 transition-all duration-500 shadow-xl group cursor-default overflow-hidden">
+                <div className="w-8 h-8 sm:w-10 sm:h-10 mx-auto rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 flex items-center justify-center mb-1 sm:mb-2 group-hover:scale-110 transition-transform shrink-0">
+                  <Folder size={18} className="sm:w-5 sm:h-5" />
                 </div>
-                <p className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">REPOSITORIO</p>
-                <p className="text-xs font-black uppercase tracking-wider text-slate-600 dark:text-slate-300">Biblioteca Digital</p>
+                <p className="text-[13px] xs:text-base sm:text-2xl md:text-3xl font-black text-slate-900 dark:text-white group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors truncate tracking-tight">REPOSITORIO</p>
+                <p className="text-[9px] sm:text-xs font-black uppercase tracking-wider text-slate-600 dark:text-slate-300 leading-snug">Biblioteca Digital</p>
               </div>
             </>
           )}
@@ -945,7 +959,7 @@ export const LandingPage: React.FC = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6 gap-8 w-full">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6 gap-5 sm:gap-8 w-full">
           
           {/* Card 1: Secretaría & GP */}
           <Link to={user ? "/dashboard/secretaria" : "/login"} className="bg-white/90 dark:bg-white/5 rounded-3xl border border-slate-200 dark:border-white/10 hover:border-amber-500 dark:hover:border-amber-400/60 overflow-hidden shadow-xl hover:shadow-[0_20px_50px_rgba(234,179,8,0.25)] hover:-translate-y-3 transition-all duration-500 flex flex-col group relative">
@@ -1282,15 +1296,15 @@ export const LandingPage: React.FC = () => {
 
             {/* Metric Feature Pills */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-3xl mx-auto pt-2">
-              <div className="p-3.5 rounded-2xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-slate-200 text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2.5 shadow-sm">
+              <div className="p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-slate-200 text-[10px] sm:text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-sm">
                 <Users size={18} className="text-amber-600 dark:text-amber-400" />
                 <span>+500 INTEGRANTES</span>
               </div>
-              <div className="p-3.5 rounded-2xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-slate-200 text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2.5 shadow-sm">
+              <div className="p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-slate-200 text-[10px] sm:text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-sm">
                 <Folder size={18} className="text-amber-600 dark:text-amber-400" />
                 <span>REPOSITORIO HD</span>
               </div>
-              <div className="p-3.5 rounded-2xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-slate-200 text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2.5 shadow-sm">
+              <div className="p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl bg-slate-100 dark:bg-white/5 border border-slate-200 dark:border-white/10 text-slate-900 dark:text-slate-200 text-[10px] sm:text-xs font-black uppercase tracking-wider flex items-center justify-center gap-2 shadow-sm">
                 <Trophy size={18} className="text-amber-600 dark:text-amber-400" />
                 <span>RÁNKINGS EN VIVO</span>
               </div>
@@ -1301,7 +1315,7 @@ export const LandingPage: React.FC = () => {
               {user ? (
                 <Link
                   to="/dashboard"
-                  className="w-full sm:w-auto px-10 py-5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-black text-sm sm:text-base font-black uppercase tracking-[0.2em] shadow-[0_10px_30px_rgba(234,179,8,0.3)] hover:scale-105 active:scale-95 transition-all duration-300 flex items-center justify-center gap-3 cursor-pointer group/btn"
+                  className="w-full sm:w-auto px-6 py-3.5 sm:px-10 sm:py-5 rounded-xl sm:rounded-2xl bg-amber-400 hover:bg-amber-300 text-black text-xs sm:text-sm md:text-base font-black uppercase tracking-wider sm:tracking-[0.2em] shadow-[0_10px_30px_rgba(234,179,8,0.3)] hover:scale-105 active:scale-95 transition-all duration-300 flex items-center justify-center gap-2 sm:gap-3 cursor-pointer group/btn"
                 >
                   <LayoutDashboard size={20} />
                   <span>MI PANEL DE CONTROL ({user.name.split(' ')[0]})</span>
@@ -1311,7 +1325,7 @@ export const LandingPage: React.FC = () => {
                 <>
                   <Link
                     to="/register"
-                    className="w-full sm:w-auto px-10 py-5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-black text-sm sm:text-base font-black uppercase tracking-[0.2em] shadow-[0_10px_30px_rgba(234,179,8,0.35)] hover:scale-105 active:scale-95 transition-all duration-300 flex items-center justify-center gap-3 cursor-pointer group/btn"
+                    className="w-full sm:w-auto px-6 py-3.5 sm:px-10 sm:py-5 rounded-xl sm:rounded-2xl bg-amber-400 hover:bg-amber-300 text-black text-xs sm:text-sm md:text-base font-black uppercase tracking-wider sm:tracking-[0.2em] shadow-[0_10px_30px_rgba(234,179,8,0.35)] hover:scale-105 active:scale-95 transition-all duration-300 flex items-center justify-center gap-2 sm:gap-3 cursor-pointer group/btn"
                   >
                     <UserPlus size={20} />
                     <span>CREAR MI CUENTA GRATIS</span>
